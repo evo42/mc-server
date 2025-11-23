@@ -1,0 +1,107 @@
+
+services:
+  mc-ilias:
+    build: ./minecraft-base
+    container_name: mc-ilias
+    environment:
+      - EULA=TRUE
+      - VERSION=1.21.10
+      - MEMORY=5G
+      - MAX_MEMORY=10G
+      - TYPE=VANILLA
+      - ONLINE_MODE=false
+      - ENABLE_PROXY_CONNECTIONS=true
+      - MOTD=mc-ilias Server
+    volumes:
+      - ./mc-ilias/data:/data
+      - ./mc-ilias/datapacks:/data/datapacks  # Datapacks volume
+    restart: unless-stopped
+    networks:
+      - minecraft-net
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    expose:
+      - "25565"
+    # No external port mapping since bungeecord will handle access
+
+  mc-niilo:
+    build: ./minecraft-base
+    container_name: mc-niilo
+    environment:
+      - EULA=TRUE
+      - VERSION=1.21.10
+      - MEMORY=5G
+      - MAX_MEMORY=10G
+      - TYPE=VANILLA
+      - ONLINE_MODE=false
+      - ENABLE_PROXY_CONNECTIONS=true
+      - MOTD=mc-niilo Server
+    volumes:
+      - ./mc-niilo/data:/data
+      - ./mc-niilo/datapacks:/data/datapacks  # Datapacks volume
+    restart: unless-stopped
+    networks:
+      - minecraft-net
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    expose:
+      - "25565"
+    # No external port mapping since bungeecord will handle access
+
+  bungeecord:
+    build: ./bungeecord
+    container_name: mc-bungeecord
+    ports:
+      - "25565:25565"  # Main Minecraft port for both servers
+    volumes:
+      - ./bungeecord/config:/home/bungee/server
+    restart: unless-stopped
+    networks:
+      - minecraft-net
+    depends_on:
+      - mc-ilias
+      - mc-niilo
+
+  admin-ui:
+    build: ./admin-ui
+    container_name: mc-admin-ui
+    expose:
+      - "3000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # To interact with Docker
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    networks:
+      - minecraft-net
+      - proxy
+    depends_on:
+      - mc-ilias
+      - mc-niilo
+
+  nginx-proxy-manager:
+    image: 'jc21/nginx-proxy-manager:latest'
+    restart: unless-stopped
+    networks:
+      - proxy
+    ports:
+      # Standard HTTP and HTTPS ports
+      - '80:80'
+      - '81:81'  # Admin panel
+      - '443:443'
+    volumes:
+      - ./nginx-proxy/data:/data
+      - ./nginx-proxy/letsencrypt:/etc/letsencrypt
+
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 30
+    restart: unless-stopped
+
+networks:
+  minecraft-net:
+    driver: bridge
+  proxy:
+    driver: bridge
