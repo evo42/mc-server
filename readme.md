@@ -1,6 +1,6 @@
 # Minecraft Server Setup
 
-This setup provides two Minecraft servers (mc-ilias and mc-niilo) running in Docker containers with the latest Minecraft version (1.21.10) and an admin UI for management.
+This setup provides Minecraft servers (mc-xyz) running in Docker containers with the latest Minecraft version (1.21.10) and an admin UI for management.
 
 ## Components
 
