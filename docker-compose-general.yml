@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  general-server:
+    build: ./general-server
+    container_name: general-server
+    environment:
+      - EULA=TRUE
+      - VERSION=1.21.10
+      - MEMORY=5G
+      - MAX_MEMORY=100G
+      - TYPE=VANILLA
+      - ONLINE_MODE=false
+      - ENABLE_PROXY_CONNECTIONS=true
+      - MOTD=General Server
+    volumes:
+      - ./general/data:/data
+      - ./general/datapacks:/data/datapacks  # Datapacks volume
+    restart: unless-stopped
+    networks:
+      - general_net
+    expose:
+      - "25565"
+    # No external port mapping since this would be handled by proxy if needed
+
+
+networks:
+  general_net:
+    driver: bridge

@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   mc-ilias:
@@ -15,15 +14,12 @@ services:
       - MOTD=mc-ilias Server
     volumes:
       - ./mc-ilias/data:/data
-      - ./mc-ilias/datapacks:/data/datapacks  # Datapacks volume
+      - ./mc-ilias/datapacks:/data/datapacks
     restart: unless-stopped
     networks:
       - minecraft-net
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
     expose:
       - "25565"
-    # No external port mapping since bungeecord will handle access
 
   mc-niilo:
     build: ./minecraft-base
@@ -39,37 +35,172 @@ services:
       - MOTD=mc-niilo Server
     volumes:
       - ./mc-niilo/data:/data
-      - ./mc-niilo/datapacks:/data/datapacks  # Datapacks volume
+      - ./mc-niilo/datapacks:/data/datapacks
     restart: unless-stopped
     networks:
       - minecraft-net
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
     expose:
       - "25565"
-    # No external port mapping since bungeecord will handle access
+
+  mc-bgstpoelten:
+    build: ./minecraft-base
+    container_name: mc-bgstpoelten
+    environment:
+      - EULA=TRUE
+      - VERSION=1.21.10
+      - MEMORY=5G
+      - MAX_MEMORY=10G
+      - TYPE=VANILLA
+      - ONLINE_MODE=false
+      - ENABLE_PROXY_CONNECTIONS=true
+      - MOTD=mc-bgstpoelten Server
+    volumes:
+      - ./bgstpoelten-mc-landing/data:/data
+      - ./bgstpoelten-mc-landing/datapacks:/data/datapacks
+    restart: unless-stopped
+    networks:
+      - minecraft-net
+    expose:
+      - "25565"
+
+  mc-htlstp:
+    build: ./minecraft-base
+    container_name: mc-htlstp
+    environment:
+      - EULA=TRUE
+      - VERSION=1.21.10
+      - MEMORY=5G
+      - MAX_MEMORY=10G
+      - TYPE=VANILLA
+      - ONLINE_MODE=false
+      - ENABLE_PROXY_CONNECTIONS=true
+      - MOTD=mc-htlstp Server
+    volumes:
+      - ./htlstp-mc-landing/data:/data
+      - ./htlstp-mc-landing/datapacks:/data/datapacks
+    restart: unless-stopped
+    networks:
+      - minecraft-net
+    expose:
+      - "25565"
+
+  mc-borgstpoelten:
+    build: ./minecraft-base
+    container_name: mc-borgstpoelten
+    environment:
+      - EULA=TRUE
+      - VERSION=1.21.10
+      - MEMORY=5G
+      - MAX_MEMORY=10G
+      - TYPE=VANILLA
+      - ONLINE_MODE=false
+      - ENABLE_PROXY_CONNECTIONS=true
+      - MOTD=mc-borgstpoelten Server
+    volumes:
+      - ./borgstpoelten-mc-landing/data:/data
+      - ./borgstpoelten-mc-landing/datapacks:/data/datapacks
+    restart: unless-stopped
+    networks:
+      - minecraft-net
+    expose:
+      - "25565"
+
+  mc-hakstpoelten:
+    build: ./minecraft-base
+    container_name: mc-hakstpoelten
+    environment:
+      - EULA=TRUE
+      - VERSION=1.21.10
+      - MEMORY=5G
+      - MAX_MEMORY=10G
+      - TYPE=VANILLA
+      - ONLINE_MODE=false
+      - ENABLE_PROXY_CONNECTIONS=true
+      - MOTD=mc-hakstpoelten Server
+    volumes:
+      - ./hakstpoelten-mc-landing/data:/data
+      - ./hakstpoelten-mc-landing/datapacks:/data/datapacks
+    restart: unless-stopped
+    networks:
+      - minecraft-net
+    expose:
+      - "25565"
+
+  mc-basop-bafep-stp:
+    build: ./minecraft-base
+    container_name: mc-basop-bafep-stp
+    environment:
+      - EULA=TRUE
+      - VERSION=1.21.10
+      - MEMORY=5G
+      - MAX_MEMORY=10G
+      - TYPE=VANILLA
+      - ONLINE_MODE=false
+      - ENABLE_PROXY_CONNECTIONS=true
+      - MOTD=mc-basop-bafep-stp Server
+    volumes:
+      - ./basop-bafep-stp-mc-landing/data:/data
+      - ./basop-bafep-stp-mc-landing/datapacks:/data/datapacks
+    restart: unless-stopped
+    networks:
+      - minecraft-net
+    expose:
+      - "25565"
+
+  mc-play:
+    build: ./minecraft-base
+    container_name: mc-play
+    environment:
+      - EULA=TRUE
+      - VERSION=1.21.10
+      - MEMORY=5G
+      - MAX_MEMORY=10G
+      - TYPE=VANILLA
+      - ONLINE_MODE=false
+      - ENABLE_PROXY_CONNECTIONS=true
+      - MOTD=mc-play Server
+    volumes:
+      - ./play-mc-landing/data:/data
+      - ./play-mc-landing/datapacks:/data/datapacks
+    restart: unless-stopped
+    networks:
+      - minecraft-net
+    expose:
+      - "25565"
 
   bungeecord:
     build: ./bungeecord
     container_name: mc-bungeecord
     ports:
-      - "25565:25565"  # Main Minecraft port for both servers
+      - "25565:25565"
     volumes:
-      - ./bungeecord/config:/home/bungee/server
+      - ./bungeecord/config/config.yml:/home/bungee/server/config.yml:ro
     restart: unless-stopped
     networks:
       - minecraft-net
     depends_on:
       - mc-ilias
       - mc-niilo
+      - mc-bgstpoelten
+      - mc-htlstp
+      - mc-borgstpoelten
+      - mc-hakstpoelten
+      - mc-basop-bafep-stp
+      - mc-play
 
-  admin-ui:
-    build: ./admin-ui
-    container_name: mc-admin-ui
-    ports:
-      - "3000:3000"
+  admin-api:
+    build: ./admin-api
+    container_name: mc-admin-api
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock  # To interact with Docker
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./mc-ilias/datapacks:/app/mc-ilias/datapacks
+      - ./mc-niilo/datapacks:/app/mc-niilo/datapacks
+      - ./bgstpoelten-mc-landing/datapacks:/app/bgstpoelten/datapacks
+      - ./htlstp-mc-landing/datapacks:/app/htlstp/datapacks
+      - ./borgstpoelten-mc-landing/datapacks:/app/borgstpoelten/datapacks
+      - ./hakstpoelten-mc-landing/datapacks:/app/hakstpoelten/datapacks
+      - ./basop-bafep-stp-mc-landing/datapacks:/app/basop-bafep-stp/datapacks
+      - ./play-mc-landing/datapacks:/app/play/datapacks
     environment:
       - NODE_ENV=production
       - ADMIN_USER=${ADMIN_USER:-admin}
@@ -80,13 +211,24 @@ services:
     depends_on:
       - mc-ilias
       - mc-niilo
+      - mc-bgstpoelten
+      - mc-htlstp
+      - mc-borgstpoelten
+      - mc-hakstpoelten
+      - mc-basop-bafep-stp
+      - mc-play
 
-  watchtower:
-    image: containrrr/watchtower
+  nginx:
+    build: ./nginx
+    container_name: mc-nginx
+    ports:
+      - "80:80"
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: --interval 30
-    restart: unless-stopped
+      - ./admin-ui:/usr/share/nginx/html
+    networks:
+      - minecraft-net
+    depends_on:
+      - admin-api
 
 networks:
   minecraft-net:

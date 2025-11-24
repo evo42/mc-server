@@ -1,4 +1,4 @@
-FROM eclipse-temurin:8-jre-alpine
+FROM arm64v8/openjdk:8-jre-alpine
 
 # Install wget
 RUN apk add --no-cache wget
@@ -16,7 +16,7 @@ RUN wget -O BungeeCord.jar https://ci.md-5.net/job/BungeeCord/lastSuccessfulBuil
 # Create necessary directories
 RUN mkdir -p plugins
 
-# Copy default config
+# Copy default config to the appropriate location
 COPY config.yml /home/bungee/config.yml
 
 # Set up startup script

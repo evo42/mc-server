@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  basop-bafep-stp-server:
+    build: ./school-server
+    container_name: basop-bafep-stp-server
+    environment:
+      - EULA=TRUE
+      - VERSION=1.21.10
+      - MEMORY=5G
+      - MAX_MEMORY=100G
+      - TYPE=VANILLA
+      - ONLINE_MODE=false
+      - ENABLE_PROXY_CONNECTIONS=true
+      - MOTD=BASOP BAFEP STP Server
+    volumes:
+      - ./basop-bafep-stp/data:/data
+      - ./basop-bafep-stp/datapacks:/data/datapacks  # Datapacks volume
+    restart: unless-stopped
+    networks:
+      - basop_bafep_stp_net
+    expose:
+      - "25565"
+    # No external port mapping since this would be handled by proxy if needed
+
+
+networks:
+  basop_bafep_stp_net:
+    driver: bridge

@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  mc-niilo:
+    build: ./mc-niilo-server
+    container_name: mc-niilo
+    environment:
+      - EULA=TRUE
+      - VERSION=1.21.10
+      - MEMORY=5G
+      - MAX_MEMORY=100G
+      - TYPE=VANILLA
+      - ONLINE_MODE=false
+      - ENABLE_PROXY_CONNECTIONS=true
+      - MOTD=mc-niilo Server
+    volumes:
+      - ./mc-niilo/data:/data
+      - ./mc-niilo/datapacks:/data/datapacks  # Datapacks volume
+    restart: unless-stopped
+    networks:
+      - mc_niilo_net
+    expose:
+      - "25565"
+    # No external port mapping since this would be handled by proxy if needed
+
+  niilo-admin-ui:
+    build: ./admin-ui
+    container_name: niilo-admin-ui
+    ports:
+      - "3002:3000"  # Using different port to avoid conflict
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # To interact with Docker
+      - ./mc-niilo/datapacks:/app/mc-niilo/datapacks  # Access to mc-niilo datapacks
+    environment:
+      - NODE_ENV=production
+      - ADMIN_USER=${ADMIN_USER:-admin}
+      - ADMIN_PASS=${ADMIN_PASS:-admin123}
+    restart: unless-stopped
+    networks:
+      - mc_niilo_net
+
+networks:
+  mc_niilo_net:
+    driver: bridge

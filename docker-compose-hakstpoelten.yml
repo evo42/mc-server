@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  hakstpoelten-server:
+    build: ./school-server
+    container_name: hakstpoelten-server
+    environment:
+      - EULA=TRUE
+      - VERSION=1.21.10
+      - MEMORY=5G
+      - MAX_MEMORY=100G
+      - TYPE=VANILLA
+      - ONLINE_MODE=false
+      - ENABLE_PROXY_CONNECTIONS=true
+      - MOTD=HAKST Pöllten Server
+    volumes:
+      - ./hakstpoelten/data:/data
+      - ./hakstpoelten/datapacks:/data/datapacks  # Datapacks volume
+    restart: unless-stopped
+    networks:
+      - hakstpoelten_net
+    expose:
+      - "25565"
+    # No external port mapping since this would be handled by proxy if needed
+
+
+networks:
+  hakstpoelten_net:
+    driver: bridge

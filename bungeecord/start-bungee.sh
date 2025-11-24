@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Copy default config if it doesn't exist
 if [ ! -f config.yml ]; then

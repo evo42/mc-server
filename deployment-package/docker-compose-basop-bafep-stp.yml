@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  basop-bafep-stp-server:
+    build: ./school-server
+    container_name: basop-bafep-stp-server
+    environment:
+      - EULA=TRUE
+      - VERSION=1.21.10
+      - MEMORY=5G
+      - MAX_MEMORY=100G
+      - TYPE=VANILLA
+      - ONLINE_MODE=false
+      - ENABLE_PROXY_CONNECTIONS=true
+      - MOTD=BASOP BAFEP STP Server
+    volumes:
+      - ./basop-bafep-stp/data:/data
+      - ./basop-bafep-stp/datapacks:/data/datapacks  # Datapacks volume
+    restart: unless-stopped
+    networks:
+      - basop_bafep_stp_net
+    expose:
+      - "25565"
+    # No external port mapping since this would be handled by proxy if needed
+
+  basop-bafep-stp-admin-ui:
+    build: ./admin-ui
+    container_name: basop-bafep-stp-admin-ui
+    ports:
+      - "3006:3000"  # Using different port to avoid conflict
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # To interact with Docker
+      - ./basop-bafep-stp/datapacks:/app/basop-bafep-stp/datapacks  # Access to basop-bafep-stp server datapacks
+    environment:
+      - NODE_ENV=production
+      - ADMIN_USER=${ADMIN_USER:-admin}
+      - ADMIN_PASS=${ADMIN_PASS:-admin123}
+    restart: unless-stopped
+    networks:
+      - basop_bafep_stp_net
+
+networks:
+  basop_bafep_stp_net:
+    driver: bridge

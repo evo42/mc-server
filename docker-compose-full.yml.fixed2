@@ -1,0 +1,114 @@
+
+services:
+  mc-ilias:
+    build: ./minecraft-base
+    container_name: mc-ilias
+    environment:
+      - EULA=TRUE
+      - VERSION=1.21.10
+      - MEMORY=5G
+      - MAX_MEMORY=10G
+      - TYPE=VANILLA
+      - ONLINE_MODE=false
+      - ENABLE_PROXY_CONNECTIONS=true
+      - MOTD=mc-ilias Server
+    volumes:
+      - ./mc-ilias/data:/data
+      - ./mc-ilias/datapacks:/data/datapacks  # Datapacks volume
+    restart: unless-stopped
+    networks:
+      - minecraft-net
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    ports:
+      - "25565"
+    # No external port mapping since bungeecord will handle access
+
+  mc-niilo:
+    build: ./minecraft-base
+    container_name: mc-niilo
+    environment:
+      - EULA=TRUE
+      - VERSION=1.21.10
+      - MEMORY=5G
+      - MAX_MEMORY=10G
+      - TYPE=VANILLA
+      - ONLINE_MODE=false
+      - ENABLE_PROXY_CONNECTIONS=true
+      - MOTD=mc-niilo Server
+    volumes:
+      - ./mc-niilo/data:/data
+      - ./mc-niilo/datapacks:/data/datapacks  # Datapacks volume
+    restart: unless-stopped
+    networks:
+      - minecraft-net
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    ports:
+      - "25565"
+    # No external port mapping since bungeecord will handle access
+
+  bungeecord:
+    build: ./bungeecord
+    container_name: mc-bungeecord
+    ports:
+      - "25565:25565"  # Main Minecraft port for both servers
+    volumes:
+      - ./bungeecord/config:/home/bungee/server
+    restart: unless-stopped
+    networks:
+      - minecraft-net
+    depends_on:
+      - mc-ilias
+      - mc-niilo
+
+  admin-ui:
+    build: ./admin-ui
+    container_name: mc-admin-ui
+    ports:
+      - "3000:3000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # To interact with Docker
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    networks:
+      - minecraft-net
+    labels:
+      - "traefik.enable=true"
+      # Router for statistics page (map root path to /stats which serves stats.html and is public)
+      - "traefik.http.routers.minecraft-stats.rule=Host(`mc.ikaria.dev`) && Path(`/`)"
+      - "traefik.http.routers.minecraft-stats.entrypoints=websecure"
+      - "traefik.http.routers.minecraft-stats.tls=true"
+      - "traefik.http.routers.minecraft-stats.service=minecraft-service"
+      # Middleware to rewrite root requests to /stats path for the actual content (without redirect)
+      - "traefik.http.middlewares.stats-replacepath.replacepath.path=/stats"
+      - "traefik.http.routers.minecraft-stats.middlewares=stats-replacepath"
+      # Router for admin interface (mc-admin path maps to / which serves index.html and requires auth)
+      - "traefik.http.routers.minecraft-admin.rule=Host(`mc.ikaria.dev`) && PathPrefix(`/mc-admin`)"
+      - "traefik.http.routers.minecraft-admin.entrypoints=websecure"
+      - "traefik.http.routers.minecraft-admin.tls=true"
+      - "traefik.http.routers.minecraft-admin.service=minecraft-service"
+      # Middleware to rewrite /mc-admin prefix to root path (since admin UI serves admin on /)
+      - "traefik.http.middlewares.admin-stripprefix.stripprefix.prefixes=/mc-admin"
+      - "traefik.http.routers.minecraft-admin.middlewares=admin-stripprefix"
+      # Define the backend service
+      - "traefik.http.services.minecraft-service.loadbalancer.server.port=3000"
+      - "traefik.http.services.minecraft-service.loadbalancer.server.scheme=http"
+    depends_on:
+      - mc-ilias
+      - mc-niilo
+
+
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 30
+    environment:
+      - DOCKER_API_VERSION=1.44
+    restart: unless-stopped
+
+networks:
+  minecraft-net:
+    driver: bridge

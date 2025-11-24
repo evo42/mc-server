@@ -1,14 +1,15 @@
-FROM itzg/minecraft-server:latest
+ARG MC_VERSION=1.21
+FROM eclipse-temurin:21-jdk-focal
 
-# Create directories for datapacks
-RUN mkdir -p /data/datapacks
+RUN apt-get update && apt-get install -y wget
 
-VOLUME ["/data"]
+ARG MC_VERSION
+RUN wget https://api.papermc.io/v2/projects/paper/versions/${MC_VERSION}/builds/1/downloads/paper-${MC_VERSION}-1.jar -O /server.jar
+
+WORKDIR /data
+
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 EXPOSE 25565
-
-# Set up entrypoint script
-COPY start-server.sh /start-server.sh
-RUN chmod +x /start-server.sh
-
-CMD ["/start-server.sh"]
+ENTRYPOINT ["/entrypoint.sh"]

@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  mc-ilias:
+    build: ./mc-ilias-server
+    container_name: mc-ilias
+    environment:
+      - EULA=TRUE
+      - VERSION=1.21.10
+      - MEMORY=5G
+      - MAX_MEMORY=100G
+      - TYPE=VANILLA
+      - ONLINE_MODE=false
+      - ENABLE_PROXY_CONNECTIONS=true
+      - MOTD=mc-ilias Server
+    volumes:
+      - ./mc-ilias/data:/data
+      - ./mc-ilias/datapacks:/data/datapacks  # Datapacks volume
+    restart: unless-stopped
+    networks:
+      - mc_ilias_net
+    expose:
+      - "25565"
+    # No external port mapping since this would be handled by proxy if needed
+
+  ilias-admin-ui:
+    build: ./admin-ui
+    container_name: ilias-admin-ui
+    ports:
+      - "3001:3000"  # Using different port to avoid conflict
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # To interact with Docker
+      - ./mc-ilias/datapacks:/app/mc-ilias/datapacks  # Access to mc-ilias datapacks
+    environment:
+      - NODE_ENV=production
+      - ADMIN_USER=${ADMIN_USER:-admin}
+      - ADMIN_PASS=${ADMIN_PASS:-admin123}
+    restart: unless-stopped
+    networks:
+      - mc_ilias_net
+
+networks:
+  mc_ilias_net:
+    driver: bridge
