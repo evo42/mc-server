@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft Server Admin Dashboard</title>
+    <title>Minecraft Server - Lerncraft Stats</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -37,10 +37,38 @@
         header {
             text-align: center;
             margin-bottom: 40px;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.3);
+            padding: 30px 20px;
+            background: linear-gradient(145deg, rgba(0, 0, 0, 0.4), rgba(20, 20, 30, 0.4));
             border-radius: 15px;
             backdrop-filter: blur(10px);
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(100, 150, 200, 0.2);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg,
+                transparent 40%,
+                rgba(52, 152, 219, 0.1) 50%,
+                transparent 60%);
+            z-index: -1;
+        }
+
+        header:hover {
+            transform: translateY(-3px);
+            box-shadow:
+                0 15px 35px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
 
         h1 {
@@ -54,7 +82,7 @@
             opacity: 0.9;
         }
 
-        .dashboard-container {
+        .servers-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
             gap: 30px;
@@ -62,19 +90,37 @@
         }
 
         .server-card {
-            background: rgba(0, 0, 0, 0.6);
+            background: linear-gradient(145deg, rgba(30, 30, 40, 0.7), rgba(20, 20, 30, 0.7));
             border-radius: 15px;
             padding: 25px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(100, 150, 200, 0.3);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            margin: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .server-card::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            bottom: -1px;
+            background: linear-gradient(45deg, rgba(52, 152, 219, 0.3), rgba(155, 89, 182, 0.3), rgba(46, 204, 113, 0.3), rgba(241, 196, 15, 0.3));
+            z-index: -1;
+            border-radius: 16px;
+            opacity: 0.5;
         }
 
         .server-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+            box-shadow:
+                0 15px 50px rgba(52, 152, 219, 0.4),
+                0 12px 40px rgba(0, 0, 0, 0.4);
         }
 
         .server-header {
@@ -119,15 +165,23 @@
             width: 14px;
             height: 14px;
             border-radius: 50%;
+            box-shadow:
+                inset 0 1px 2px rgba(0, 0, 0, 0.3),
+                0 1px 2px rgba(0, 0, 0, 0.2);
         }
 
         .status-indicator.running {
-            background-color: #2ecc71;
-            box-shadow: 0 0 10px #2ecc71;
+            background: linear-gradient(145deg, #2ecc71, #27ae60);
+            box-shadow:
+                inset 0 1px 2px rgba(0, 0, 0, 0.3),
+                0 0 10px rgba(46, 204, 113, 0.5);
         }
 
         .status-indicator.stopped {
-            background-color: #e74c3c;
+            background: linear-gradient(145deg, #e74c3c, #c0392b);
+            box-shadow:
+                inset 0 1px 2px rgba(0, 0, 0, 0.3),
+                0 0 8px rgba(231, 76, 60, 0.4);
         }
 
         .server-info {
@@ -145,48 +199,101 @@
             font-weight: 600;
         }
 
-        .actions {
-            display: flex;
-            gap: 10px;
-            margin: 20px 0;
-            flex-wrap: wrap;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
         }
 
-        button {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 1em;
+        .stat-box {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(200, 200, 200, 0.05));
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                0 2px 4px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        button:hover {
+        .stat-box:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                0 5px 15px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.2), rgba(200, 200, 200, 0.1));
         }
 
-        .btn-start {
-            background: linear-gradient(45deg, #2ecc71, #27ae60);
-            color: white;
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-top: 5px;
         }
 
-        .btn-stop {
-            background: linear-gradient(45deg, #e74c3c, #c0392b);
-            color: white;
+        .chart-container {
+            margin: 25px 0;
+            height: 300px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            /* Add 3D depth effect */
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+                0 8px 16px rgba(0, 0, 0, 0.3),
+                0 0 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            /* Subtle 3D effect using depth */
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
         }
 
-        .btn-restart {
-            background: linear-gradient(45deg, #f39c12, #d35400);
-            color: white;
+        .chart-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 30%;
+            background: linear-gradient(to bottom,
+                rgba(255, 255, 255, 0.15),
+                rgba(255, 255, 255, 0.05));
+            border-radius: 10px 10px 0 0;
+            pointer-events: none;
         }
 
-        .btn-download {
-            background: linear-gradient(45deg, #3498db, #2980b9);
-            color: white;
+        .chart-container::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 20%;
+            background: linear-gradient(to top,
+                rgba(0, 0, 0, 0.4),
+                rgba(0, 0, 0, 0.1));
+            border-radius: 0 0 10px 10px;
+            pointer-events: none;
         }
+
+        .chart-title {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+            /* Add 3D effect to title */
+            text-shadow:
+                0 1px 0 rgba(255, 255, 255, 0.2),
+                0 2px 2px rgba(0, 0, 0, 0.5),
+                0 0 10px rgba(255, 255, 255, 0.3);
+            font-weight: bold;
+            position: relative;
+            z-index: 2;
+        }
+
 
         .admin-section {
             background: rgba(0, 0, 0, 0.6);
@@ -205,37 +312,10 @@
             border-bottom: 2px solid rgba(255, 255, 255, 0.2);
         }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            font-size: 1.1em;
-        }
-
-        .form-row {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-
-        input, select {
-            padding: 12px 15px;
-            border-radius: 30px;
-            border: none;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 1em;
-            width: 100%;
-            backdrop-filter: blur(10px);
-        }
-
-        input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
+        .datapack-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin: 5px 0;
         }
 
         .players-section {
@@ -255,11 +335,25 @@
         }
 
         .player-tag {
-            background: rgba(52, 152, 219, 0.3);
+            background: linear-gradient(145deg, rgba(52, 152, 219, 0.4), rgba(41, 128, 185, 0.3));
             padding: 6px 12px;
             border-radius: 20px;
             font-size: 0.9em;
             border: 1px solid rgba(52, 152, 219, 0.5);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                0 1px 2px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            display: inline-block;
+            margin: 3px;
+        }
+
+        .player-tag:hover {
+            transform: translateY(-1px);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                0 3px 6px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(145deg, rgba(52, 152, 219, 0.5), rgba(41, 128, 185, 0.4));
         }
 
         .no-players {
@@ -292,19 +386,6 @@
             transform: scale(1.05);
         }
 
-        .datapack-item {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            margin: 5px 0;
-        }
-
-        .search-result-item {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 15px;
-            margin: 10px 0;
-        }
-
         footer {
             text-align: center;
             margin-top: 40px;
@@ -315,22 +396,16 @@
         }
 
         @media (max-width: 768px) {
-            .dashboard-container {
+            .servers-container {
                 grid-template-columns: 1fr;
             }
 
-            .form-row {
-                flex-direction: column;
-                gap: 10px;
+            .stats-grid {
+                grid-template-columns: 1fr;
             }
 
             h1 {
                 font-size: 2em;
-            }
-
-            button {
-                width: 100%;
-                margin-bottom: 10px;
             }
         }
     </style>
@@ -338,11 +413,11 @@
 <body>
     <div class="container">
         <header>
-            <h1>🎮 Minecraft Server Admin Dashboard 🎮</h1>
-            <p class="subtitle">Manage your Minecraft servers with ease</p>
+            <h1>🎮 Minecraft Server Status 🎮</h1>
+            <p class="subtitle">Real-time server statistics and player information</p>
         </header>
 
-        <div class="dashboard-container">
+        <div class="servers-container">
             <div class="server-card">
                 <div class="server-header">
                     <div class="server-name"><i class="fas fa-dice-d20"></i> <a href="https://youtube.com/@ikariagames10" style="color: inherit; text-decoration: none;">Ikaria Games</a></div>
@@ -360,24 +435,34 @@
                         <span class="info-label">Version:</span>
                         <span id="ilias-version">1.21.1</span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">Players Online:</span>
-                        <span id="ilias-player-count">0/20</span>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div>Online</div>
+                        <div class="stat-value" id="ilias-player-count">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div>Uptime</div>
+                        <div class="stat-value" id="ilias-uptime">N/A</div>
+                    </div>
+                    <div class="stat-box">
+                        <div>CPU Usage</div>
+                        <div class="stat-value" id="ilias-cpu">N/A</div>
+                    </div>
+                    <div class="stat-box">
+                        <div>Memory Usage</div>
+                        <div class="stat-value" id="ilias-memory">N/A</div>
                     </div>
                 </div>
 
-                <div class="actions">
-                    <button class="btn-start" onclick="startServer('mc-ilias')">Start Server</button>
-                    <button class="btn-stop" onclick="stopServer('mc-ilias')">Stop Server</button>
-                    <button class="btn-restart" onclick="restartServer('mc-ilias')">Restart Server</button>
-                </div>
-
-                <div class="actions">
-                    <button class="btn-download" onclick="downloadWorld('mc-ilias')">Download World</button>
+                <div class="chart-container">
+                    <div class="chart-title">Performance Last 24 Hours</div>
+                    <canvas id="ilias-chart"></canvas>
                 </div>
 
                 <div class="players-section">
-                    <div class="players-title">Active Players:</div>
+                    <div class="players-title">Currently Online:</div>
                     <div class="players-list" id="ilias-players">Checking...</div>
                 </div>
             </div>
@@ -399,24 +484,34 @@
                         <span class="info-label">Version:</span>
                         <span id="niilo-version">1.21.1</span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">Players Online:</span>
-                        <span id="niilo-player-count">0/20</span>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div>Online</div>
+                        <div class="stat-value" id="niilo-player-count">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div>Uptime</div>
+                        <div class="stat-value" id="niilo-uptime">N/A</div>
+                    </div>
+                    <div class="stat-box">
+                        <div>CPU Usage</div>
+                        <div class="stat-value" id="niilo-cpu">N/A</div>
+                    </div>
+                    <div class="stat-box">
+                        <div>Memory Usage</div>
+                        <div class="stat-value" id="niilo-memory">N/A</div>
                     </div>
                 </div>
 
-                <div class="actions">
-                    <button class="btn-start" onclick="startServer('mc-niilo')">Start Server</button>
-                    <button class="btn-stop" onclick="stopServer('mc-niilo')">Stop Server</button>
-                    <button class="btn-restart" onclick="restartServer('mc-niilo')">Restart Server</button>
-                </div>
-
-                <div class="actions">
-                    <button class="btn-download" onclick="downloadWorld('mc-niilo')">Download World</button>
+                <div class="chart-container">
+                    <div class="chart-title">Performance Last 24 Hours</div>
+                    <canvas id="niilo-chart"></canvas>
                 </div>
 
                 <div class="players-section">
-                    <div class="players-title">Active Players:</div>
+                    <div class="players-title">Currently Online:</div>
                     <div class="players-list" id="niilo-players">Checking...</div>
                 </div>
             </div>
@@ -438,24 +533,34 @@
                         <span class="info-label">Version:</span>
                         <span id="bgstpoelten-version">1.21.1</span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">Players Online:</span>
-                        <span id="bgstpoelten-player-count">0/20</span>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div>Online</div>
+                        <div class="stat-value" id="bgstpoelten-player-count">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div>Uptime</div>
+                        <div class="stat-value" id="bgstpoelten-uptime">N/A</div>
+                    </div>
+                    <div class="stat-box">
+                        <div>CPU Usage</div>
+                        <div class="stat-value" id="bgstpoelten-cpu">N/A</div>
+                    </div>
+                    <div class="stat-box">
+                        <div>Memory Usage</div>
+                        <div class="stat-value" id="bgstpoelten-memory">N/A</div>
                     </div>
                 </div>
 
-                <div class="actions">
-                    <button class="btn-start" onclick="startServer('bgstpoelten')">Start Server</button>
-                    <button class="btn-stop" onclick="stopServer('bgstpoelten')">Stop Server</button>
-                    <button class="btn-restart" onclick="restartServer('bgstpoelten')">Restart Server</button>
-                </div>
-
-                <div class="actions">
-                    <button class="btn-download" onclick="downloadWorld('bgstpoelten')">Download World</button>
+                <div class="chart-container">
+                    <div class="chart-title">Performance Last 24 Hours</div>
+                    <canvas id="bgstpoelten-chart"></canvas>
                 </div>
 
                 <div class="players-section">
-                    <div class="players-title">Active Players:</div>
+                    <div class="players-title">Currently Online:</div>
                     <div class="players-list" id="bgstpoelten-players">Checking...</div>
                 </div>
             </div>
@@ -477,24 +582,34 @@
                         <span class="info-label">Version:</span>
                         <span id="htlstp-version">1.21.1</span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">Players Online:</span>
-                        <span id="htlstp-player-count">0/20</span>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div>Online</div>
+                        <div class="stat-value" id="htlstp-player-count">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div>Uptime</div>
+                        <div class="stat-value" id="htlstp-uptime">N/A</div>
+                    </div>
+                    <div class="stat-box">
+                        <div>CPU Usage</div>
+                        <div class="stat-value" id="htlstp-cpu">N/A</div>
+                    </div>
+                    <div class="stat-box">
+                        <div>Memory Usage</div>
+                        <div class="stat-value" id="htlstp-memory">N/A</div>
                     </div>
                 </div>
 
-                <div class="actions">
-                    <button class="btn-start" onclick="startServer('htlstp')">Start Server</button>
-                    <button class="btn-stop" onclick="stopServer('htlstp')">Stop Server</button>
-                    <button class="btn-restart" onclick="restartServer('htlstp')">Restart Server</button>
-                </div>
-
-                <div class="actions">
-                    <button class="btn-download" onclick="downloadWorld('htlstp')">Download World</button>
+                <div class="chart-container">
+                    <div class="chart-title">Performance Last 24 Hours</div>
+                    <canvas id="htlstp-chart"></canvas>
                 </div>
 
                 <div class="players-section">
-                    <div class="players-title">Active Players:</div>
+                    <div class="players-title">Currently Online:</div>
                     <div class="players-list" id="htlstp-players">Checking...</div>
                 </div>
             </div>
@@ -516,24 +631,34 @@
                         <span class="info-label">Version:</span>
                         <span id="borgstpoelten-version">1.21.1</span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">Players Online:</span>
-                        <span id="borgstpoelten-player-count">0/20</span>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div>Online</div>
+                        <div class="stat-value" id="borgstpoelten-player-count">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div>Uptime</div>
+                        <div class="stat-value" id="borgstpoelten-uptime">N/A</div>
+                    </div>
+                    <div class="stat-box">
+                        <div>CPU Usage</div>
+                        <div class="stat-value" id="borgstpoelten-cpu">N/A</div>
+                    </div>
+                    <div class="stat-box">
+                        <div>Memory Usage</div>
+                        <div class="stat-value" id="borgstpoelten-memory">N/A</div>
                     </div>
                 </div>
 
-                <div class="actions">
-                    <button class="btn-start" onclick="startServer('borgstpoelten')">Start Server</button>
-                    <button class="btn-stop" onclick="stopServer('borgstpoelten')">Stop Server</button>
-                    <button class="btn-restart" onclick="restartServer('borgstpoelten')">Restart Server</button>
-                </div>
-
-                <div class="actions">
-                    <button class="btn-download" onclick="downloadWorld('borgstpoelten')">Download World</button>
+                <div class="chart-container">
+                    <div class="chart-title">Performance Last 24 Hours</div>
+                    <canvas id="borgstpoelten-chart"></canvas>
                 </div>
 
                 <div class="players-section">
-                    <div class="players-title">Active Players:</div>
+                    <div class="players-title">Currently Online:</div>
                     <div class="players-list" id="borgstpoelten-players">Checking...</div>
                 </div>
             </div>
@@ -555,24 +680,34 @@
                         <span class="info-label">Version:</span>
                         <span id="hakstpoelten-version">1.21.1</span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">Players Online:</span>
-                        <span id="hakstpoelten-player-count">0/20</span>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div>Online</div>
+                        <div class="stat-value" id="hakstpoelten-player-count">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div>Uptime</div>
+                        <div class="stat-value" id="hakstpoelten-uptime">N/A</div>
+                    </div>
+                    <div class="stat-box">
+                        <div>CPU Usage</div>
+                        <div class="stat-value" id="hakstpoelten-cpu">N/A</div>
+                    </div>
+                    <div class="stat-box">
+                        <div>Memory Usage</div>
+                        <div class="stat-value" id="hakstpoelten-memory">N/A</div>
                     </div>
                 </div>
 
-                <div class="actions">
-                    <button class="btn-start" onclick="startServer('hakstpoelten')">Start Server</button>
-                    <button class="btn-stop" onclick="stopServer('hakstpoelten')">Stop Server</button>
-                    <button class="btn-restart" onclick="restartServer('hakstpoelten')">Restart Server</button>
-                </div>
-
-                <div class="actions">
-                    <button class="btn-download" onclick="downloadWorld('hakstpoelten')">Download World</button>
+                <div class="chart-container">
+                    <div class="chart-title">Performance Last 24 Hours</div>
+                    <canvas id="hakstpoelten-chart"></canvas>
                 </div>
 
                 <div class="players-section">
-                    <div class="players-title">Active Players:</div>
+                    <div class="players-title">Currently Online:</div>
                     <div class="players-list" id="hakstpoelten-players">Checking...</div>
                 </div>
             </div>
@@ -594,24 +729,34 @@
                         <span class="info-label">Version:</span>
                         <span id="basopbafepstp-version">1.21.1</span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">Players Online:</span>
-                        <span id="basopbafepstp-player-count">0/20</span>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div>Online</div>
+                        <div class="stat-value" id="basopbafepstp-player-count">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div>Uptime</div>
+                        <div class="stat-value" id="basopbafepstp-uptime">N/A</div>
+                    </div>
+                    <div class="stat-box">
+                        <div>CPU Usage</div>
+                        <div class="stat-value" id="basopbafepstp-cpu">N/A</div>
+                    </div>
+                    <div class="stat-box">
+                        <div>Memory Usage</div>
+                        <div class="stat-value" id="basopbafepstp-memory">N/A</div>
                     </div>
                 </div>
 
-                <div class="actions">
-                    <button class="btn-start" onclick="startServer('basopbafepstp')">Start Server</button>
-                    <button class="btn-stop" onclick="stopServer('basopbafepstp')">Stop Server</button>
-                    <button class="btn-restart" onclick="restartServer('basopbafepstp')">Restart Server</button>
-                </div>
-
-                <div class="actions">
-                    <button class="btn-download" onclick="downloadWorld('basopbafepstp')">Download World</button>
+                <div class="chart-container">
+                    <div class="chart-title">Performance Last 24 Hours</div>
+                    <canvas id="basopbafepstp-chart"></canvas>
                 </div>
 
                 <div class="players-section">
-                    <div class="players-title">Active Players:</div>
+                    <div class="players-title">Currently Online:</div>
                     <div class="players-list" id="basopbafepstp-players">Checking...</div>
                 </div>
             </div>
@@ -633,58 +778,35 @@
                         <span class="info-label">Version:</span>
                         <span id="play-version">1.21.1</span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">Players Online:</span>
-                        <span id="play-player-count">0/20</span>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div>Online</div>
+                        <div class="stat-value" id="play-player-count">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div>Uptime</div>
+                        <div class="stat-value" id="play-uptime">N/A</div>
+                    </div>
+                    <div class="stat-box">
+                        <div>CPU Usage</div>
+                        <div class="stat-value" id="play-cpu">N/A</div>
+                    </div>
+                    <div class="stat-box">
+                        <div>Memory Usage</div>
+                        <div class="stat-value" id="play-memory">N/A</div>
                     </div>
                 </div>
 
-                <div class="actions">
-                    <button class="btn-start" onclick="startServer('play')">Start Server</button>
-                    <button class="btn-stop" onclick="stopServer('play')">Stop Server</button>
-                    <button class="btn-restart" onclick="restartServer('play')">Restart Server</button>
-                </div>
-
-                <div class="actions">
-                    <button class="btn-download" onclick="downloadWorld('play')">Download World</button>
+                <div class="chart-container">
+                    <div class="chart-title">Performance Last 24 Hours</div>
+                    <canvas id="play-chart"></canvas>
                 </div>
 
                 <div class="players-section">
-                    <div class="players-title">Active Players:</div>
+                    <div class="players-title">Currently Online:</div>
                     <div class="players-list" id="play-players">Checking...</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="admin-section">
-            <h2 class="section-title">Admin Permissions</h2>
-            <p>Manage admin permissions for players</p>
-
-            <div class="form-group">
-                <label for="username">Player Username:</label>
-                <input type="text" id="username" placeholder="Enter player username">
-            </div>
-
-            <div class="form-row">
-                <div class="form-group" style="flex: 1;">
-                    <label for="server-select">Select Server:</label>
-                    <select id="server-select">
-                        <option value="mc-ilias">Ikaria Games</option>
-                        <option value="mc-niilo">Königreich der letzten Krieger</option>
-                        <option value="bgstpoelten">BGST Pölten</option>
-                        <option value="htlstp">HTL St. Pölten</option>
-                        <option value="borgstpoelten">BORG St. Pölten</option>
-                        <option value="hakstpoelten">HAK St. Pölten</option>
-                        <option value="basopbafepstp">BASOP/BAFEP St. Pölten</option>
-                        <option value="play">Allgemeiner Spielserver</option>
-                    </select>
-                </div>
-
-                <div class="form-group" style="flex: 1; display: flex; align-items: flex-end;">
-                    <div class="actions" style="width: 100%;">
-                        <button class="btn-start" onclick="addAdmin()">Add Admin</button>
-                        <button class="btn-stop" onclick="removeAdmin()">Remove Admin</button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -718,6 +840,7 @@
             </div>
         </section>
 
+        <!-- Installed Datapacks Section -->
         <div class="admin-section">
             <h2 class="section-title">Installed Datapacks</h2>
             <div class="dashboard-container">
@@ -779,32 +902,21 @@
             </div>
         </div>
 
-        <div class="admin-section">
-            <h2 class="section-title">Install New Datapacks</h2>
-            <div class="form-group">
-                <label for="search-datapacks">Search for Datapacks/Mods:</label>
-                <div class="form-row">
-                    <div class="form-group" style="flex: 1;">
-                        <input type="text" id="search-datapacks" placeholder="Enter datapack name..." onkeyup="handleSearchKeyup(event)">
-                        <button class="btn-start" onclick="searchDatapacks()" style="margin-top: 10px;">Search</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="search-results" style="margin-top: 20px;">
-                <p>Search for datapacks to install</p>
-            </div>
-        </div>
-
-        <button class="refresh-btn" onclick="refreshAll()">🔄 Refresh All Data</button>
+        <button class="refresh-btn" onclick="refreshStats()">🔄 Refresh Stats</button>
         <div class="last-updated" id="last-updated">Last updated: Just now</div>
 
         <footer>
-            <p>Minecraft Server Admin Dashboard | Secure Management Interface</p>
+            <p>Minecraft Server Statistics Dashboard | Updated in real-time</p>
         </footer>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/lines/LineMaterial.js"></script>
     <script>
+        // Chart instances
+        let iliasChart, niiloChart;
+
         // Function to update stats
         async function updateStats() {
             try {
@@ -879,7 +991,25 @@
             // Update player count
             const playerCount = document.getElementById(`${server}-player-count`);
             if (playerCount) {
-                playerCount.textContent = `${data.playerCount}/20`;
+                playerCount.textContent = data.playerCount || 0;
+            }
+
+            // Update CPU usage
+            const cpuElement = document.getElementById(`${server}-cpu`);
+            if (cpuElement) {
+                cpuElement.textContent = data.cpu || 'N/A';
+            }
+
+            // Update memory usage
+            const memoryElement = document.getElementById(`${server}-memory`);
+            if (memoryElement) {
+                memoryElement.textContent = data.memory || 'N/A';
+            }
+
+            // Update uptime (for now, just show generic message)
+            const uptimeElement = document.getElementById(`${server}-uptime`);
+            if (uptimeElement) {
+                uptimeElement.textContent = data.status === 'Running' ? 'Active' : 'Offline';
             }
 
             // Update players list
@@ -899,195 +1029,360 @@
             }
         }
 
-        // Function to start server
-        async function startServer(serverName) {
-            if (!confirm(`Are you sure you want to start ${serverName}?`)) {
-                return;
-            }
-
+        // Function to load and display historical data
+        async function loadHistoricalData() {
             try {
-                const response = await fetch(`/api/start/${serverName}`, {
-                    method: 'POST'
-                });
+                const [iliasHistory, niiloHistory, bgstpoeltenHistory, htlstpHistory, borgstpoeltenHistory, hakstpoeltenHistory, basopbafepstpHistory, playHistory] = await Promise.all([
+                    fetch('/api/public/history/mc-ilias').then(r => r.json()).catch(() => []),
+                    fetch('/api/public/history/mc-niilo').then(r => r.json()).catch(() => []),
+                    fetch('/api/public/history/bgstpoelten').then(r => r.json()).catch(() => []),
+                    fetch('/api/public/history/htlstp').then(r => r.json()).catch(() => []),
+                    fetch('/api/public/history/borgstpoelten').then(r => r.json()).catch(() => []),
+                    fetch('/api/public/history/hakstpoelten').then(r => r.json()).catch(() => []),
+                    fetch('/api/public/history/basopbafepstp').then(r => r.json()).catch(() => []),
+                    fetch('/api/public/history/play').then(r => r.json()).catch(() => [])
+                ]);
 
-                if (response.ok) {
-                    alert(`${serverName} started successfully!`);
-                    setTimeout(() => updateStats(), 2000); // Refresh after 2 seconds
-                } else {
-                    const errorText = await response.text();
-                    alert(`Failed to start ${serverName}: ${response.status} - ${errorText}`);
-                }
+                // Create/update charts
+                createOrUpdateChart('ilias-chart', iliasHistory);
+                createOrUpdateChart('niilo-chart', niiloHistory);
+                createOrUpdateChart('bgstpoelten-chart', bgstpoeltenHistory);
+                createOrUpdateChart('htlstp-chart', htlstpHistory);
+                createOrUpdateChart('borgstpoelten-chart', borgstpoeltenHistory);
+                createOrUpdateChart('hakstpoelten-chart', hakstpoeltenHistory);
+                createOrUpdateChart('basopbafepstp-chart', basopbafepstpHistory);
+                createOrUpdateChart('play-chart', playHistory);
             } catch (error) {
-                console.error(`Error starting ${serverName}:`, error);
-                alert(`Error starting ${serverName}: ${error.message}`);
+                console.error('Error loading historical data:', error);
             }
         }
 
-        // Function to stop server
-        async function stopServer(serverName) {
-            if (!confirm(`Are you sure you want to stop ${serverName}?`)) {
-                return;
-            }
+        // Function to create or update a chart
+        function createOrUpdateChart(canvasId, historyData) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
 
-            try {
-                const response = await fetch(`/api/stop/${serverName}`, {
-                    method: 'POST'
+            // Process data for chart
+            let timestamps = [];
+            let playerCounts = [];
+            let cpuUsage = [];
+            let memoryUsage = [];
+
+            if (historyData && historyData.length > 0) {
+                // Sort by timestamp to ensure proper order
+                historyData.sort((a, b) => a.timestamp - b.timestamp);
+
+                // Filter data to last 24 hours only
+                const now = new Date();
+                const twentyFourHoursAgo = new Date(now.getTime() - (24 * 60 * 60 * 1000));
+
+                // Filter and sample data to reduce frequency
+                const filteredData = [];
+                historyData.forEach(dataPoint => {
+                    const dataTime = new Date(dataPoint.timestamp);
+
+                    // Only include data from the last 24 hours
+                    if (dataTime >= twentyFourHoursAgo) {
+                        filteredData.push(dataPoint);
+                    }
                 });
 
-                if (response.ok) {
-                    alert(`${serverName} stopped successfully!`);
-                    setTimeout(() => updateStats(), 2000); // Refresh after 2 seconds
-                } else {
-                    const errorText = await response.text();
-                    alert(`Failed to stop ${serverName}: ${response.status} - ${errorText}`);
+                // Sample the data to reduce frequency - keep every nth point
+                // Ensure we have between 8 and 24 points for optimal visualization
+                const maxPoints = 24;
+                const minPoints = 8;
+                let samplingRate = 1;
+
+                if (filteredData.length > maxPoints) {
+                    samplingRate = Math.ceil(filteredData.length / maxPoints);
+                } else if (filteredData.length > minPoints) {
+                    samplingRate = Math.ceil(filteredData.length / 16); // Intermediate value
                 }
-            } catch (error) {
-                console.error(`Error stopping ${serverName}:`, error);
-                alert(`Error stopping ${serverName}: ${error.message}`);
-            }
-        }
 
-        // Function to restart server
-        async function restartServer(serverName) {
-            if (!confirm(`Are you sure you want to restart ${serverName}? This will temporarily disconnect all players.`)) {
-                return;
-            }
+                for (let i = 0; i < filteredData.length; i += samplingRate) {
+                    const dataPoint = filteredData[i];
+                    const dataTime = new Date(dataPoint.timestamp);
 
-            try {
-                const response = await fetch(`/api/restart/${serverName}`, {
-                    method: 'POST'
-                });
+                    // Convert timestamp to human-readable format
+                    timestamps.push(dataTime.toLocaleTimeString());
 
-                if (response.ok) {
-                    alert(`${serverName} restarted successfully!`);
-                    setTimeout(() => updateStats(), 2000); // Refresh after 2 seconds
-                } else {
-                    const errorText = await response.text();
-                    alert(`Failed to restart ${serverName}: ${response.status} - ${errorText}`);
+                    // Extract player count
+                    playerCounts.push(dataPoint.playerCount || 0);
+
+                    // Extract CPU usage (remove % symbol)
+                    let cpu = dataPoint.cpu || '0%';
+                    if (typeof cpu === 'string') {
+                        cpu = parseFloat(cpu.replace('%', '')) || 0;
+                    }
+                    cpuUsage.push(cpu);
+
+                    // Extract Memory usage (simplified)
+                    let memory = dataPoint.memory || '0GB';
+                    // For memory, we'll just extract GB value for simplicity
+                    const memoryMatch = memory.match(/([\d.]+)G/);
+                    if (memoryMatch) {
+                        memory = parseFloat(memoryMatch[1]);
+                    } else if (typeof memory === 'string') {
+                        // If it's a string like "N/A", set to 0
+                        memory = 0;
+                    }
+                    memoryUsage.push(memory);
                 }
-            } catch (error) {
-                console.error(`Error restarting ${serverName}:`, error);
-                alert(`Error restarting ${serverName}: ${error.message}`);
-            }
-        }
-
-        // Function to download world
-        async function downloadWorld(serverName) {
-            if (!confirm(`Are you sure you want to download the world from ${serverName}? This may take a while.`)) {
-                return;
             }
 
-            try {
-                const response = await fetch(`/api/download/world/${serverName}`, {
-                    method: 'GET'
-                });
-
-                if (response.ok) {
-                    const blob = await response.blob();
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `${serverName}-world.zip`;
-                    document.body.appendChild(a);
-                    a.click();
-                    window.URL.revokeObjectURL(url);
-                    document.body.removeChild(a);
-                    alert(`Download started for ${serverName} world!`);
-                } else {
-                    const errorText = await response.text();
-                    alert(`Failed to download world: ${response.status} - ${errorText}`);
-                }
-            } catch (error) {
-                console.error('Error downloading world:', error);
-                alert(`Error downloading world: ${error.message}`);
+            // Destroy existing chart if it exists
+            const chartId = canvasId.replace('-chart', '');
+            let existingChart;
+            switch(chartId) {
+                case 'ilias':
+                    existingChart = iliasChart;
+                    break;
+                case 'niilo':
+                    existingChart = niiloChart;
+                    break;
+                case 'bgstpoelten':
+                    existingChart = bgstpoeltenChart;
+                    break;
+                case 'htlstp':
+                    existingChart = htlstpChart;
+                    break;
+                case 'borgstpoelten':
+                    existingChart = borgstpoeltenChart;
+                    break;
+                case 'hakstpoelten':
+                    existingChart = hakstpoeltenChart;
+                    break;
+                case 'basopbafepstp':
+                    existingChart = basopbafepstpChart;
+                    break;
+                case 'play':
+                    existingChart = playChart;
+                    break;
+                default:
+                    existingChart = null;
             }
-        }
-
-        // Function to add admin
-        async function addAdmin() {
-            const username = document.getElementById('username').value.trim();
-            const serverName = document.getElementById('server-select').value;
-
-            if (!username) {
-                alert('Please enter a username');
-                return;
-            }
-
-            if (!confirm(`Are you sure you want to add ${username} as admin to ${serverName}?`)) {
-                return;
+            if (existingChart) {
+                existingChart.destroy();
             }
 
-            try {
-                const response = await fetch(`/api/admin/add/${serverName}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
+            // Create new chart with 3D effects
+            const newChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: timestamps,
+                    datasets: [
+                        {
+                            label: '\uD83C\uDFAE Online', // Gamer controller emoji
+                            data: playerCounts,
+                            borderColor: 'rgb(54, 162, 235)',
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            yAxisID: 'y',
+                            // Remove the line and show as points for the Online metric
+                            showLine: false,
+                            pointRadius: 6,
+                            pointStyle: 'circle',
+                            pointBackgroundColor: 'rgba(54, 162, 235, 0.8)',
+                            pointBorderColor: 'rgba(255, 255, 255, 0.9)',
+                            pointBorderWidth: 2,
+                            pointHoverRadius: 8,
+                            // Add 3D effect to points
+                            borderCapStyle: 'round',
+                            borderJoinStyle: 'round'
+                        },
+                        {
+                            label: 'CPU %',
+                            data: cpuUsage,
+                            borderColor: 'rgb(255, 99, 132)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                            yAxisID: 'y1',
+                            fill: true, // Fill area under line to create heatmap-like effect
+                            pointRadius: 0,
+                            borderWidth: 4,
+                            borderCapStyle: 'round',
+                            borderJoinStyle: 'round',
+                            // Add 3D effect to line
+                            tension: 0.4, // Smoother curves for 3D effect
+                        },
+                        {
+                            label: 'Memory (GB)',
+                            data: memoryUsage,
+                            borderColor: 'rgb(75, 192, 192)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                            yAxisID: 'y1',
+                            pointRadius: 0,
+                            borderWidth: 4,
+                            borderCapStyle: 'round',
+                            borderJoinStyle: 'round',
+                            // Add 3D effect to line
+                            tension: 0.4, // Smoother curves for 3D effect
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                // Add 3D effect to legend text
+                                font: {
+                                    size: 12,
+                                    family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+                                },
+                                // Add text shadow for 3D effect
+                                color: 'rgba(255, 255, 255, 0.9)'
+                            }
+                        },
+                        tooltip: {
+                            // 3D effect for tooltips
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            borderColor: 'rgba(255, 255, 255, 0.3)',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            displayColors: true,
+                            padding: 12,
+                            boxPadding: 6,
+                            // Add shadow for 3D effect
+                            xPadding: 15,
+                            yPadding: 15,
+                            caretSize: 10,
+                            caretPadding: 15
+                        },
+                        // Add 3D-like lighting effect
+                        filler: {
+                            propagate: false
+                        }
                     },
-                    body: JSON.stringify({ username: username })
-                });
-
-                if (response.ok) {
-                    alert(`Added ${username} as admin to ${serverName}!`);
-                    document.getElementById('username').value = '';
-                } else {
-                    const errorText = await response.text();
-                    alert(`Failed to add admin: ${response.status} - ${errorText}`);
-                }
-            } catch (error) {
-                console.error('Error adding admin:', error);
-                alert(`Error adding admin: ${error.message}`);
-            }
-        }
-
-        // Function to remove admin
-        async function removeAdmin() {
-            const username = document.getElementById('username').value.trim();
-            const serverName = document.getElementById('server-select').value;
-
-            if (!username) {
-                alert('Please enter a username');
-                return;
-            }
-
-            if (!confirm(`Are you sure you want to remove ${username} as admin from ${serverName}?`)) {
-                return;
-            }
-
-            try {
-                const response = await fetch(`/api/admin/remove/${serverName}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Time',
+                                // Add 3D effect to axis title
+                                color: 'rgba(255, 255, 255, 0.9)',
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                }
+                            },
+                            // 3D grid lines
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)',
+                                tickColor: 'rgba(255, 255, 255, 0.2)',
+                                lineWidth: 1
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.8)',
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Online',
+                                // Add 3D effect to axis title
+                                color: 'rgba(255, 255, 255, 0.9)',
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                }
+                            },
+                            min: 0,
+                            // 3D grid lines
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)',
+                                tickColor: 'rgba(255, 255, 255, 0.2)',
+                                lineWidth: 1
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.8)'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'CPU % / Memory (GB)',
+                                // Add 3D effect to axis title
+                                color: 'rgba(255, 255, 255, 0.9)',
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                }
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                                color: 'rgba(255, 255, 255, 0.1)',
+                                tickColor: 'rgba(255, 255, 255, 0.2)',
+                                lineWidth: 1
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.8)'
+                            }
+                        }
                     },
-                    body: JSON.stringify({ username: username })
-                });
-
-                if (response.ok) {
-                    alert(`Removed ${username} as admin from ${serverName}!`);
-                    document.getElementById('username').value = '';
-                } else {
-                    const errorText = await response.text();
-                    alert(`Failed to remove admin: ${response.status} - ${errorText}`);
+                    // Add 3D lighting effects
+                    elements: {
+                        point: {
+                            hoverBackgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            hoverBorderWidth: 2
+                        },
+                        line: {
+                            borderWidth: 3,
+                            borderCapStyle: 'round',
+                            borderJoinStyle: 'round',
+                            // Add drop shadow for 3D effect
+                            borderDashOffset: 0,
+                            tension: 0.4
+                        }
+                    }
                 }
-            } catch (error) {
-                console.error('Error removing admin:', error);
-                alert(`Error removing admin: ${error.message}`);
+            });
+
+            // Store chart reference
+            switch(chartId) {
+                case 'ilias':
+                    iliasChart = newChart;
+                    init3DChart(canvasId, historyData);
+                    break;
+                case 'niilo':
+                    niiloChart = newChart;
+                    init3DChart(canvasId, historyData);
+                    break;
+                case 'bgstpoelten':
+                    bgstpoeltenChart = newChart;
+                    init3DChart(canvasId, historyData);
+                    break;
+                case 'htlstp':
+                    htlstpChart = newChart;
+                    init3DChart(canvasId, historyData);
+                    break;
+                case 'borgstpoelten':
+                    borgstpoeltenChart = newChart;
+                    init3DChart(canvasId, historyData);
+                    break;
+                case 'hakstpoelten':
+                    hakstpoeltenChart = newChart;
+                    init3DChart(canvasId, historyData);
+                    break;
+                case 'basopbafepstp':
+                    basopbafepstpChart = newChart;
+                    init3DChart(canvasId, historyData);
+                    break;
+                case 'play':
+                    playChart = newChart;
+                    init3DChart(canvasId, historyData);
+                    break;
             }
         }
-
-        // Refresh all data function
-        function refreshAll() {
-            updateStats();
-        }
-
-        // Initial load
-        updateStats();
-
-        // Load installed datapacks
-        loadInstalledDatapacks();
-
-        // Refresh every 30 seconds
-        setInterval(updateStats, 30000);
 
         // Function to load installed datapacks for all servers
         async function loadInstalledDatapacks() {
@@ -1179,148 +1474,289 @@
 
             if (datapacks && datapacks.length > 0) {
                 const datapacksHtml = datapacks.map(dp => `
-                    <div class="datapack-item" style="padding: 8px; margin: 5px 0; background: rgba(255, 255, 255, 0.05); border-radius: 5px; display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <span class="datapack-tag" style="display: inline-block; background: rgba(52, 152, 219, 0.3); padding: 4px 8px; margin-right: 8px; border-radius: 20px; font-size: 0.85em; border: 1px solid rgba(52, 152, 219, 0.5);">
-                                <strong>${dp.name}</strong> (${dp.version})
-                            </span>
-                        </div>
-                        <div style="text-align: right;">
-                            <button class="btn-stop" onclick="uninstallDatapack('${server}', '${dp.directory}')"
-                                style="padding: 4px 8px; font-size: 0.8em;">Uninstall</button>
-                        </div>
-                    </div>
+                    <span class="datapack-tag" style="display: inline-block; background: rgba(52, 152, 219, 0.3); padding: 6px 12px; margin: 4px; border-radius: 20px; font-size: 0.9em; border: 1px solid rgba(52, 152, 219, 0.5);">
+                        <strong>${dp.name}</strong> (${dp.version})
+                    </span>
                 `).join('');
 
-                container.innerHTML = datapacksHtml;
+                container.innerHTML = `<div class="datapacks-container" style="display: flex; flex-wrap: wrap; gap: 5px;">${datapacksHtml}</div>`;
             } else {
                 container.innerHTML = '<p>No datapacks installed</p>';
             }
         }
 
-        // Function to uninstall a datapack (real implementation)
-        async function uninstallDatapack(server, datapackDir) {
-            if (!confirm(`Are you sure you want to uninstall ${datapackDir} from ${server}? This will delete the datapack folder.`)) {
-                return;
-            }
+        // Refresh stats function
+        function refreshStats() {
+            updateStats();
+            loadHistoricalData();
+            loadInstalledDatapacks(); // Also refresh datapacks
+        }
 
-            try {
-                const response = await fetch(`/api/uninstall/datapack/${server}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ datapackDir: datapackDir })
+        // Initial load
+        updateStats();
+        loadHistoricalData();
+        loadInstalledDatapacks(); // Load installed datapacks
+
+        // Refresh data every 30 seconds
+        setInterval(updateStats, 30000);
+
+        // Refresh history every 60 seconds
+        setInterval(loadHistoricalData, 60000);
+
+        // Refresh installed datapacks every 3 minutes
+        setInterval(loadInstalledDatapacks, 180000);
+
+        // Initialize 3D charts if needed
+        function init3DChart(canvasId, historyData) {
+            const container = document.getElementById(canvasId).parentElement;
+            if (!container) return;
+
+            // Create a canvas element for the 3D chart
+            const threeDContainer = document.createElement('div');
+            threeDContainer.style.position = 'relative';
+            threeDContainer.style.width = '100%';
+            threeDContainer.style.height = '100%';
+            threeDContainer.style.display = 'none'; // Initially hidden
+
+            // Add a toggle button to switch between 2D and 3D
+            const toggleBtn = document.createElement('button');
+            toggleBtn.textContent = '3D View';
+            toggleBtn.style.position = 'absolute';
+            toggleBtn.style.top = '10px';
+            toggleBtn.style.right = '10px';
+            toggleBtn.style.zIndex = '10';
+            toggleBtn.style.background = 'rgba(0, 0, 0, 0.7)';
+            toggleBtn.style.color = 'white';
+            toggleBtn.style.border = '1px solid rgba(255, 255, 255, 0.3)';
+            toggleBtn.style.borderRadius = '4px';
+            toggleBtn.style.padding = '5px 10px';
+            toggleBtn.style.cursor = 'pointer';
+            toggleBtn.onclick = function() {
+                const canvas2D = document.getElementById(canvasId);
+                const is2DVisible = canvas2D.style.display !== 'none';
+
+                if (is2DVisible) {
+                    canvas2D.style.display = 'none';
+                    if (threeDContainer.children.length === 0) {
+                        create3DChart(threeDContainer, historyData, canvasId);
+                    }
+                    threeDContainer.style.display = 'block';
+                    toggleBtn.textContent = '2D View';
+                } else {
+                    canvas2D.style.display = 'block';
+                    threeDContainer.style.display = 'none';
+                    toggleBtn.textContent = '3D View';
+                }
+            };
+
+            container.appendChild(toggleBtn);
+            container.appendChild(threeDContainer);
+        }
+
+        // Function to create a 3D chart using Three.js
+        function create3DChart(container, historyData, canvasId) {
+            // Clear any existing content
+            container.innerHTML = '';
+
+            // Create canvas element for Three.js
+            const canvas = document.createElement('canvas');
+            canvas.style.width = '100%';
+            canvas.style.height = '100%';
+            canvas.id = canvasId + '-3d';
+            container.appendChild(canvas);
+
+            // Initialize Three.js scene
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000022);
+
+            const camera = new THREE.PerspectiveCamera(
+                75,
+                container.clientWidth / container.clientHeight,
+                0.1,
+                1000
+            );
+
+            const renderer = new THREE.WebGLRenderer({
+                canvas: canvas,
+                antialias: true,
+                alpha: true
+            });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+
+            // Add some lights for 3D effect
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(1, 1, 2);
+            scene.add(directionalLight);
+
+            // Position the camera for better viewing angle
+            camera.position.z = 20;
+            camera.position.y = 12;
+            camera.position.x = 10;
+            camera.lookAt(0, 0, 0);
+
+            // Process the history data for 3D representation
+            if (historyData && historyData.length > 0) {
+                // Sort by timestamp to ensure proper order
+                historyData.sort((a, b) => a.timestamp - b.timestamp);
+
+                // Filter data to last 24 hours only
+                const now = new Date();
+                const twentyFourHoursAgo = new Date(now.getTime() - (24 * 60 * 60 * 1000));
+
+                // Extract values for 3D charting
+                const timestamps = [];
+                const playerCounts = [];
+                const cpuUsage = [];
+                const memoryUsage = [];
+
+                // Filter and sample data to reduce frequency
+                const filteredData = [];
+                historyData.forEach(dataPoint => {
+                    const dataTime = new Date(dataPoint.timestamp);
+
+                    // Only include data from the last 24 hours
+                    if (dataTime >= twentyFourHoursAgo) {
+                        filteredData.push(dataPoint);
+                    }
                 });
 
-                if (response.ok) {
-                    const result = await response.json();
-                    alert(result.message);
-                    loadInstalledDatapacks(); // Refresh the list
-                } else {
-                    const errorData = await response.json();
-                    alert(`Failed to uninstall datapack: ${response.status} - ${errorData.error || 'Unknown error'}`);
+                // Sample the data to reduce frequency - keep every nth point
+                // Ensure we have between 8 and 24 points for optimal visualization
+                const maxPoints = 24;
+                const minPoints = 8;
+                let samplingRate = 1;
+
+                if (filteredData.length > maxPoints) {
+                    samplingRate = Math.ceil(filteredData.length / maxPoints);
+                } else if (filteredData.length > minPoints) {
+                    samplingRate = Math.ceil(filteredData.length / 16); // Intermediate value
                 }
-            } catch (error) {
-                console.error('Error uninstalling datapack:', error);
-                alert(`Error uninstalling datapack: ${error.message}`);
-            }
-        }
 
-        // Function to search for datapacks
-        async function searchDatapacks() {
-            const query = document.getElementById('search-datapacks').value.trim();
-            const resultsContainer = document.getElementById('search-results');
+                for (let i = 0; i < filteredData.length; i += samplingRate) {
+                    const dataPoint = filteredData[i];
+                    const dataTime = new Date(dataPoint.timestamp);
 
-            if (!query) {
-                resultsContainer.innerHTML = '<p>Please enter a search term</p>';
-                return;
-            }
+                    // Convert timestamp to human-readable format
+                    const date = new Date(dataPoint.timestamp);
+                    timestamps.push(date.toLocaleTimeString());
 
-            try {
-                resultsContainer.innerHTML = '<p>Searching...</p>';
+                    // Extract player count
+                    playerCounts.push(dataPoint.playerCount || 0);
 
-                const response = await fetch(`/api/search/datapacks?q=${encodeURIComponent(query)}`);
-                const data = await response.json();
+                    // Extract CPU usage (remove % symbol)
+                    let cpu = dataPoint.cpu || '0%';
+                    if (typeof cpu === 'string') {
+                        cpu = parseFloat(cpu.replace('%', '')) || 0;
+                    }
+                    cpuUsage.push(cpu);
 
-                if (data.datapacks && data.datapacks.length > 0) {
-                    const resultsHtml = data.datapacks.map(dp => `
-                        <div class="search-result-item" style="padding: 15px; border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; margin: 10px 0; background: rgba(255,255,255,0.05);">
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                <div style="flex: 1;">
-                                    <h3 style="margin: 0 0 5px 0; color: #3498db;">${dp.name}</h3>
-                                    <p style="margin: 0 0 10px 0; opacity: 0.8;">Version: ${dp.version} | Game: ${dp.gameVersion}</p>
-                                    <p style="margin: 0;">${dp.description}</p>
-                                </div>
-                                <div style="text-align: right;">
-                                    <select id="server-select-${dp.name.replace(/\s+/g, '-').toLowerCase()}" style="margin-bottom: 10px; padding: 5px; border-radius: 5px; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3);">
-                                        <option value="mc-ilias">Ikaria Games</option>
-                                        <option value="mc-niilo">Königreich der letzten Krieger</option>
-                                        <option value="bgstpoelten">BGST Pölten</option>
-                                        <option value="htlstp">HTL St. Pölten</option>
-                                        <option value="borgstpoelten">BORG St. Pölten</option>
-                                        <option value="hakstpoelten">HAK St. Pölten</option>
-                                        <option value="basopbafepstp">BASOP/BAFEP St. Pölten</option>
-                                        <option value="play">Allgemeiner Spielserver</option>
-                                    </select>
-                                    <button class="btn-start" onclick="installDatapack('${dp.name}', '${dp.version}')"
-                                        style="padding: 8px 15px; font-size: 0.9em;">Install</button>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('');
-
-                    resultsContainer.innerHTML = resultsHtml;
-                } else {
-                    resultsContainer.innerHTML = '<p>No datapacks found matching your search</p>';
+                    // Extract Memory usage
+                    let memory = dataPoint.memory || '0GB';
+                    const memoryMatch = memory.match(/([\d.]+)G/);
+                    if (memoryMatch) {
+                        memory = parseFloat(memoryMatch[1]);
+                    } else if (typeof memory === 'string') {
+                        memory = 0;
+                    }
+                    memoryUsage.push(memory);
                 }
-            } catch (error) {
-                console.error('Error searching datapacks:', error);
-                resultsContainer.innerHTML = '<p>Error searching for datapacks</p>';
-            }
-        }
 
-        // Function to handle enter key press in search field
-        function handleSearchKeyup(event) {
-            if (event.key === 'Enter') {
-                searchDatapacks();
-            }
-        }
+                // Create 3D lines for each metric
+                const createLine = (data, color, zOffset) => {
+                    if (data.length < 2) return null;
 
-        // Function to install a datapack
-        async function installDatapack(name, version) {
-            // Get the selected server from the dropdown
-            const serverSelectId = `server-select-${name.replace(/\s+/g, '-').toLowerCase()}`;
-            const serverSelect = document.getElementById(serverSelectId);
-            const server = serverSelect ? serverSelect.value : 'mc-ilias';
+                    const points = [];
+                    const maxVal = Math.max(...data) || 1;
 
-            if (!confirm(`Are you sure you want to install ${name} v${version} to ${server}?`)) {
-                return;
-            }
+                    for (let i = 0; i < data.length; i++) {
+                        const x = (i / (data.length - 1)) * 15 - 7.5; // Spread across X axis (time)
+                        const y = (data[i] / maxVal) * 5; // Normalize to Y axis (value)
+                        const z = zOffset; // Z position to separate different metrics
+                        points.push(new THREE.Vector3(x, y, z));
+                    }
 
-            try {
-                const response = await fetch(`/api/install/datapack/${server}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ datapackName: name, version: version })
-                });
+                    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                    // Use a material that's more visible in 3D
+                    const material = new THREE.LineBasicMaterial({
+                        color: color,
+                        linewidth: 4,
+                        transparent: true,
+                        opacity: 0.9
+                    });
+                    const line = new THREE.Line(geometry, material);
+                    return line;
+                };
 
-                if (response.ok) {
-                    const result = await response.json();
-                    alert(result.message);
+                // Create lines for each metric - positioned in 3D space
+                const playerLine = createLine(playerCounts, 0x3498db, -6); // Blue for players
+                const cpuLine = createLine(cpuUsage, 0xe74c3c, 0);        // Red for CPU
+                const memoryLine = createLine(memoryUsage, 0x2ecc71, 6); // Green for memory
 
-                    // Refresh the installed datapacks list
-                    loadInstalledDatapacks();
-                } else {
-                    const errorText = await response.text();
-                    alert(`Failed to install datapack: ${response.status} - ${errorText}`);
+                if (playerLine) scene.add(playerLine);
+                if (cpuLine) scene.add(cpuLine);
+                if (memoryLine) scene.add(memoryLine);
+
+                // Add grid lines for better visualization
+                const gridHelper = new THREE.GridHelper(20, 20, 0x444444, 0x222222);
+                gridHelper.rotation.x = Math.PI / 2; // Rotate to be horizontal
+                scene.add(gridHelper);
+
+                // Add axes helpers for reference
+                const axesHelper = new THREE.AxesHelper(12);
+                scene.add(axesHelper);
+
+                // Add small indicators for each metric to make them clearly visible
+                if (playerCounts.length > 0) {
+                    const playerIndicator = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.3, 16, 16),
+                        new THREE.MeshBasicMaterial({ color: 0x3498db })
+                    );
+                    playerIndicator.position.set(9, playerCounts[playerCounts.length - 1] / (Math.max(...playerCounts, 1) || 1) * 5, -6);
+                    scene.add(playerIndicator);
                 }
-            } catch (error) {
-                console.error('Error installing datapack:', error);
-                alert(`Error installing datapack: ${error.message}`);
+
+                if (cpuUsage.length > 0) {
+                    const cpuIndicator = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.3, 16, 16),
+                        new THREE.MeshBasicMaterial({ color: 0xe74c3c })
+                    );
+                    cpuIndicator.position.set(9, cpuUsage[cpuUsage.length - 1] / (Math.max(...cpuUsage, 1) || 1) * 5, 0);
+                    scene.add(cpuIndicator);
+                }
+
+                if (memoryUsage.length > 0) {
+                    const memoryIndicator = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.3, 16, 16),
+                        new THREE.MeshBasicMaterial({ color: 0x2ecc71 })
+                    );
+                    memoryIndicator.position.set(9, memoryUsage[memoryUsage.length - 1] / (Math.max(...memoryUsage, 1) || 1) * 5, 6);
+                    scene.add(memoryIndicator);
+                }
             }
+
+            // Animation loop for the 3D chart
+            const animate = function() {
+                requestAnimationFrame(animate);
+
+                // Add subtle rotation for visual appeal - slower rotation
+                camera.position.y = 10 * Math.sin(Date.now() * 0.0005); // Gentle vertical movement
+                scene.rotation.y += 0.0005;
+                scene.rotation.x = Math.PI / 7; // Gentle angle to view the 3D data
+
+                renderer.render(scene, camera);
+            };
+
+            animate();
+
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            });
         }
     </script>
 </body>
