@@ -18,6 +18,7 @@ x-mc-server-base: &mc-server-base
     - TYPE=PAPER
     - ONLINE_MODE=${MC_ONLINE_MODE:-false}
     - ENABLE_PROXY_CONNECTIONS=${MC_ENABLE_PROXY_CONNECTIONS:-true}
+    - MAX_PLAYERS=${MC_MAX_PLAYERS:-250}
     - SERVER_DIR=/data
 
 services:
@@ -45,8 +46,8 @@ services:
     environment:
       - MOTD=${MC_BGSTPOELEN_MOTD:-mc-bgstpoelten Server}
     volumes:
-      - ./bgstpoelten-mc-landing/data:/data
-      - ./bgstpoelten-mc-landing/datapacks:/data/datapacks
+      - ./landing/bgstpoelten-mc-landing/data:/data
+      - ./landing/bgstpoelten-mc-landing/datapacks:/data/datapacks
 
   mc-htlstp:
     <<: *mc-server-base
@@ -54,8 +55,8 @@ services:
     environment:
       - MOTD=${MC_HTLSTP_MOTD:-mc-htlstp Server}
     volumes:
-      - ./htlstp-mc-landing/data:/data
-      - ./htlstp-mc-landing/datapacks:/data/datapacks
+      - ./landing/htlstp-mc-landing/data:/data
+      - ./landing/htlstp-mc-landing/datapacks:/data/datapacks
 
   mc-borgstpoelten:
     <<: *mc-server-base
@@ -63,8 +64,8 @@ services:
     environment:
       - MOTD=${MC_BORGSTPOELEN_MOTD:-mc-borgstpoelten Server}
     volumes:
-      - ./borgstpoelten-mc-landing/data:/data
-      - ./borgstpoelten-mc-landing/datapacks:/data/datapacks
+      - ./landing/borgstpoelten-mc-landing/data:/data
+      - ./landing/borgstpoelten-mc-landing/datapacks:/data/datapacks
 
   mc-hakstpoelten:
     <<: *mc-server-base
@@ -72,8 +73,8 @@ services:
     environment:
       - MOTD=${MC_HAKSTPOELEN_MOTD:-mc-hakstpoelten Server}
     volumes:
-      - ./hakstpoelten-mc-landing/data:/data
-      - ./hakstpoelten-mc-landing/datapacks:/data/datapacks
+      - ./landing/hakstpoelten-mc-landing/data:/data
+      - ./landing/hakstpoelten-mc-landing/datapacks:/data/datapacks
 
   mc-basop-bafep-stp:
     <<: *mc-server-base
@@ -81,8 +82,8 @@ services:
     environment:
       - MOTD=${MC_BASOP_BAFEP_STP_MOTD:-mc-basop-bafep-stp Server}
     volumes:
-      - ./basop-bafep-stp-mc-landing/data:/data
-      - ./basop-bafep-stp-mc-landing/datapacks:/data/datapacks
+      - ./landing/basop-bafep-stp-mc-landing/data:/data
+      - ./landing/basop-bafep-stp-mc-landing/datapacks:/data/datapacks
 
   mc-play:
     <<: *mc-server-base
@@ -90,8 +91,8 @@ services:
     environment:
       - MOTD=${MC_PLAY_MOTD:-mc-play Server}
     volumes:
-      - ./play-mc-landing/data:/data
-      - ./play-mc-landing/datapacks:/data/datapacks
+      - ./landing/play-mc-landing/data:/data
+      - ./landing/play-mc-landing/datapacks:/data/datapacks
 
   bungeecord:
     build: ./bungeecord
@@ -118,14 +119,34 @@ services:
     container_name: mc-admin-api
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./landing/borgstpoelten-mc-landing/data/world/datapacks:/app/world/datapacks
+      - ./landing/borgstpoelten-mc-landing/data/datapacks:/app/data/datapacks
+      - ./landing/borgstpoelten-mc-landing/datapacks:/app/borgstpoelten/datapacks
+      - ./landing/bgstpoelten-mc-landing/data/world/datapacks:/app/world/datapacks
+      - ./landing/bgstpoelten-mc-landing/data/datapacks:/app/data/datapacks
+      - ./landing/bgstpoelten-mc-landing/datapacks:/app/bgstpoelten/datapacks
+      - ./landing/hakstpoelten-mc-landing/data/world/datapacks:/app/world/datapacks
+      - ./landing/hakstpoelten-mc-landing/data/datapacks:/app/data/datapacks
+      - ./landing/hakstpoelten-mc-landing/datapacks:/app/hakstpoelten/datapacks
+      - ./landing/htlstp-mc-landing/data/world/datapacks:/app/world/datapacks
+      - ./landing/htlstp-mc-landing/data/datapacks:/app/data/datapacks
+      - ./landing/htlstp-mc-landing/datapacks:/app/htlstp/datapacks
+      - ./landing/basop-bafep-stp-mc-landing/data/world/datapacks:/app/world/datapacks
+      - ./landing/basop-bafep-stp-mc-landing/data/datapacks:/app/data/datapacks
+      - ./landing/basop-bafep-stp-mc-landing/datapacks:/app/basop-bafep-stp/datapacks
+      - ./landing/play-mc-landing/data/world/datapacks:/app/world/datapacks
+      - ./landing/play-mc-landing/data/datapacks:/app/data/datapacks
+      - ./landing/play-mc-landing/datapacks:/app/play/datapacks
+      - ./mc-ilias/data/world/datapacks:/app/world/datapacks
+      - ./mc-ilias/data/datapacks:/app/data/datapacks
       - ./mc-ilias/datapacks:/app/mc-ilias/datapacks
+      - ./school/data/datapacks:/app/data/datapacks
+      - ./school/datapacks:/app/school/datapacks
+      - ./mc-niilo/data/world/datapacks:/app/world/datapacks
+      - ./mc-niilo/data/datapacks:/app/data/datapacks
       - ./mc-niilo/datapacks:/app/mc-niilo/datapacks
-      - ./bgstpoelten-mc-landing/datapacks:/app/bgstpoelten/datapacks
-      - ./htlstp-mc-landing/datapacks:/app/htlstp/datapacks
-      - ./borgstpoelten-mc-landing/datapacks:/app/borgstpoelten/datapacks
-      - ./hakstpoelten-mc-landing/datapacks:/app/hakstpoelten/datapacks
-      - ./basop-bafep-stp-mc-landing/datapacks:/app/basop-bafep-stp/datapacks
-      - ./play-mc-landing/datapacks:/app/play/datapacks
+      - ./admin-api/mc-ilias/datapacks:/app/mc-ilias/datapacks
+
     environment:
       - NODE_ENV=production
       - ADMIN_USER=${ADMIN_USER:-admin}
