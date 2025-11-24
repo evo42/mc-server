@@ -27,12 +27,12 @@ print_error() {
 # --- BUILD FUNCTIONS ---
 
 build_spa() {
-    print_status \"Building Admin SPA...\"
-    if [ -d \"./admin-ui-spa\" ]; then
+    print_status "Building Admin SPA..."
+    if [ -d "./admin-ui-spa" ]; then
         (cd admin-ui-spa && npm install && npm run build)
-        print_status \"Admin SPA built successfully!\"
+        print_status "Admin SPA built successfully!"
     else
-        print_error \"admin-ui-spa directory not found!\"
+        print_error "admin-ui-spa directory not found!"
         exit 1
     fi
 }
@@ -90,7 +90,7 @@ help() {
     echo \"Usage: $0 [command]\"
     echo \"\"
     echo \"Commands:\"
-    echo \"  (no command) - Build both SPA and containers\"
+    echo "  \(no command\) - Build both SPA and containers"
     echo \"  spa          - Build the Admin SPA only\"
     echo \"  containers   - Build all Docker containers\"
     echo \"  push         - Build and push all images to the registry\"
@@ -100,20 +100,20 @@ help() {
 ACTION=${1:-all}
 
 case $ACTION in
-    \"all\")
+    all)
         build_spa
         build_containers
         ;;
-    \"spa\")
+    spa)
         build_spa
         ;;
-    \"containers\")
+    containers)
         build_containers
         ;;
-    \"push\")
+    push)
         build_and_push
         ;;
-    \"help\")
+    help)
         help
         ;;
     *)

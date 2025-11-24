@@ -6,7 +6,9 @@ set -e
 
 # Load environment variables
 if [ -f .env ]; then
-    export $(cat .env | xargs)
+    set -o allexport
+    source .env
+    set +o allexport
 fi
 
 deploy() {
