@@ -1,4 +1,4 @@
-const datapacksService = require('../services/datapacksService');
+const logger = require('pino')();
 
 const getDatapacks = async (req, res) => {
     const server = req.params.server;
@@ -6,7 +6,7 @@ const getDatapacks = async (req, res) => {
         const datapacks = await datapacksService.getDatapacks(server);
         res.json({ server: server, datapacks: datapacks });
     } catch (error) {
-        console.error(`Error getting datapacks for ${server}:`, error);
+logger.error({ err: error, server: server }, `Error getting datapacks for ${server}`);
         res.status(500).json({ error: 'Failed to get datapacks', details: error.message });
     }
 };
@@ -18,7 +18,7 @@ const installDatapack = async (req, res) => {
         await datapacksService.installDatapack(server, datapackName, version);
         res.json({ success: true, message: `Successfully installed ${datapackName} v${version} to ${server}` });
     } catch (error) {
-        console.error(`Error installing datapack ${datapackName} to ${server}:`, error);
+logger.error({ err: error, server: server, datapackName: datapackName }, `Error installing datapack ${datapackName} to ${server}`);
         res.status(500).json({ error: 'Failed to install datapack', details: error.message });
     }
 };
@@ -30,7 +30,7 @@ const uninstallDatapack = async (req, res) => {
         await datapacksService.uninstallDatapack(server, datapackDir);
         res.json({ success: true, message: `Successfully uninstalled ${datapackDir} from ${server}` });
     } catch (error) {
-        console.error(`Error uninstalling datapack ${datapackDir} from ${server}:`, error);
+logger.error({ err: error, server: server, datapackDir: datapackDir }, `Error uninstalling datapack ${datapackDir} from ${server}`);
         res.status(500).json({ error: 'Failed to uninstall datapack', details: error.message });
     }
 };
@@ -41,7 +41,7 @@ const searchDatapacks = async (req, res) => {
         const datapacks = await datapacksService.searchDatapacks(query);
         res.json({ datapacks: datapacks, total: datapacks.length });
     } catch (error) {
-        console.error('Error searching for datapacks:', error);
+logger.error({ err: error, query: query }, 'Error searching for datapacks');
         res.status(500).json({ error: 'Failed to search for datapacks', details: error.message });
     }
 };

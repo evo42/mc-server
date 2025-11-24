@@ -1,180 +1,105 @@
 
+version: '3.8'
+
+x-mc-server-base: &mc-server-base
+  build:
+    context: ./minecraft-base
+    dockerfile: Dockerfile.consolidated
+  restart: unless-stopped
+  networks:
+    - minecraft-net
+  expose:
+    - "25565"
+  environment:
+    - EULA=${MC_EULA:-TRUE}
+    - VERSION=${MC_VERSION:-1.21.1}
+    - MEMORY=${MC_MEMORY:-4G}
+    - MAX_MEMORY=${MC_MAX_MEMORY:-8G}
+    - TYPE=PAPER
+    - ONLINE_MODE=${MC_ONLINE_MODE:-false}
+    - ENABLE_PROXY_CONNECTIONS=${MC_ENABLE_PROXY_CONNECTIONS:-true}
+    - SERVER_DIR=/data
+
 services:
   mc-ilias:
-    build: ./minecraft-base
+    <<: *mc-server-base
     container_name: mc-ilias
     environment:
-      - EULA=TRUE
-      - VERSION=1.21.10
-      - MEMORY=5G
-      - MAX_MEMORY=10G
-      - TYPE=VANILLA
-      - ONLINE_MODE=false
-      - ENABLE_PROXY_CONNECTIONS=true
-      - MOTD=mc-ilias Server
+      - MOTD=${MC_ILIAS_MOTD:-mc-ilias Server}
     volumes:
       - ./mc-ilias/data:/data
       - ./mc-ilias/datapacks:/data/datapacks
-    restart: unless-stopped
-    networks:
-      - minecraft-net
-    expose:
-      - "25565"
 
   mc-niilo:
-    build: ./minecraft-base
+    <<: *mc-server-base
     container_name: mc-niilo
     environment:
-      - EULA=TRUE
-      - VERSION=1.21.10
-      - MEMORY=5G
-      - MAX_MEMORY=10G
-      - TYPE=VANILLA
-      - ONLINE_MODE=false
-      - ENABLE_PROXY_CONNECTIONS=true
-      - MOTD=mc-niilo Server
+      - MOTD=${MC_NILO_MOTD:-mc-niilo Server}
     volumes:
       - ./mc-niilo/data:/data
       - ./mc-niilo/datapacks:/data/datapacks
-    restart: unless-stopped
-    networks:
-      - minecraft-net
-    expose:
-      - "25565"
 
   mc-bgstpoelten:
-    build: ./minecraft-base
+    <<: *mc-server-base
     container_name: mc-bgstpoelten
     environment:
-      - EULA=TRUE
-      - VERSION=1.21.10
-      - MEMORY=5G
-      - MAX_MEMORY=10G
-      - TYPE=VANILLA
-      - ONLINE_MODE=false
-      - ENABLE_PROXY_CONNECTIONS=true
-      - MOTD=mc-bgstpoelten Server
+      - MOTD=${MC_BGSTPOELEN_MOTD:-mc-bgstpoelten Server}
     volumes:
       - ./bgstpoelten-mc-landing/data:/data
       - ./bgstpoelten-mc-landing/datapacks:/data/datapacks
-    restart: unless-stopped
-    networks:
-      - minecraft-net
-    expose:
-      - "25565"
 
   mc-htlstp:
-    build: ./minecraft-base
+    <<: *mc-server-base
     container_name: mc-htlstp
     environment:
-      - EULA=TRUE
-      - VERSION=1.21.10
-      - MEMORY=5G
-      - MAX_MEMORY=10G
-      - TYPE=VANILLA
-      - ONLINE_MODE=false
-      - ENABLE_PROXY_CONNECTIONS=true
-      - MOTD=mc-htlstp Server
+      - MOTD=${MC_HTLSTP_MOTD:-mc-htlstp Server}
     volumes:
       - ./htlstp-mc-landing/data:/data
       - ./htlstp-mc-landing/datapacks:/data/datapacks
-    restart: unless-stopped
-    networks:
-      - minecraft-net
-    expose:
-      - "25565"
 
   mc-borgstpoelten:
-    build: ./minecraft-base
+    <<: *mc-server-base
     container_name: mc-borgstpoelten
     environment:
-      - EULA=TRUE
-      - VERSION=1.21.10
-      - MEMORY=5G
-      - MAX_MEMORY=10G
-      - TYPE=VANILLA
-      - ONLINE_MODE=false
-      - ENABLE_PROXY_CONNECTIONS=true
-      - MOTD=mc-borgstpoelten Server
+      - MOTD=${MC_BORGSTPOELEN_MOTD:-mc-borgstpoelten Server}
     volumes:
       - ./borgstpoelten-mc-landing/data:/data
       - ./borgstpoelten-mc-landing/datapacks:/data/datapacks
-    restart: unless-stopped
-    networks:
-      - minecraft-net
-    expose:
-      - "25565"
 
   mc-hakstpoelten:
-    build: ./minecraft-base
+    <<: *mc-server-base
     container_name: mc-hakstpoelten
     environment:
-      - EULA=TRUE
-      - VERSION=1.21.10
-      - MEMORY=5G
-      - MAX_MEMORY=10G
-      - TYPE=VANILLA
-      - ONLINE_MODE=false
-      - ENABLE_PROXY_CONNECTIONS=true
-      - MOTD=mc-hakstpoelten Server
+      - MOTD=${MC_HAKSTPOELEN_MOTD:-mc-hakstpoelten Server}
     volumes:
       - ./hakstpoelten-mc-landing/data:/data
       - ./hakstpoelten-mc-landing/datapacks:/data/datapacks
-    restart: unless-stopped
-    networks:
-      - minecraft-net
-    expose:
-      - "25565"
 
   mc-basop-bafep-stp:
-    build: ./minecraft-base
+    <<: *mc-server-base
     container_name: mc-basop-bafep-stp
     environment:
-      - EULA=TRUE
-      - VERSION=1.21.10
-      - MEMORY=5G
-      - MAX_MEMORY=10G
-      - TYPE=VANILLA
-      - ONLINE_MODE=false
-      - ENABLE_PROXY_CONNECTIONS=true
-      - MOTD=mc-basop-bafep-stp Server
+      - MOTD=${MC_BASOP_BAFEP_STP_MOTD:-mc-basop-bafep-stp Server}
     volumes:
       - ./basop-bafep-stp-mc-landing/data:/data
       - ./basop-bafep-stp-mc-landing/datapacks:/data/datapacks
-    restart: unless-stopped
-    networks:
-      - minecraft-net
-    expose:
-      - "25565"
 
   mc-play:
-    build: ./minecraft-base
+    <<: *mc-server-base
     container_name: mc-play
     environment:
-      - EULA=TRUE
-      - VERSION=1.21.10
-      - MEMORY=5G
-      - MAX_MEMORY=10G
-      - TYPE=VANILLA
-      - ONLINE_MODE=false
-      - ENABLE_PROXY_CONNECTIONS=true
-      - MOTD=mc-play Server
+      - MOTD=${MC_PLAY_MOTD:-mc-play Server}
     volumes:
       - ./play-mc-landing/data:/data
       - ./play-mc-landing/datapacks:/data/datapacks
-    restart: unless-stopped
-    networks:
-      - minecraft-net
-    expose:
-      - "25565"
 
   bungeecord:
     build: ./bungeecord
     container_name: mc-bungeecord
     ports:
-      - "25565:25565"
+      - "${PROXY_PORT:-25565}:25565"
     volumes:
-      - ./bungeecord/config/config.yml:/home/bungee/server/config.yml:ro
+      - ./bungeecord/config:/home/bungee/server
     restart: unless-stopped
     networks:
       - minecraft-net
@@ -208,6 +133,8 @@ services:
     restart: unless-stopped
     networks:
       - minecraft-net
+    ports:
+      - "${ADMIN_API_PORT:-3000}:3000"
     depends_on:
       - mc-ilias
       - mc-niilo
@@ -222,14 +149,28 @@ services:
     build: ./nginx
     container_name: mc-nginx
     ports:
-      - "80:80"
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_HTTPS_PORT:-443}:443"
     volumes:
-      - ./admin-ui:/usr/share/nginx/html
+      - ./admin-ui-dist:/usr/share/nginx/html
+      - ./nginx/conf.d:/etc/nginx/conf.d
     networks:
       - minecraft-net
+      - proxy
     depends_on:
       - admin-api
 
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 30 --cleanup
+    environment:
+      - DOCKER_API_VERSION=1.44
+    restart: unless-stopped
+
 networks:
   minecraft-net:
+    driver: bridge
+  proxy:
     driver: bridge

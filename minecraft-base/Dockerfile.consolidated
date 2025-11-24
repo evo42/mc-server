@@ -1,0 +1,7 @@
+FROM itzg/minecraft-server:latest
+
+# Set the entrypoint to a custom script
+COPY start-server.sh /start-server.sh
+RUN chmod +x /start-server.sh
+
+CMD ["/start-server.sh"]

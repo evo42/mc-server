@@ -1,37 +1,44 @@
-const serversService = require('../services/serversService');
-const Docker = require('dockerode');
+// Create mocks before importing services to avoid initialization issues
+const mockContainer = {
+    start: jest.fn(),
+    stop: jest.fn(),
+    restart: jest.fn(),
+    inspect: jest.fn(),
+    stats: jest.fn()
+};
 
-jest.mock('dockerode');
+const mockDocker = {
+    getContainer: jest.fn(() => mockContainer)
+};
+
+// Mock the dockerode module before importing
+jest.mock('dockerode', () => {
+    return jest.fn(() => mockDocker);
+});
+
+const serversService = require('../services/serversService');
 
 describe('serversService', () => {
-    afterEach(() => {
+    beforeEach(() => {
+        // Reset mock calls before each test
         jest.clearAllMocks();
     });
 
     it('should start a server', async () => {
-        const container = {
-            start: jest.fn(),
-        };
-        Docker.prototype.getContainer = jest.fn().mockReturnValue(container);
         await serversService.startServer('mc-ilias');
-        expect(container.start).toHaveBeenCalled();
+        expect(mockDocker.getContainer).toHaveBeenCalledWith('mc-ilias');
+        expect(mockContainer.start).toHaveBeenCalled();
     });
 
     it('should stop a server', async () => {
-        const container = {
-            stop: jest.fn(),
-        };
-        Docker.prototype.getContainer = jest.fn().mockReturnValue(container);
         await serversService.stopServer('mc-ilias');
-        expect(container.stop).toHaveBeenCalled();
+        expect(mockDocker.getContainer).toHaveBeenCalledWith('mc-ilias');
+        expect(mockContainer.stop).toHaveBeenCalled();
     });
 
     it('should restart a server', async () => {
-        const container = {
-            restart: jest.fn(),
-        };
-        Docker.prototype.getContainer = jest.fn().mockReturnValue(container);
         await serversService.restartServer('mc-ilias');
-        expect(container.restart).toHaveBeenCalled();
+        expect(mockDocker.getContainer).toHaveBeenCalledWith('mc-ilias');
+        expect(mockContainer.restart).toHaveBeenCalled();
     });
 });

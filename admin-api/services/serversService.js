@@ -1,22 +1,55 @@
 const Docker = require('dockerode');
 const docker = new Docker({ socketPath: '/var/run/docker.sock' });
 
+// Define allowed server names for security
+const ALLOWED_SERVERS = [
+    'mc-ilias',
+    'mc-niilo',
+    'mc-bgstpoelten',
+    'mc-htlstp',
+    'mc-borgstpoelten',
+    'mc-hakstpoelten',
+    'mc-basop-bafep-stp',
+    'mc-play'
+];
+
+// Validate if a server name is allowed
+const isValidServer = (server) => {
+    return ALLOWED_SERVERS.includes(server);
+};
+
 const startServer = async (server) => {
+    if (!isValidServer(server)) {
+        throw new Error(`Invalid server name: ${server}`);
+    }
+
     const container = docker.getContainer(server);
     await container.start();
 };
 
 const stopServer = async (server) => {
+    if (!isValidServer(server)) {
+        throw new Error(`Invalid server name: ${server}`);
+    }
+
     const container = docker.getContainer(server);
     await container.stop();
 };
 
 const restartServer = async (server) => {
+    if (!isValidServer(server)) {
+        throw new Error(`Invalid server name: ${server}`);
+    }
+
     const container = docker.getContainer(server);
     await container.restart();
 };
 
 const getServerStatus = async (server) => {
+    if (!isValidServer(server)) {
+        throw new Error(`Invalid server name: ${server}`);
+    }
+
     try {
         const container = docker.getContainer(server);
         const data = await container.inspect();
@@ -51,9 +84,8 @@ const getServerStatus = async (server) => {
 };
 
 const getAllServerStatus = async () => {
-    const servers = ['mc-ilias', 'mc-niilo', 'bgstpoelten', 'htlstp', 'borgstpoelten', 'hakstpoelten', 'basopbafepstp', 'play'];
     const results = {};
-    for (const server of servers) {
+    for (const server of ALLOWED_SERVERS) {
         results[server] = await getServerStatus(server);
     }
     return results;
@@ -65,4 +97,6 @@ module.exports = {
     restartServer,
     getServerStatus,
     getAllServerStatus,
+    isValidServer, // Export for testing
+    ALLOWED_SERVERS // Export for reference
 };

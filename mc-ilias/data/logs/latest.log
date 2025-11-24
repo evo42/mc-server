@@ -1,0 +1,4 @@
+[14:20:54] [ServerMain/INFO]: [bootstrap] Running Java 21 (OpenJDK 64-Bit Server VM 21.0.9+10-LTS; Eclipse Adoptium Temurin-21.0.9+10) on Linux 6.12.54-linuxkit (aarch64)
+[14:20:54] [ServerMain/INFO]: [bootstrap] Loading Paper 1.21.1-133-ver/1.21.1@3cb8529 (2025-03-28T16:14:36Z) for Minecraft 1.21.1
+[14:20:57] [ServerMain/INFO]: [PluginInitializerManager] Initializing plugins...
+[14:21:08] [ServerMain/INFO]: [PluginInitializerManager] Initialized 0 plugins

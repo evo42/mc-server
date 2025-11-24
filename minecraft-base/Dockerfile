@@ -1,15 +1,49 @@
-ARG MC_VERSION=1.21
-FROM eclipse-temurin:21-jdk-focal
+# Use a more recent base image with Java 21
+FROM eclipse-temurin:21-jdk-jammy
 
-RUN apt-get update && apt-get install -y wget
+# Install required tools
+RUN apt-get update && \
+    apt-get install -y wget curl jq && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-ARG MC_VERSION
-RUN wget https://api.papermc.io/v2/projects/paper/versions/${MC_VERSION}/builds/1/downloads/paper-${MC_VERSION}-1.jar -O /server.jar
+# Set working directory
+WORKDIR /app
 
-WORKDIR /data
+# Create user for security
+RUN groupadd -r minecraft && useradd -r -g minecraft minecraft
 
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# Environment variables with defaults
+ENV EULA=FALSE \
+    VERSION=1.21.1 \
+    TYPE=PAPER \
+    MEMORY=4G \
+    MAX_MEMORY=8G \
+    ONLINE_MODE=true \
+    MOTD="A Minecraft Server" \
+    SERVER_DIR=/data
+
+# Create server directory
+RUN mkdir -p $SERVER_DIR && \
+    chown -R minecraft:minecraft $SERVER_DIR
+
+VOLUME ["/data"]
+
+WORKDIR /app
+
+# Script to download and select the correct build for a given version
+COPY download-server.sh /app/download-server.sh
+RUN chmod +x /app/download-server.sh
+
+# Download the server jar based on environment variables
+RUN ./download-server.sh
+
+# Copy start script
+COPY start-server.sh /app/start-server.sh
+RUN chmod +x /app/start-server.sh
 
 EXPOSE 25565
-ENTRYPOINT ["/entrypoint.sh"]
+
+USER minecraft
+
+CMD ["/app/start-server.sh"]

@@ -1,0 +1,95 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for admin-api
+        id: meta-admin-api
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-admin-api
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Extract metadata for minecraft-base
+        id: meta-minecraft-base
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-minecraft-base
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push admin-api
+        uses: docker/build-push-action@v5
+        with:
+          context: ./admin-api
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta-admin-api.outputs.tags }}
+          labels: ${{ steps.meta-admin-api.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push minecraft-base
+        uses: docker/build-push-action@v5
+        with:
+          context: ./minecraft-base
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta-minecraft-base.outputs.tags }}
+          labels: ${{ steps.meta-minecraft-base.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # Optional: Deploy to production (only on main branch push)
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to server
+        run: |
+          # This is a placeholder for actual deployment logic
+          # The actual deployment would depend on your infrastructure
+          echo "Deploying to production server..."
+          # In a real scenario, you might SSH to your server and run:
+          # ssh user@server 'cd /path/to/mc-server && git pull && docker-compose pull && docker-compose up -d'

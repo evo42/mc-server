@@ -1,0 +1,434 @@
+version: '3.8'
+
+services:
+  # Minecraft Server - ILIAS
+  mc-ilias:
+    build:
+      context: ./minecraft-base
+      args:
+        - MC_VERSION=1.21.1  # Minecraft version to run (uses latest build for this version)
+    container_name: mc-ilias
+    environment:
+      # Essential settings
+      - EULA=${MC_EULA:-TRUE}  # Must be TRUE to accept Mojang's EULA
+      - VERSION=${MC_VERSION:-1.21.1}  # Minecraft version (matches build context arg)
+      - TYPE=PAPER  # Server type (PAPER is recommended for performance)
+      
+      # Memory settings (critical for performance)
+      - MEMORY=${MC_ILIAS_MEMORY:-8G}  # Initial RAM allocation (set based on server load)
+      - MAX_MEMORY=${MC_ILIAS_MAX_MEMORY:-16G}  # Maximum RAM allocation (don't exceed host RAM)
+      
+      # Gameplay settings
+      - ONLINE_MODE=${MC_ONLINE_MODE:-false}  # false = cracked server, true = Mojang auth required
+      - ENABLE_PROXY_CONNECTIONS=${MC_ENABLE_PROXY_CONNECTIONS:-true}  # Required for BungeeCord integration
+      - MOTD=${MC_ILIAS_MOTD:-"ILIAS Education Server - Welcome!"}  # Server description shown in server list
+      - SERVER_DIR=/data  # Working directory inside container
+      
+      # Advanced gameplay settings (override defaults if needed)
+      - DIFFICULTY=easy  # Options: peaceful, easy, normal, hard
+      - MODE=survival  # Options: survival, creative, adventure, spectator
+      - MAX_PLAYERS=100  # Maximum concurrent players (consider your hardware)
+      - VIEW_DISTANCE=10  # Render distance for players (higher = more resource usage)
+      - SIMULATION_DISTANCE=8  # Simulation distance (chunks processed around players)
+      - PVP=true  # Enable/Disable player vs player combat
+      - SNOOPER_ENABLED=false  # Disable data collection about your server
+      - MAX_BUILD_HEIGHT=320  # Maximum build height (for 1.18+)
+      - ALLOW_NETHER=true  # Enable nether dimension
+      - ALLOW_END=true  # Enable end dimension  
+      - GENERATE_STRUCTURES=true  # Generate villages, temples, etc.
+      - SPAWN_ANIMALS=true  # Spawn animals
+      - SPAWN_MONSTERS=true  # Spawn monsters
+      - SPAWN_NPCS=true  # Spawn villagers
+      - FORCE_GAMEMODE=false  # Force gamemode on login
+      - HARDCORE=false  # Game over on death
+      - SPAWN_PROTECTION=16  # Protected spawn radius (0 = disabled)
+      - MAX_WORLD_SIZE=29999984  # World border size limit
+      - ANNOUNCE_PLAYER_ACHIEVEMENTS=true  # Announce achievements to all players
+      - PREVENT_PROXY_CONNECTIONS=false  # Only used when online_mode is true
+      - ENABLE_COMMAND_BLOCK=true  # Enable command blocks
+      - NETWORK_COMPRESSION_THRESHOLD=256  # Network compression (bytes)
+      - MAX_TICK_TIME=60000  # Maximum time a single tick may take (ms)
+      - RESOURCE_PACK=  # URL to force resource pack (empty = no pack)
+      - RESOURCE_PACK_SHA1=  # SHA-1 hash for resource pack validation
+      - ENABLE_JMX_MONITORING=false  # JMX monitoring (for advanced users)
+      - RCON_PORT=25575  # Remote console port
+      - RCON_PASSWORD=  # Password for remote console access
+      - USE_NATIVE_TRANSPORT=true  # Better performance on Linux
+      - ONLINE_MODE_NPC=true  # Online mode for NPC plugins
+      - SERVER_NAME=ilias  # Internal server name (for plugins)
+    volumes:
+      # Data persistence - CRITICAL: backups required!
+      - ./mc-ilias/data:/data  # Server data (world, config, etc.)
+      - ./mc-ilias/datapacks:/data/datapacks  # Datapacks directory
+      # Optional: custom server files (place custom JARs, plugins, etc. here)
+      # - ./mc-ilias/custom-server-files:/data:ro
+    restart: unless-stopped  # Auto-restart unless manually stopped
+    networks:
+      - minecraft-net
+    expose:
+      - "25565"  # Internal port (BungeeCord handles external access)
+
+  # Minecraft Server - Niilo (Example with different config)
+  mc-niilo:
+    build:
+      context: ./minecraft-base
+      args:
+        - MC_VERSION=1.21.1
+    container_name: mc-niilo
+    environment:
+      # Essential settings
+      - EULA=${MC_EULA:-TRUE}
+      - VERSION=${MC_VERSION:-1.21.1}
+      - TYPE=PAPER
+      # Higher memory for more active server
+      - MEMORY=${MC_NILO_MEMORY:-12G}
+      - MAX_MEMORY=${MC_NILO_MAX_MEMORY:-24G}
+      # Gameplay settings
+      - ONLINE_MODE=${MC_ONLINE_MODE:-false}
+      - ENABLE_PROXY_CONNECTIONS=${MC_ENABLE_PROXY_CONNECTIONS:-true}
+      - MOTD=${MC_NILO_MOTD:-"Niilo Creative Server - Build Your Dreams!"}
+      - SERVER_DIR=/data
+      # Niilo-specific settings
+      - MODE=creative  # Creative mode server
+      - MAX_PLAYERS=50  # Adjusted for creative gameplay
+      - VIEW_DISTANCE=12  # Larger view distance for building
+      - SIMULATION_DISTANCE=10  # More active chunks for creative
+      - PVP=false  # Disable PVP for creative server
+      - SPAWN_ANIMALS=true
+      - SPAWN_MONSTERS=false  # No monsters in creative
+      - SPAWN_NPCS=true
+      - HARDCORE=false
+      - SPAWN_PROTECTION=32  # Larger spawn protection for creative
+      - MAX_WORLD_SIZE=40000  # Larger world for creative projects
+    volumes:
+      - ./mc-niilo/data:/data
+      - ./mc-niilo/datapacks:/data/datapacks
+    restart: unless-stopped
+    networks:
+      - minecraft-net
+    expose:
+      - "25565"
+
+  # Minecraft Server - BGSTPöelten
+  mc-bgstpoelten:
+    build:
+      context: ./minecraft-base
+      args:
+        - MC_VERSION=1.21.1
+    container_name: mc-bgstpoelten
+    environment:
+      - EULA=${MC_EULA:-TRUE}
+      - VERSION=${MC_VERSION:-1.21.1}
+      - TYPE=PAPER
+      - MEMORY=${MC_BGSTPOELEN_MEMORY:-6G}
+      - MAX_MEMORY=${MC_BGSTPOELEN_MAX_MEMORY:-12G}
+      - ONLINE_MODE=${MC_ONLINE_MODE:-false}
+      - ENABLE_PROXY_CONNECTIONS=${MC_ENABLE_PROXY_CONNECTIONS:-true}
+      - MOTD=${MC_BGSTPOELEN_MOTD:-"BGST Pöelten Server - Educational!"}
+      - SERVER_DIR=/data
+      # Educational server settings
+      - MODE=survival
+      - MAX_PLAYERS=75
+      - VIEW_DISTANCE=8
+      - SIMULATION_DISTANCE=6
+      - PVP=true  # Allow PVP for challenge
+      - SPAWN_ANIMALS=true
+      - SPAWN_MONSTERS=true
+      - SPAWN_NPCS=true
+      - HARDCORE=false
+      - SPAWN_PROTECTION=8  # Standard spawn protection
+    volumes:
+      - ./bgstpoelten-mc-landing/data:/data
+      - ./bgstpoelten-mc-landing/datapacks:/data/datapacks
+    restart: unless-stopped
+    networks:
+      - minecraft-net
+    expose:
+      - "25565"
+
+  # Minecraft Server - HTLSTP
+  mc-htlstp:
+    build:
+      context: ./minecraft-base
+      args:
+        - MC_VERSION=1.21.1
+    container_name: mc-htlstp
+    environment:
+      - EULA=${MC_EULA:-TRUE}
+      - VERSION=${MC_VERSION:-1.21.1}
+      - TYPE=PAPER
+      - MEMORY=${MC_HTLSTP_MEMORY:-8G}
+      - MAX_MEMORY=${MC_HTLSTP_MAX_MEMORY:-16G}
+      - ONLINE_MODE=${MC_ONLINE_MODE:-false}
+      - ENABLE_PROXY_CONNECTIONS=${MC_ENABLE_PROXY_CONNECTIONS:-true}
+      - MOTD=${MC_HTLSTP_MOTD:-"HTLSTP Technical Server - Engineering!"}
+      - SERVER_DIR=/data
+      # Technical server settings
+      - MODE=creative
+      - MAX_PLAYERS=40
+      - VIEW_DISTANCE=10
+      - SIMULATION_DISTANCE=8
+      - PVP=false
+      - SPAWN_ANIMALS=false  # No animals for technical focus
+      - SPAWN_MONSTERS=false
+      - SPAWN_NPCS=true
+      - HARDCORE=false
+      - SPAWN_PROTECTION=16
+      - ENABLE_COMMAND_BLOCK=true  # Important for technical builds
+    volumes:
+      - ./htlstp-mc-landing/data:/data
+      - ./htlstp-mc-landing/datapacks:/data/datapacks
+    restart: unless-stopped
+    networks:
+      - minecraft-net
+    expose:
+      - "25565"
+
+  # Minecraft Server - BorgstPöelten
+  mc-borgstpoelten:
+    build:
+      context: ./minecraft-base
+      args:
+        - MC_VERSION=1.21.1
+    container_name: mc-borgstpoelten
+    environment:
+      - EULA=${MC_EULA:-TRUE}
+      - VERSION=${MC_VERSION:-1.21.1}
+      - TYPE=PAPER
+      - MEMORY=${MC_BORGSTPOELEN_MEMORY:-10G}
+      - MAX_MEMORY=${MC_BORGSTPOELEN_MAX_MEMORY:-20G}
+      - ONLINE_MODE=${MC_ONLINE_MODE:-false}
+      - ENABLE_PROXY_CONNECTIONS=${MC_ENABLE_PROXY_CONNECTIONS:-true}
+      - MOTD=${MC_BORGSTPOELEN_MOTD:-"BORGST Pöelten Server - Advanced Students!"}
+      - SERVER_DIR=/data
+      # Advanced server settings
+      - MODE=survival
+      - MAX_PLAYERS=80
+      - VIEW_DISTANCE=10
+      - SIMULATION_DISTANCE=8
+      - PVP=true
+      - SPAWN_ANIMALS=true
+      - SPAWN_MONSTERS=true
+      - SPAWN_NPCS=true
+      - HARDCORE=false
+      - SPAWN_PROTECTION=12
+    volumes:
+      - ./borgstpoelten-mc-landing/data:/data
+      - ./borgstpoelten-mc-landing/datapacks:/data/datapacks
+    restart: unless-stopped
+    networks:
+      - minecraft-net
+    expose:
+      - "25565"
+
+  # Minecraft Server - HakstPöelten
+  mc-hakstpoelten:
+    build:
+      context: ./minecraft-base
+      args:
+        - MC_VERSION=1.21.1
+    container_name: mc-hakstpoelten
+    environment:
+      - EULA=${MC_EULA:-TRUE}
+      - VERSION=${MC_VERSION:-1.21.1}
+      - TYPE=PAPER
+      - MEMORY=${MC_HAKSTPOELEN_MEMORY:-7G}
+      - MAX_MEMORY=${MC_HAKSTPOELEN_MAX_MEMORY:-14G}
+      - ONLINE_MODE=${MC_ONLINE_MODE:-false}
+      - ENABLE_PROXY_CONNECTIONS=${MC_ENABLE_PROXY_CONNECTIONS:-true}
+      - MOTD=${MC_HAKSTPOELEN_MOTD:-"HAKST Pöelten Server - Healthcare Focus!"}
+      - SERVER_DIR=/data
+      # Healthcare education server settings
+      - MODE=survival
+      - MAX_PLAYERS=60
+      - VIEW_DISTANCE=9
+      - SIMULATION_DISTANCE=7
+      - PVP=true
+      - SPAWN_ANIMALS=true
+      - SPAWN_MONSTERS=true
+      - SPAWN_NPCS=true
+      - HARDCORE=false
+      - SPAWN_PROTECTION=10
+    volumes:
+      - ./hakstpoelten-mc-landing/data:/data
+      - ./hakstpoelten-mc-landing/datapacks:/data/datapacks
+    restart: unless-stopped
+    networks:
+      - minecraft-net
+    expose:
+      - "25565"
+
+  # Minecraft Server - Basop-Bafep-TP
+  mc-basop-bafep-stp:
+    build:
+      context: ./minecraft-base
+      args:
+        - MC_VERSION=1.21.1
+    container_name: mc-basop-bafep-stp
+    environment:
+      - EULA=${MC_EULA:-TRUE}
+      - VERSION=${MC_VERSION:-1.21.1}
+      - TYPE=PAPER
+      - MEMORY=${MC_BASOP_BAFEP_STP_MEMORY:-9G}
+      - MAX_MEMORY=${MC_BASOP_BAFEP_STP_MAX_MEMORY:-18G}
+      - ONLINE_MODE=${MC_ONLINE_MODE:-false}
+      - ENABLE_PROXY_CONNECTIONS=${MC_ENABLE_PROXY_CONNECTIONS:-true}
+      - MOTD=${MC_BASOP_BAFEP_STP_MOTD:-"BASOP BAFEP STP Server - Applied Sciences!"}
+      - SERVER_DIR=/data
+      # Applied sciences server settings
+      - MODE=survival
+      - MAX_PLAYERS=70
+      - VIEW_DISTANCE=10
+      - SIMULATION_DISTANCE=8
+      - PVP=true
+      - SPAWN_ANIMALS=true
+      - SPAWN_MONSTERS=true
+      - SPAWN_NPCS=true
+      - HARDCORE=false
+      - SPAWN_PROTECTION=14
+    volumes:
+      - ./basop-bafep-stp-mc-landing/data:/data
+      - ./basop-bafep-stp-mc-landing/datapacks:/data/datapacks
+    restart: unless-stopped
+    networks:
+      - minecraft-net
+    expose:
+      - "25565"
+
+  # Minecraft Server - Play (Public/Sandbox)
+  mc-play:
+    build:
+      context: ./minecraft-base
+      args:
+        - MC_VERSION=1.21.1
+    container_name: mc-play
+    environment:
+      - EULA=${MC_EULA:-TRUE}
+      - VERSION=${MC_VERSION:-1.21.1}
+      - TYPE=PAPER
+      - MEMORY=${MC_PLAY_MEMORY:-12G}
+      - MAX_MEMORY=${MC_PLAY_MAX_MEMORY:-24G}
+      - ONLINE_MODE=${MC_ONLINE_MODE:-false}
+      - ENABLE_PROXY_CONNECTIONS=${MC_ENABLE_PROXY_CONNECTIONS:-true}
+      - MOTD=${MC_PLAY_MOTD:-"Play Server - Sandbox & Fun!"}
+      - SERVER_DIR=/data
+      # Public server settings
+      - MODE=survival
+      - MAX_PLAYERS=150  # Higher capacity for public server
+      - VIEW_DISTANCE=8  # Lower for performance with more players
+      - SIMULATION_DISTANCE=6
+      - PVP=true
+      - SPAWN_ANIMALS=true
+      - SPAWN_MONSTERS=true
+      - SPAWN_NPCS=true
+      - HARDCORE=false
+      - SPAWN_PROTECTION=16
+      - ANNOUNCE_PLAYER_ACHIEVEMENTS=true  # Fun for public server
+    volumes:
+      - ./play-mc-landing/data:/data
+      - ./play-mc-landing/datapacks:/data/datapacks
+    restart: unless-stopped
+    networks:
+      - minecraft-net
+    expose:
+      - "25565"
+
+  # BungeeCord Proxy Server (Routes players to appropriate servers)
+  bungeecord:
+    build: ./bungeecord
+    container_name: mc-bungeecord
+    ports:
+      # Main Minecraft port accessible from outside
+      - "${PROXY_PORT:-25565}:25565"
+    volumes:
+      # BungeeCord configuration directory
+      - ./bungeecord/config:/home/bungee/server
+    restart: unless-stopped
+    networks:
+      - minecraft-net
+    # Wait for all Minecraft servers to start before starting BungeeCord
+    depends_on:
+      - mc-ilias
+      - mc-niilo
+      - mc-bgstpoelten
+      - mc-htlstp
+      - mc-borgstpoelten
+      - mc-hakstpoelten
+      - mc-basop-bafep-stp
+      - mc-play
+
+  # Admin API Service (Controls all servers)
+  admin-api:
+    build: ./admin-api
+    container_name: mc-admin-api
+    volumes:
+      # Access to Docker daemon for container management
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Access to all datapacks directories for management
+      - ./mc-ilias/datapacks:/app/mc-ilias/datapacks
+      - ./mc-niilo/datapacks:/app/mc-niilo/datapacks
+      - ./bgstpoelten-mc-landing/datapacks:/app/bgstpoelten/datapacks
+      - ./htlstp-mc-landing/datapacks:/app/htlstp/datapacks
+      - ./borgstpoelten-mc-landing/datapacks:/app/borgstpoelten/datapacks
+      - ./hakstpoelten-mc-landing/datapacks:/app/hakstpoelten/datapacks
+      - ./basop-bafep-stp-mc-landing/datapacks:/app/basop-bafep-stp/datapacks
+      - ./play-mc-landing/datapacks:/app/play/datapacks
+    environment:
+      - NODE_ENV=production
+      - ADMIN_USER=${ADMIN_USER:-admin}
+      - ADMIN_PASS=${ADMIN_PASS:-admin123}
+    restart: unless-stopped
+    networks:
+      - minecraft-net
+    ports:
+      # Admin API available on port 3000 (for direct access if needed)
+      - "${ADMIN_API_PORT:-3000}:3000"
+    # Wait for Minecraft servers to start before API is available
+    depends_on:
+      - mc-ilias
+      - mc-niilo
+      - mc-bgstpoelten
+      - mc-htlstp
+      - mc-borgstpoelten
+      - mc-hakstpoelten
+      - mc-basop-bafep-stp
+      - mc-play
+
+  # Nginx Web Server (Serves SPA admin panel and handles API proxy)
+  nginx:
+    build: ./nginx
+    container_name: mc-nginx
+    ports:
+      # Standard HTTP and HTTPS ports
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_HTTPS_PORT:-443}:443"
+    volumes:
+      # Serves the built SPA admin panel
+      - ./admin-ui-dist:/usr/share/nginx/html
+      # Custom nginx configuration (if needed)
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - minecraft-net
+      - proxy
+    # Wait for API to be available before serving requests
+    depends_on:
+      - admin-api
+
+  # Watchtower (Automatically updates containers)
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    # Check for updates every 30 minutes and clean up old images
+    command: --interval 1800 --cleanup
+    environment:
+      - DOCKER_API_VERSION=1.44
+    restart: unless-stopped
+
+networks:
+  # Internal network for Minecraft services
+  minecraft-net:
+    driver: bridge
+  # Network for external proxy services (like Nginx)
+  proxy:
+    driver: bridge

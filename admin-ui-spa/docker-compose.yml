@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  admin-ui-spa:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mc-admin-ui-spa
+    ports:
+      - "8080:80"
+    volumes:
+      - ./dist:/usr/share/nginx/html

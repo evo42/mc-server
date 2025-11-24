@@ -1,37 +1,70 @@
-name: CI
+name: Backend CI Pipeline
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'admin-api/**'
+      - 'minecraft-base/**'
+      - 'bungeecord/**'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    paths:
+      - 'admin-api/**'
+      - 'minecraft-base/**'
+      - 'bungeecord/**'
 
 jobs:
-  build:
+  build-and-push:
+    name: Build and Push Images
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [admin-api, minecraft-base, bungeecord]
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
 
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push minecraft-base image
-        uses: docker/build-push-action@v2
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
         with:
-          context: ./minecraft-base
+          context: ./${{ matrix.service }}
           push: true
-          tags: ghcr.io/${{ github.repository }}/minecraft-base:latest
+          tags: ghcr.io/${{ github.repository }}/${{ matrix.service }}:latest
+  
+  test-admin-api:
+    name: Test Admin API
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Build and push admin-api image
-        uses: docker/build-push-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
         with:
-          context: ./admin-api
-          push: true
-          tags: ghcr.io/${{ github.repository }}/admin-api:latest
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull latest admin-api image
+        run: docker pull ghcr.io/${{ github.repository }}/admin-api:latest
+
+      - name: Run unit tests
+        run: docker run --rm ghcr.io/${{ github.repository }}/admin-api:latest npm test
