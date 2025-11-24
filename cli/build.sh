@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# Consolidated Build Script for Minecraft SaaS Platform
+# This script builds the Minecraft server infrastructure.
+# It builds the admin-ui-spa application and then builds all the services
+# defined in the docker compose.yml file.
 
 set -e
 

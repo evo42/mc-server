@@ -1,7 +1,6 @@
 
 
 x-mc-server-base: &mc-server-base
-  platform: linux/amd64
   image: ghcr.io/evo42/mc-server/minecraft-base
   build:
     context: ./minecraft-base
@@ -28,7 +27,6 @@ services:
     container_name: mc-ilias
     environment:
       - MOTD=${MC_ILIAS_MOTD:-mc-ilias Server}
-      - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./mc-ilias/data:/data
       - ./mc-ilias/datapacks:/data/datapacks
@@ -38,7 +36,6 @@ services:
     container_name: mc-niilo
     environment:
       - MOTD=${MC_NILO_MOTD:-mc-niilo Server}
-      - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./mc-niilo/data:/data
       - ./mc-niilo/datapacks:/data/datapacks
@@ -48,7 +45,6 @@ services:
     container_name: mc-bgstpoelten
     environment:
       - MOTD=${MC_BGSTPOELEN_MOTD:-mc-bgstpoelten Server}
-      - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./landing/bgstpoelten-mc-landing/data:/data
       - ./landing/bgstpoelten-mc-landing/datapacks:/data/datapacks
@@ -58,7 +54,6 @@ services:
     container_name: mc-htlstp
     environment:
       - MOTD=${MC_HTLSTP_MOTD:-mc-htlstp Server}
-      - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./landing/htlstp-mc-landing/data:/data
       - ./landing/htlstp-mc-landing/datapacks:/data/datapacks
@@ -68,7 +63,6 @@ services:
     container_name: mc-borgstpoelten
     environment:
       - MOTD=${MC_BORGSTPOELEN_MOTD:-mc-borgstpoelten Server}
-      - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./landing/borgstpoelten-mc-landing/data:/data
       - ./landing/borgstpoelten-mc-landing/datapacks:/data/datapacks
@@ -78,7 +72,6 @@ services:
     container_name: mc-hakstpoelten
     environment:
       - MOTD=${MC_HAKSTPOELEN_MOTD:-mc-hakstpoelten Server}
-      - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./landing/hakstpoelten-mc-landing/data:/data
       - ./landing/hakstpoelten-mc-landing/datapacks:/data/datapacks
@@ -88,7 +81,6 @@ services:
     container_name: mc-basop-bafep-stp
     environment:
       - MOTD=${MC_BASOP_BAFEP_STP_MOTD:-mc-basop-bafep-stp Server}
-      - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./landing/basop-bafep-stp-mc-landing/data:/data
       - ./landing/basop-bafep-stp-mc-landing/datapacks:/data/datapacks
@@ -98,13 +90,11 @@ services:
     container_name: mc-play
     environment:
       - MOTD=${MC_PLAY_MOTD:-mc-play Server}
-      - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./landing/play-mc-landing/data:/data
       - ./landing/play-mc-landing/datapacks:/data/datapacks
 
   bungeecord:
-    platform: linux/amd64
     image: ghcr.io/evo42/mc-server/bungeecord
     build: ./bungeecord
     container_name: mc-bungeecord
@@ -126,7 +116,6 @@ services:
       - mc-play
 
   admin-api:
-    platform: linux/amd64
     image: ghcr.io/evo42/mc-server/admin-api
     build: ./admin-api
     container_name: mc-admin-api
@@ -160,8 +149,6 @@ services:
       - ./mc-niilo/datapacks:/app/mc-niilo/datapacks
       - ./admin-api/mc-ilias/datapacks:/app/mc-ilias/datapacks
 
-    env_file:
-      - .env
     environment:
       - NODE_ENV=production
       - ADMIN_USER=${ADMIN_USER:-admin}
@@ -182,17 +169,12 @@ services:
       - mc-play
 
   admin-ui:
-    platform: linux/amd64
     image: ghcr.io/evo42/mc-server/admin-ui
     build: ./admin-ui-spa
-    labels:
-      - com.centurylinklabs.watchtower.enable=false
 
   nginx:
     build: ./nginx
     container_name: mc-nginx
-    labels:
-      - com.centurylinklabs.watchtower.enable=false
     ports:
       - "${NGINX_PORT:-80}:80"
       - "${NGINX_HTTPS_PORT:-443}:443"
@@ -207,15 +189,11 @@ services:
 
   watchtower:
     image: containrrr/watchtower
-    labels:
-      - com.centurylinklabs.watchtower.enable=false
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    env_file:
-      - .secrets
+    command: --interval 30 --cleanup
     environment:
       - DOCKER_API_VERSION=1.44
-    command: --interval 30 --cleanup
     restart: unless-stopped
 
 networks:
