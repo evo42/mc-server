@@ -3,17 +3,7 @@ const fs = require('fs').promises;
 const path = require('path');
 
 // Mock the fs module for datapacksService
-jest.mock('fs', () => ({
-    ...jest.requireActual('fs'),
-    promises: {
-        readdir: jest.fn(),
-        stat: jest.fn(),
-        mkdir: jest.fn(),
-        access: jest.fn(),
-        writeFile: jest.fn(),
-        rm: jest.fn(),
-    }
-}));
+jest.mock('fs/promises');
 
 const fsMock = require('fs').promises;
 
@@ -41,7 +31,7 @@ jest.mock('fs', () => ({
     }
 }));
 
-const fsMock = require('fs').promises;
+const fsMock = fs.promises;
 
 describe('Datapacks Service Unit Tests', () => {
     });
@@ -171,7 +161,8 @@ describe('Datapacks Service Unit Tests', () => {
         });
 
         it('should throw error if datapack is already installed', async () => {
-            fsMock.access.mockResolvedValue(undefined); // Simulate file exists
+            const fsPromises = require('fs/promises');
+            fsPromises.access.mockResolvedValue(); // Simulate file exists
 
             await expect(datapacksService.installDatapack('mc-ilias', 'afk display', '1.1.14'))
                 .rejects.toThrow('Datapack afk display v1.1.14 is already installed');

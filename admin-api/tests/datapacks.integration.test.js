@@ -1,3 +1,6 @@
+process.env.ADMIN_USER = 'testuser';
+process.env.ADMIN_PASS = 'testpass';
+
 const request = require('supertest');
 const express = require('express');
 const app = require('../server');
@@ -13,9 +16,7 @@ jest.mock('../services/datapacksService', () => ({
 
 describe('Datapacks API Integration Tests', () => {
     beforeAll(() => {
-        // Set up authentication credentials
-        process.env.ADMIN_USER = 'testuser';
-        process.env.ADMIN_PASS = 'testpass';
+        // Credentials already set before require
     });
 
     afterEach(() => {
@@ -101,6 +102,33 @@ describe('Datapacks API Integration Tests', () => {
                 details: 'Installation error'
             });
         });
+        it('should return 400 if datapackName is missing', async () => {
+            const credentials = Buffer.from('testuser:testpass').toString('base64');
+            const response = await request(app)
+                .post('/api/datapacks/install/mc-ilias')
+                .set('Authorization', `Basic ${credentials}`)
+                .send({ version: '1.1.14' })
+                .expect(400);
+
+            expect(response.body).toEqual({
+                error: 'Missing required fields',
+                details: 'Both datapackName and version are required'
+            });
+        });
+
+        it('should return 400 if version is missing', async () => {
+            const credentials = Buffer.from('testuser:testpass').toString('base64');
+            const response = await request(app)
+                .post('/api/datapacks/install/mc-ilias')
+                .set('Authorization', `Basic ${credentials}`)
+                .send({ datapackName: 'afk display' })
+                .expect(400);
+
+            expect(response.body).toEqual({
+                error: 'Missing required fields',
+                details: 'Both datapackName and version are required'
+            });
+        });
     });
 
     describe('POST /api/datapacks/uninstall/:server', () => {
@@ -119,6 +147,35 @@ describe('Datapacks API Integration Tests', () => {
                 message: 'Successfully uninstalled test-datapack v1.0.0 (MC 1.21) from mc-ilias' 
             });
             expect(datapacksService.uninstallDatapack).toHaveBeenCalledWith('mc-ilias', 'test-datapack v1.0.0 (MC 1.21)');
+        });
+        it('should return 500 for datapack uninstallation failure', async () => {
+            datapacksService.uninstallDatapack.mockRejectedValue(new Error('Uninstallation error'));
+
+            const credentials = Buffer.from('testuser:testpass').toString('base64');
+            const response = await request(app)
+                .post('/api/datapacks/uninstall/mc-ilias')
+                .set('Authorization', `Basic ${credentials}`)
+                .send({ datapackDir: 'test-datapack v1.0.0 (MC 1.21)' })
+                .expect(500);
+
+            expect(response.body).toEqual({
+                error: 'Failed to uninstall datapack',
+                details: 'Uninstallation error'
+            });
+        });
+
+        it('should return 400 if datapackDir is missing', async () => {
+            const credentials = Buffer.from('testuser:testpass').toString('base64');
+            const response = await request(app)
+                .post('/api/datapacks/uninstall/mc-ilias')
+                .set('Authorization', `Basic ${credentials}`)
+                .send({})
+                .expect(400);
+
+            expect(response.body).toEqual({
+                error: 'Missing required field',
+                details: 'datapackDir is required'
+            });
         });
     });
 
@@ -162,6 +219,20 @@ describe('Datapacks API Integration Tests', () => {
                 total: 1
             });
             expect(datapacksService.searchDatapacks).toHaveBeenCalledWith('afk');
+        });
+        it('should return 500 for search failure', async () => {
+            datapacksService.searchDatapacks.mockRejectedValue(new Error('Search error'));
+
+            const credentials = Buffer.from('testuser:testpass').toString('base64');
+            const response = await request(app)
+                .get('/api/datapacks/search')
+                .set('Authorization', `Basic ${credentials}`)
+                .expect(500);
+
+            expect(response.body).toEqual({
+                error: 'Failed to search for datapacks',
+                details: 'Search error'
+            });
         });
     });
 });

@@ -1,3 +1,6 @@
+process.env.ADMIN_USER = 'testuser';
+process.env.ADMIN_PASS = 'testpass';
+
 const request = require('supertest');
 const express = require('express');
 const app = require('../server');
@@ -15,9 +18,7 @@ jest.mock('../services/serversService', () => ({
 
 describe('Servers API Integration Tests', () => {
     beforeAll(() => {
-        // Set up authentication credentials
-        process.env.ADMIN_USER = 'testuser';
-        process.env.ADMIN_PASS = 'testpass';
+        // Credentials already set before require
     });
 
     afterEach(() => {
@@ -79,6 +80,21 @@ describe('Servers API Integration Tests', () => {
             expect(response.body).toEqual({ success: true, message: 'mc-ilias stopped' });
             expect(serversService.stopServer).toHaveBeenCalledWith('mc-ilias');
         });
+        it('should return 500 for server stop failure', async () => {
+            serversService.stopServer.mockRejectedValue(new Error('Failed to stop'));
+            serversService.isValidServer.mockReturnValue(true);
+
+            const credentials = Buffer.from('testuser:testpass').toString('base64');
+            const response = await request(app)
+                .post('/api/servers/stop/mc-ilias')
+                .set('Authorization', `Basic ${credentials}`)
+                .expect(500);
+
+            expect(response.body).toEqual({
+                error: 'Failed to stop server',
+                details: 'Failed to stop'
+            });
+        });
     });
 
     describe('POST /api/servers/restart/:server', () => {
@@ -94,6 +110,21 @@ describe('Servers API Integration Tests', () => {
 
             expect(response.body).toEqual({ success: true, message: 'mc-ilias restarted' });
             expect(serversService.restartServer).toHaveBeenCalledWith('mc-ilias');
+        });
+        it('should return 500 for server restart failure', async () => {
+            serversService.restartServer.mockRejectedValue(new Error('Failed to restart'));
+            serversService.isValidServer.mockReturnValue(true);
+
+            const credentials = Buffer.from('testuser:testpass').toString('base64');
+            const response = await request(app)
+                .post('/api/servers/restart/mc-ilias')
+                .set('Authorization', `Basic ${credentials}`)
+                .expect(500);
+
+            expect(response.body).toEqual({
+                error: 'Failed to restart server',
+                details: 'Failed to restart'
+            });
         });
     });
 
@@ -156,6 +187,20 @@ describe('Servers API Integration Tests', () => {
 
             expect(response.body).toEqual(mockAllStatus);
             expect(serversService.getAllServerStatus).toHaveBeenCalled();
+        });
+        it('should return 500 for get all server statuses failure', async () => {
+            serversService.getAllServerStatus.mockRejectedValue(new Error('Failed to get statuses'));
+
+            const credentials = Buffer.from('testuser:testpass').toString('base64');
+            const response = await request(app)
+                .get('/api/servers/status')
+                .set('Authorization', `Basic ${credentials}`)
+                .expect(500);
+
+            expect(response.body).toEqual({
+                error: 'Failed to get server status',
+                details: 'Failed to get statuses'
+            });
         });
     });
 });

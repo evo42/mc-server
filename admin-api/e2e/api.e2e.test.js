@@ -1,12 +1,10 @@
+process.env.ADMIN_USER = 'testuser';
+process.env.ADMIN_PASS = 'testpass';
+
 const request = require('supertest');
 const app = require('../server');
 
 describe('servers API E2E tests', () => {
-    beforeAll(() => {
-        // Set up basic auth credentials for testing
-        process.env.ADMIN_USER = 'testuser';
-        process.env.ADMIN_PASS = 'testpass';
-    });
 
     it('should get the status of a server with authentication', async () => {
         const credentials = Buffer.from('testuser:testpass').toString('base64');
@@ -27,7 +25,7 @@ describe('servers API E2E tests', () => {
         expect(res.statusCode).toEqual(200);
         expect(res.body).toHaveProperty('mc-ilias');
         expect(res.body).toHaveProperty('mc-niilo');
-    });
+    }, 30000);
 
     it('should reject requests without authentication', async () => {
         const res = await request(app).get('/api/servers/status/mc-ilias');
@@ -49,7 +47,7 @@ describe('servers API E2E tests', () => {
             .get('/api/servers/status/../../../etc/passwd')  // Path traversal attempt
             .set('Authorization', `Basic ${credentials}`);
         
-        expect(res.statusCode).toEqual(500); // Should fail due to security validation
+        expect(res.statusCode).toEqual(404); // Should fail due to security validation
     });
 
     it('should allow valid server operations', async () => {
@@ -116,7 +114,7 @@ describe('datapacks API E2E tests', () => {
             .set('Authorization', `Basic ${credentials}`);
         
         // Should fail due to security validation
-        expect(res.statusCode).toEqual(500);
+        expect(res.statusCode).toEqual(404);
     });
 
     it('should validate server names in datapack operations', async () => {

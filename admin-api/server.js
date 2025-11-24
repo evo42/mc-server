@@ -24,6 +24,7 @@ const ADMIN_PASS = process.env.ADMIN_PASS || 'admin123';
 
 // Middleware
 app.use(httpLogger);
+app.use(express.json());
 
 // Serve static files from the root directory
 app.use(express.static(__dirname));
