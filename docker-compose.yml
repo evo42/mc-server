@@ -27,6 +27,7 @@ services:
     container_name: mc-ilias
     environment:
       - MOTD=${MC_ILIAS_MOTD:-mc-ilias Server}
+      - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./mc-ilias/data:/data
       - ./mc-ilias/datapacks:/data/datapacks
@@ -36,6 +37,7 @@ services:
     container_name: mc-niilo
     environment:
       - MOTD=${MC_NILO_MOTD:-mc-niilo Server}
+      - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./mc-niilo/data:/data
       - ./mc-niilo/datapacks:/data/datapacks
@@ -45,6 +47,7 @@ services:
     container_name: mc-bgstpoelten
     environment:
       - MOTD=${MC_BGSTPOELEN_MOTD:-mc-bgstpoelten Server}
+      - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./landing/bgstpoelten-mc-landing/data:/data
       - ./landing/bgstpoelten-mc-landing/datapacks:/data/datapacks
@@ -54,6 +57,7 @@ services:
     container_name: mc-htlstp
     environment:
       - MOTD=${MC_HTLSTP_MOTD:-mc-htlstp Server}
+      - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./landing/htlstp-mc-landing/data:/data
       - ./landing/htlstp-mc-landing/datapacks:/data/datapacks
@@ -63,6 +67,7 @@ services:
     container_name: mc-borgstpoelten
     environment:
       - MOTD=${MC_BORGSTPOELEN_MOTD:-mc-borgstpoelten Server}
+      - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./landing/borgstpoelten-mc-landing/data:/data
       - ./landing/borgstpoelten-mc-landing/datapacks:/data/datapacks
@@ -72,6 +77,7 @@ services:
     container_name: mc-hakstpoelten
     environment:
       - MOTD=${MC_HAKSTPOELEN_MOTD:-mc-hakstpoelten Server}
+      - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./landing/hakstpoelten-mc-landing/data:/data
       - ./landing/hakstpoelten-mc-landing/datapacks:/data/datapacks
@@ -81,6 +87,7 @@ services:
     container_name: mc-basop-bafep-stp
     environment:
       - MOTD=${MC_BASOP_BAFEP_STP_MOTD:-mc-basop-bafep-stp Server}
+      - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./landing/basop-bafep-stp-mc-landing/data:/data
       - ./landing/basop-bafep-stp-mc-landing/datapacks:/data/datapacks
@@ -90,6 +97,7 @@ services:
     container_name: mc-play
     environment:
       - MOTD=${MC_PLAY_MOTD:-mc-play Server}
+      - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./landing/play-mc-landing/data:/data
       - ./landing/play-mc-landing/datapacks:/data/datapacks
