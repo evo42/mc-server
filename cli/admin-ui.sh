@@ -73,7 +73,7 @@ ensure_image_exists() {
 
 deploy_admin_ui() {
     print_status \"Deploying admin UI service...\"
-    docker-compose up -d --force-recreate mc-admin-ui
+    docker compose up -d --force-recreate mc-admin-ui
     print_status \"Admin UI service deployed\"
 }
 

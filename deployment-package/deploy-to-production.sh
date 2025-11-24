@@ -18,7 +18,7 @@ TAG="latest"
 SERVICES=(
     "admin-ui"
     "mc-ilias"
-    "ilias-admin-ui" 
+    "ilias-admin-ui"
     "mc-niilo"
     "niilo-admin-ui"
     "school-server"
@@ -47,10 +47,10 @@ echo
 
 # Check if compose files exist
 COMPOSE_FILES=(
-    "docker-compose-ilias.yml"
-    "docker-compose-niilo.yml"
-    "docker-compose-school.yml"
-    "docker-compose-general.yml"
+    "docker compose-ilias.yml"
+    "docker compose-niilo.yml"
+    "docker compose-school.yml"
+    "docker compose-general.yml"
 )
 
 for COMPOSE_FILE in "${COMPOSE_FILES[@]}"; do
@@ -70,7 +70,7 @@ echo
 for COMPOSE_FILE in "${COMPOSE_FILES[@]}"; do
     if [ -f "$COMPOSE_FILE" ]; then
         echo "Stopping services in $COMPOSE_FILE"
-        docker-compose -f "$COMPOSE_FILE" down --remove-orphans || true
+        docker compose -f "$COMPOSE_FILE" down --remove-orphans || true
     fi
 done
 
@@ -81,7 +81,7 @@ echo
 # Start each compose setup
 for COMPOSE_FILE in "${COMPOSE_FILES[@]}"; do
     echo "Starting services in $COMPOSE_FILE..."
-    docker-compose -f "$COMPOSE_FILE" up -d --force-recreate
+    docker compose -f "$COMPOSE_FILE" up -d --force-recreate
 done
 
 echo
@@ -100,14 +100,14 @@ echo "Deployment completed successfully!"
 echo
 echo "Services are now available at:"
 echo "- mc-ilias admin UI: http://<server>:3001"
-echo "- mc-niilo admin UI: http://<server>:3002" 
+echo "- mc-niilo admin UI: http://<server>:3002"
 echo "- School server admin UI: http://<server>:3003"
 echo "- General server admin UI: http://<server>:3004"
 echo "- Main admin UI: http://<server>:3000"
 echo
 
 echo "To check logs for any specific service:"
-echo "  docker-compose -f <compose-file> logs -f <service-name>"
+echo "  docker compose -f <compose-file> logs -f <service-name>"
 echo
 
 echo "To stop the infrastructure:"

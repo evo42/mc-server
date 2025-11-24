@@ -50,14 +50,14 @@ Commands:
 # Display logs for all Minecraft containers
 show_logs() {
     print_status "Displaying logs for running Minecraft containers..."
-    
+
     CONTAINERS=$(docker ps --format "{{.Names}}" | grep -E "(mc-|ilias-|niilo-|school-|general-)" | tr '\n' ' ')
-    
+
     if [ -z "$CONTAINERS" ]; then
         print_warn "No Minecraft containers are currently running"
         return
     fi
-    
+
     for CONTAINER in $CONTAINERS; do
         echo
         print_status "Last 50 lines of logs for container: $CONTAINER"
@@ -71,7 +71,7 @@ show_logs() {
 show_stats() {
     print_status "Displaying resource usage statistics..."
     echo
-    
+
     if command -v docker stats &> /dev/null; then
         echo "Current container resource usage:"
         docker stats --no-stream || echo "Could not retrieve stats"
@@ -83,74 +83,74 @@ show_stats() {
 # Cleanup unused Docker objects
 perform_cleanup() {
     print_status "Performing cleanup of unused Docker objects..."
-    
+
     print_status "Removing stopped containers..."
     docker container prune -f
-    
+
     print_status "Removing unused volumes..."
     docker volume prune -f
-    
+
     print_status "Removing unused networks..."
     docker network prune -f
-    
+
     print_status "Removing unused images..."
     docker image prune -f
-    
+
     print_status "Cleanup completed"
 }
 
 # Restart all services
 restart_services() {
     print_status "Restarting all Minecraft services..."
-    
+
     print_status "Stopping all services..."
-    docker-compose -f docker-compose-ilias.yml down --remove-orphans || true
-    docker-compose -f docker-compose-niilo.yml down --remove-orphans || true
-    docker-compose -f docker-compose-school.yml down --remove-orphans || true
-    docker-compose -f docker-compose-general.yml down --remove-orphans || true
-    
+    docker compose -f docker compose-ilias.yml down --remove-orphans || true
+    docker compose -f docker compose-niilo.yml down --remove-orphans || true
+    docker compose -f docker compose-school.yml down --remove-orphans || true
+    docker compose -f docker compose-general.yml down --remove-orphans || true
+
     sleep 10  # Wait for proper shutdown
-    
+
     print_status "Starting all services..."
-    docker-compose -f docker-compose-ilias.yml up -d
+    docker compose -f docker compose-ilias.yml up -d
     sleep 5
-    docker-compose -f docker-compose-niilo.yml up -d
+    docker compose -f docker compose-niilo.yml up -d
     sleep 5
-    docker-compose -f docker-compose-school.yml up -d
+    docker compose -f docker compose-school.yml up -d
     sleep 5
-    docker-compose -f docker-compose-general.yml up -d
-    
+    docker compose -f docker compose-general.yml up -d
+
     print_status "All services restarted"
 }
 
 # Stop all services
 stop_services() {
     print_status "Stopping all Minecraft services..."
-    
-    docker-compose -f docker-compose-ilias.yml down --remove-orphans
-    docker-compose -f docker-compose-niilo.yml down --remove-orphans
-    docker-compose -f docker-compose-school.yml down --remove-orphans
-    docker-compose -f docker-compose-general.yml down --remove-orphans
-    
+
+    docker compose -f docker compose-ilias.yml down --remove-orphans
+    docker compose -f docker compose-niilo.yml down --remove-orphans
+    docker compose -f docker compose-school.yml down --remove-orphans
+    docker compose -f docker compose-general.yml down --remove-orphans
+
     print_status "All services stopped"
 }
 
 # Prune unused containers and images
 perform_prune() {
     print_status "Pruning unused containers and images..."
-    
+
     # Stop and remove containers that are not managed by compose
     echo "Removing unused containers..."
     docker container prune -f
-    
+
     # Remove unused images (only dangling ones by default)
     echo "Removing dangling images..."
     docker image prune -f
-    
+
     # Optionally remove unused volumes
     echo "Removing unused volumes..."
     docker volume prune -f
-    
+
     print_status "Prune completed"
 }
 
@@ -160,7 +160,7 @@ main() {
         print_warn "No command provided. Use 'help' to see available commands."
         exit 1
     fi
-    
+
     case "$1" in
         "help")
             usage

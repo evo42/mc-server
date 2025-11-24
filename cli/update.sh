@@ -29,13 +29,13 @@ print_error() {
 update_services() {
     print_status \"Updating all services...\"
     ./cli/build.sh
-    docker-compose up -d --force-recreate
+    docker compose up -d --force-recreate
     print_status \"All services updated successfully!\"
 }
 
 update_datapacks() {
     print_status \"Updating datapack volumes in docker-compose.yml...\"
-    
+
     DOCKER_COMPOSE_FILE=\"docker-compose.yml\"
     DATAPACKS_DIR=\"datapacks\"
 

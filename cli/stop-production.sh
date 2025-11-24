@@ -11,10 +11,10 @@ echo "==========================================="
 
 # Compose files to shut down
 COMPOSE_FILES=(
-    "docker-compose-ilias.yml"
-    "docker-compose-niilo.yml"
-    "docker-compose-school.yml"
-    "docker-compose-general.yml"
+    "docker compose-ilias.yml"
+    "docker compose-niilo.yml"
+    "docker compose-school.yml"
+    "docker compose-general.yml"
 )
 
 echo
@@ -23,7 +23,7 @@ echo "Stopping all services..."
 for COMPOSE_FILE in "${COMPOSE_FILES[@]}"; do
     if [ -f "$COMPOSE_FILE" ]; then
         echo "Stopping services in $COMPOSE_FILE..."
-        docker-compose -f "$COMPOSE_FILE" down --remove-orphans
+        docker compose -f "$COMPOSE_FILE" down --remove-orphans
     fi
 done
 

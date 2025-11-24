@@ -39,13 +39,13 @@ build_spa() {
 
 build_containers() {
     print_status \"Building all Docker containers...\"
-    docker-compose build
+    docker compose build
     print_status \"All Docker containers built successfully!\"
 }
 
 build_and_push() {
     print_status \"Building and pushing images to registry...\"
-    
+
     REGISTRY=\"ghcr.io\"
     REPO=\"evo42/mc-server\"
     TAG=\"latest\"
