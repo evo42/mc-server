@@ -7,6 +7,7 @@ const basicAuth = require('express-basic-auth');
 const serversRouter = require('./routes/servers');
 const datapacksRouter = require('./routes/datapacks');
 
+const app = express(); // Create the express app
 const logger = pino({
   level: process.env.LOG_LEVEL || 'info',
   transport: {
