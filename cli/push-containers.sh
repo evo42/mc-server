@@ -55,6 +55,7 @@ IMAGES=(
     "admin-api"
     "bungeecord"
     "minecraft-base"
+    "admin-ui"
 )
 
 # Push each image

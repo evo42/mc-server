@@ -21,7 +21,7 @@ export default defineConfig({
     }
   },
   build: {
-    outDir: '../admin-ui-dist', // Output to a separate directory
+outDir: 'dist',
     emptyOutDir: true,
   }
 })

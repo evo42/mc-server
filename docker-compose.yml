@@ -168,6 +168,10 @@ services:
       - mc-basop-bafep-stp
       - mc-play
 
+  admin-ui:
+    image: admin-ui
+    build: ./admin-ui-spa
+
   nginx:
     build: ./nginx
     container_name: mc-nginx

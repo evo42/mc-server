@@ -1,11 +1,16 @@
 # Log files
 *.log
+*.log.gz
 
 # Terraform secrets
 terraform.tfvars
 
 node_modules/
+
+# Server data
 */data/*
 */world/*
 */logs/*
-*.log
+server.properties
+.rcon-cli.env
+.rcon-cli.yaml
