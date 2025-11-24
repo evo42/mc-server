@@ -318,16 +318,16 @@
             .dashboard-container {
                 grid-template-columns: 1fr;
             }
-            
+
             .form-row {
                 flex-direction: column;
                 gap: 10px;
             }
-            
+
             h1 {
                 font-size: 2em;
             }
-            
+
             button {
                 width: 100%;
                 margin-bottom: 10px;
@@ -436,7 +436,7 @@
                     </div>
                     <div class="info-item">
                         <span class="info-label">Version:</span>
-                        <span id="bgstpoelten-version">1.20.4</span>
+                        <span id="bgstpoelten-version">1.21.1</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Players Online:</span>
@@ -475,7 +475,7 @@
                     </div>
                     <div class="info-item">
                         <span class="info-label">Version:</span>
-                        <span id="htlstp-version">1.20.4</span>
+                        <span id="htlstp-version">1.21.1</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Players Online:</span>
@@ -514,7 +514,7 @@
                     </div>
                     <div class="info-item">
                         <span class="info-label">Version:</span>
-                        <span id="borgstpoelten-version">1.20.4</span>
+                        <span id="borgstpoelten-version">1.21.1</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Players Online:</span>
@@ -553,7 +553,7 @@
                     </div>
                     <div class="info-item">
                         <span class="info-label">Version:</span>
-                        <span id="hakstpoelten-version">1.20.4</span>
+                        <span id="hakstpoelten-version">1.21.1</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Players Online:</span>
@@ -592,7 +592,7 @@
                     </div>
                     <div class="info-item">
                         <span class="info-label">Version:</span>
-                        <span id="basopbafepstp-version">1.20.4</span>
+                        <span id="basopbafepstp-version">1.21.1</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Players Online:</span>
@@ -631,7 +631,7 @@
                     </div>
                     <div class="info-item">
                         <span class="info-label">Version:</span>
-                        <span id="play-version">1.20.4</span>
+                        <span id="play-version">1.21.1</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Players Online:</span>
@@ -867,7 +867,7 @@
                 document.getElementById('last-updated').textContent = 'Error loading stats';
             }
         }
-        
+
         function updateServerDisplay(server, data) {
             // Update status indicator
             const statusIndicator = document.getElementById(`${server}-status-indicator`);
@@ -875,13 +875,13 @@
             if (statusIndicator) {
                 statusIndicator.className = `status-indicator ${data.status.toLowerCase()}`;
             }
-            
+
             // Update player count
             const playerCount = document.getElementById(`${server}-player-count`);
             if (playerCount) {
                 playerCount.textContent = `${data.playerCount}/20`;
             }
-            
+
             // Update players list
             const playersList = document.getElementById(`${server}-players`);
             if (playersList) {
@@ -898,13 +898,13 @@
                 }
             }
         }
-        
+
         // Function to start server
         async function startServer(serverName) {
             if (!confirm(`Are you sure you want to start ${serverName}?`)) {
                 return;
             }
-            
+
             try {
                 const response = await fetch(`/api/start/${serverName}`, {
                     method: 'POST'
@@ -922,13 +922,13 @@
                 alert(`Error starting ${serverName}: ${error.message}`);
             }
         }
-        
+
         // Function to stop server
         async function stopServer(serverName) {
             if (!confirm(`Are you sure you want to stop ${serverName}?`)) {
                 return;
             }
-            
+
             try {
                 const response = await fetch(`/api/stop/${serverName}`, {
                     method: 'POST'
@@ -946,13 +946,13 @@
                 alert(`Error stopping ${serverName}: ${error.message}`);
             }
         }
-        
+
         // Function to restart server
         async function restartServer(serverName) {
             if (!confirm(`Are you sure you want to restart ${serverName}? This will temporarily disconnect all players.`)) {
                 return;
             }
-            
+
             try {
                 const response = await fetch(`/api/restart/${serverName}`, {
                     method: 'POST'
@@ -970,13 +970,13 @@
                 alert(`Error restarting ${serverName}: ${error.message}`);
             }
         }
-        
+
         // Function to download world
         async function downloadWorld(serverName) {
             if (!confirm(`Are you sure you want to download the world from ${serverName}? This may take a while.`)) {
                 return;
             }
-            
+
             try {
                 const response = await fetch(`/api/download/world/${serverName}`, {
                     method: 'GET'
@@ -1002,7 +1002,7 @@
                 alert(`Error downloading world: ${error.message}`);
             }
         }
-        
+
         // Function to add admin
         async function addAdmin() {
             const username = document.getElementById('username').value.trim();
@@ -1079,7 +1079,7 @@
         function refreshAll() {
             updateStats();
         }
-        
+
         // Initial load
         updateStats();
 

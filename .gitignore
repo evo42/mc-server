@@ -30,3 +30,5 @@ server.properties
 .rcon-cli.yaml
 level.dat
 level.dat_old
+raids.dat
+raids_end.dat

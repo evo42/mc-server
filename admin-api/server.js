@@ -53,6 +53,10 @@ app.get('/stats', (req, res) => {
     res.sendFile(path.join(__dirname, 'stats.html'));
 });
 
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'stats.html'));
+});
+
 // Only start the server if this file is run directly (not imported)
 if (require.main === module) {
     app.listen(port, '0.0.0.0', () => {
