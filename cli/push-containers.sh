@@ -31,8 +31,8 @@ print_error() {
 
 # Registry to push to (change this to your registry)
 if [ -z "$1" ]; then
-    REGISTRY="docker.io"
-    REPO_PREFIX="your-username/mc-server"
+REGISTRY="ghcr.io"
+REPO_PREFIX="evo42/mc-server"
 else
     REGISTRY="$1"
     if [ -z "$2" ]; then
@@ -52,15 +52,9 @@ print_status "Using repo prefix: $REPO_PREFIX"
 
 # List of images to push
 IMAGES=(
-    "admin-ui"
-    "mc-ilias"
-    "ilias-admin-ui"
-    "mc-niilo"
-    "niilo-admin-ui"
-    "school-server"
-    "school-admin-ui"
-    "general-server"
-    "general-admin-ui"
+    "admin-api"
+    "bungeecord"
+    "minecraft-base"
 )
 
 # Push each image
@@ -71,10 +65,10 @@ for IMAGE in "${IMAGES[@]}"; do
     FULL_IMAGE_NAME="${REGISTRY}/${REPO_PREFIX}/${IMAGE}"
     
     print_status "Tagging $FULL_IMAGE_NAME:latest"
-    docker tag "mc-server/${IMAGE}:latest" "${FULL_IMAGE_NAME}:latest"
+    docker tag "${IMAGE}" "${FULL_IMAGE_NAME}:latest"
     
     print_status "Tagging $FULL_IMAGE_NAME:prod-v1.0"
-    docker tag "mc-server/${IMAGE}:prod-v1.0" "${FULL_IMAGE_NAME}:prod-v1.0"
+    docker tag "${IMAGE}" "${FULL_IMAGE_NAME}:prod-v1.0"
     
     print_status "Pushing $FULL_IMAGE_NAME:latest"
     docker push "${FULL_IMAGE_NAME}:latest"

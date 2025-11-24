@@ -1,6 +1,7 @@
 
 
 x-mc-server-base: &mc-server-base
+  image: minecraft-base
   build:
     context: ./minecraft-base
     dockerfile: Dockerfile.consolidated
@@ -94,6 +95,7 @@ services:
       - ./landing/play-mc-landing/datapacks:/data/datapacks
 
   bungeecord:
+    image: bungeecord
     build: ./bungeecord
     container_name: mc-bungeecord
     ports:
@@ -114,6 +116,7 @@ services:
       - mc-play
 
   admin-api:
+    image: admin-api
     build: ./admin-api
     container_name: mc-admin-api
     volumes:
