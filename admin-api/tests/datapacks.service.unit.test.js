@@ -117,8 +117,16 @@ describe('Datapacks Service Unit Tests', () => {
 
             await datapacksService.installDatapack('mc-ilias', 'afk display', '1.1.14');
 
-            expect(fsMock.readdir).toHaveBeenCalledWith(path.join(__dirname, '..', 'mc-ilias', 'datapacks'));
+            // The first call should be to create the base datapacks directory
             expect(fsMock.mkdir).toHaveBeenCalledWith(path.join(__dirname, '..', 'mc-ilias', 'datapacks'), { recursive: true });
+
+            // The second call to access should fail (directory doesn't exist)
+            expect(fsMock.access).toHaveBeenCalledWith(path.join(__dirname, '..', 'mc-ilias', 'datapacks', 'afk display v1.1.14 (MC 1.21-1.21.10)'));
+
+            // The third call should be mkdir for the specific datapack directory
+            expect(fsMock.mkdir).toHaveBeenCalledWith(path.join(__dirname, '..', 'mc-ilias', 'datapacks', 'afk display v1.1.14 (MC 1.21-1.21.10)'), { recursive: true });
+
+            // Finally, the pack.mcmeta should be written
             expect(fsMock.writeFile).toHaveBeenCalled();
 
             // Verify that the written content contains proper pack.mcmeta structure
@@ -154,11 +162,20 @@ describe('Datapacks Service Unit Tests', () => {
                 return Promise.resolve([]);
             });
 
-            fsMock.readdir.mockResolvedValue(['afk display v1.1.14 (MC 1.21-1.21.10)']);
-            fsMock.access.mockResolvedValue(undefined); // Directory exists
+            // Mock the filesystem operations in the correct sequence:
+            // 1. mkdir for base datapacks directory (should succeed)
+            // 2. access for specific datapack directory (should succeed - meaning it exists)
+            fsMock.mkdir.mockResolvedValueOnce(undefined); // For creating base datapacks directory
+            fsMock.access.mockResolvedValue(undefined); // For checking if specific datapack dir exists (will succeed, triggering error)
 
             await expect(datapacksService.installDatapack('mc-ilias', 'afk display', '1.1.14'))
                 .rejects.toThrow('Datapack afk display v1.1.14 is already installed');
+
+            // Verify the correct calls were made
+            expect(fsMock.mkdir).toHaveBeenCalled(); // Should have tried to create base directory
+            expect(fsMock.access).toHaveBeenCalledWith(
+                expect.stringContaining('afk display v1.1.14 (MC 1.21-1.21.10)')  // Should check for specific datapack dir
+            );
 
             // Restore the original function
             datapacksService.searchDatapacks = originalSearchDatapacks;

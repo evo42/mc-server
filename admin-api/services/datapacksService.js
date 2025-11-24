@@ -8,6 +8,7 @@ const sanitizeInput = (input) => {
 
 const fs = require('fs').promises;
 const path = require('path');
+const allDatapacks = require('../datapacks.json');  // Import the datapack repository
 const { isValidServer } = require('./serversService'); // Reuse the server validation
 
 // Sanitize server name to prevent path traversal
@@ -132,7 +133,6 @@ const uninstallDatapack = async (server, datapackDir) => {
 };
 
 const searchDatapacks = async (query) => {
-const allDatapacks = require('../datapacks.json');
     if (query) {
         return allDatapacks.filter(dp =>
             dp.name.toLowerCase().includes(query.toLowerCase())

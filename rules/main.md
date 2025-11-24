@@ -4,7 +4,7 @@ This document outlines the rules and guidelines for AI systems managing and inte
 
 ## Platform Overview
 
-The Minecraft SaaS Platform is a production-ready multi-server system supporting Minecraft 1.21.10 with:
+The Minecraft SaaS Platform is a production-ready multi-server system supporting Minecraft 1.21.1 with:
 - Universal Minecraft base image with dynamic PaperMC download
 - Secure admin API with Dockerode integration
 - Vue.js SPA admin panel
@@ -14,7 +14,7 @@ The Minecraft SaaS Platform is a production-ready multi-server system supporting
 ## AI System Rules
 
 ### 1. Configuration Management Rules
-- **Version Consistency**: Always maintain version compatibility across all servers
+- **Version Consistency**: Always maintain Minecraft 1.21.1 compatibility across all servers
 - **Security First**: Prioritize security over convenience in all decisions
 - **Resource Limitation**: Never exceed available system resources
 - **Backup Protocol**: Always backup configurations before making changes
@@ -38,7 +38,7 @@ The Minecraft SaaS Platform is a production-ready multi-server system supporting
 - **Testing Required**: Test all configuration changes in staging environment
 
 ### 5. Server Management Rules
-- **Version Support**: Support only Minecraft versions compatible with PaperMC (1.12.2+)
+- **Version Support**: Support only Minecraft versions compatible with PaperMC
 - **Resource Allocation**: Assign resources based on server usage patterns
 - **Player Limits**: Set realistic maximums based on available resources
 - **Performance Tuning**: Optimize settings for each server's intended use case
@@ -87,7 +87,7 @@ When making decisions about the platform, follow this hierarchy:
 
 ### 1. PaperMC Support
 - **Supported Versions**: PaperMC supports Minecraft 1.12.2 and newer versions
-- **Current Target**: Minecraft 1.21.10 (latest stable supported version)
+- **Current Target**: Minecraft 1.21.1 (latest stable supported version)
 - **Version Selection**: Use latest stable PaperMC build for each Minecraft version
 - **Validation**: Verify PaperMC availability before implementing new Minecraft versions
 
