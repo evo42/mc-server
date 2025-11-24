@@ -18,8 +18,32 @@ jest.mock('fs', () => ({
 const fsMock = require('fs').promises;
 
 describe('Datapacks Service Unit Tests', () => {
-    beforeEach(() => {
-        jest.clearAllMocks();
+const datapacksService = require('../services/datapacksService');
+const fs = require('fs').promises;
+const path = require('path');
+const mockDatapacks = [
+    { name: 'afk display', version: '1.1.14', gameVersion: 'MC 1.21-1.21.10', description: 'Shows AFK status for players' },
+    { name: 'another datapack', version: '2.0.0', gameVersion: 'MC 1.21.1', description: 'Another great datapack' }
+];
+
+jest.mock('../datapacks.json', () => mockDatapacks);
+
+// Mock the fs module for datapacksService
+jest.mock('fs', () => ({
+    ...jest.requireActual('fs'),
+    promises: {
+        readdir: jest.fn(),
+        stat: jest.fn(),
+        mkdir: jest.fn(),
+        access: jest.fn(),
+        writeFile: jest.fn(),
+        rm: jest.fn(),
+    }
+}));
+
+const fsMock = require('fs').promises;
+
+describe('Datapacks Service Unit Tests', () => {
     });
 
     describe('getDatapacks', () => {
@@ -147,32 +171,10 @@ describe('Datapacks Service Unit Tests', () => {
         });
 
         it('should throw error if datapack is already installed', async () => {
-            // Mock the search to return the expected datapack so the repo lookup passes
-            const originalSearchDatapacks = datapacksService.searchDatapacks;
-            datapacksService.searchDatapacks = jest.fn().mockImplementation((query) => {
-                if (query === 'afk display') {
-                    return Promise.resolve([{
-                        name: "afk display",
-                        version: "1.1.14",
-                        gameVersion: "MC 1.21-1.21.10",
-                        description: "Shows AFK status for players"
-                    }]);
-                }
-                // Default response for other queries
-                return Promise.resolve([]);
-            });
-
-            // Mock the filesystem operations in the correct sequence:
-            // 1. mkdir for base datapacks directory (should succeed)
-            // 2. access for specific datapack directory (should succeed - meaning it exists)
-            fsMock.mkdir.mockResolvedValueOnce(undefined); // For creating base datapacks directory
-            fsMock.access.mockResolvedValue(undefined); // For checking if specific datapack dir exists (will succeed, triggering error)
+            fsMock.access.mockResolvedValue(undefined); // Simulate file exists
 
             await expect(datapacksService.installDatapack('mc-ilias', 'afk display', '1.1.14'))
-                .rejects.toThrow('is already installed');
-
-            // Restore the original function
-            datapacksService.searchDatapacks = originalSearchDatapacks;
+                .rejects.toThrow('Datapack afk display v1.1.14 is already installed');
         });
 
         it('should throw error for invalid server name', async () => {

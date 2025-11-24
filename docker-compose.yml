@@ -157,6 +157,8 @@ services:
       - ./mc-niilo/datapacks:/app/mc-niilo/datapacks
       - ./admin-api/mc-ilias/datapacks:/app/mc-ilias/datapacks
 
+    env_file:
+      - .env
     environment:
       - NODE_ENV=production
       - ADMIN_USER=${ADMIN_USER:-admin}
