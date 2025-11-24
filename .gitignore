@@ -28,3 +28,5 @@ node_modules/
 server.properties
 .rcon-cli.env
 .rcon-cli.yaml
+level.dat
+level.dat_old
