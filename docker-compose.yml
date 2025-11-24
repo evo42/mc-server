@@ -1,5 +1,4 @@
 
-version: '3.8'
 
 x-mc-server-base: &mc-server-base
   build:
