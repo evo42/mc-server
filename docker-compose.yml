@@ -1,7 +1,7 @@
 
 
 x-mc-server-base: &mc-server-base
-  image: minecraft-base
+  image: ghcr.io/evo42/mc-server/minecraft-base
   build:
     context: ./minecraft-base
     dockerfile: Dockerfile.consolidated
@@ -95,7 +95,7 @@ services:
       - ./landing/play-mc-landing/datapacks:/data/datapacks
 
   bungeecord:
-    image: bungeecord
+    image: ghcr.io/evo42/mc-server/bungeecord
     build: ./bungeecord
     container_name: mc-bungeecord
     ports:
@@ -116,7 +116,7 @@ services:
       - mc-play
 
   admin-api:
-    image: admin-api
+    image: ghcr.io/evo42/mc-server/admin-api
     build: ./admin-api
     container_name: mc-admin-api
     volumes:
@@ -169,7 +169,7 @@ services:
       - mc-play
 
   admin-ui:
-    image: admin-ui
+    image: ghcr.io/evo42/mc-server/admin-ui
     build: ./admin-ui-spa
 
   nginx:
