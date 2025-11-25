@@ -11,11 +11,13 @@ if [ -f .env ]; then
     set +o allexport
 fi
 
-deploy() {
+deploy() {\
+    echo "Stopping all containers..."\
+    docker compose down
     echo \"Deploying Minecraft SaaS Platform...\"
     ./cli/build.sh containers
     docker compose up -d --remove-orphans
-    docker compose ps
+
 }
 
 verify() {
@@ -67,12 +69,12 @@ update() {
     echo "Updating Minecraft SaaS Platform..."
     docker compose pull
     docker compose up -d --force-recreate
-    docker compose ps
+
 }
 
 status() {
     echo "Current service status:"
-    docker compose ps
+
 }
 
 logs() {

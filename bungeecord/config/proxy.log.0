@@ -1,0 +1,94 @@
+13:50:22 [INFO] Using mbed TLS based native cipher.
+13:50:22 [INFO] Using zlib based native compressor.
+13:50:22 [INFO] Enabled BungeeCord version git:BungeeCord-Bootstrap:1.21-R0.5-SNAPSHOT:3929ac4:2009
+13:50:22 [INFO] Not on Windows, attempting to use enhanced EpollEventLoop
+13:50:23 [INFO] Epoll is working, utilising it!
+13:50:23 [INFO] Discovered module: ModuleSpec(name=cmd_alert, file=modules/cmd_alert.jar, provider=JenkinsModuleSource())
+13:50:23 [INFO] Discovered module: ModuleSpec(name=cmd_find, file=modules/cmd_find.jar, provider=JenkinsModuleSource())
+13:50:23 [INFO] Discovered module: ModuleSpec(name=cmd_list, file=modules/cmd_list.jar, provider=JenkinsModuleSource())
+13:50:23 [INFO] Discovered module: ModuleSpec(name=cmd_send, file=modules/cmd_send.jar, provider=JenkinsModuleSource())
+13:50:23 [INFO] Discovered module: ModuleSpec(name=cmd_server, file=modules/cmd_server.jar, provider=JenkinsModuleSource())
+13:50:23 [INFO] Discovered module: ModuleSpec(name=reconnect_yaml, file=modules/reconnect_yaml.jar, provider=JenkinsModuleSource())
+13:50:23 [INFO] Attempting to update plugin from null to ModuleVersion(build=2009, git=3929ac4)
+13:50:23 [INFO] Attempting to Jenkins download module cmd_alert v2009
+13:50:24 [INFO] Download complete
+13:50:24 [INFO] Attempting to update plugin from null to ModuleVersion(build=2009, git=3929ac4)
+13:50:24 [INFO] Attempting to Jenkins download module cmd_find v2009
+13:50:24 [INFO] Download complete
+13:50:24 [INFO] Attempting to update plugin from null to ModuleVersion(build=2009, git=3929ac4)
+13:50:24 [INFO] Attempting to Jenkins download module cmd_list v2009
+13:50:24 [INFO] Download complete
+13:50:24 [INFO] Attempting to update plugin from null to ModuleVersion(build=2009, git=3929ac4)
+13:50:24 [INFO] Attempting to Jenkins download module cmd_send v2009
+13:50:24 [INFO] Download complete
+13:50:24 [INFO] Attempting to update plugin from null to ModuleVersion(build=2009, git=3929ac4)
+13:50:24 [INFO] Attempting to Jenkins download module cmd_server v2009
+13:50:24 [INFO] Download complete
+13:50:24 [INFO] Attempting to update plugin from null to ModuleVersion(build=2009, git=3929ac4)
+13:50:24 [INFO] Attempting to Jenkins download module reconnect_yaml v2009
+13:50:24 [INFO] Download complete
+13:50:24 [INFO] Loaded plugin reconnect_yaml version git:reconnect_yaml:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+13:50:24 [INFO] Loaded plugin cmd_find version git:cmd_find:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+13:50:24 [INFO] Loaded plugin cmd_server version git:cmd_server:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+13:50:24 [INFO] Loaded plugin cmd_alert version git:cmd_alert:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+13:50:24 [INFO] Loaded plugin cmd_send version git:cmd_send:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+13:50:24 [INFO] Loaded plugin cmd_list version git:cmd_list:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+13:50:25 [INFO] Enabled plugin reconnect_yaml version git:reconnect_yaml:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+13:50:25 [INFO] Enabled plugin cmd_find version git:cmd_find:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+13:50:25 [INFO] Enabled plugin cmd_server version git:cmd_server:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+13:50:25 [INFO] Enabled plugin cmd_alert version git:cmd_alert:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+13:50:25 [INFO] Enabled plugin cmd_send version git:cmd_send:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+13:50:25 [INFO] Enabled plugin cmd_list version git:cmd_list:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+13:50:25 [INFO] Listening on /0.0.0.0:25565
+13:50:30 [INFO] [/176.65.148.52:61673] <-> InitialHandler has pinged
+13:51:52 [INFO] Closing listener [id: 0x124b5a3d, L:/[0:0:0:0:0:0:0:0]:25565]
+13:51:52 [INFO] Closing pending connections
+13:51:52 [INFO] Disconnecting 0 connections
+13:51:53 [INFO] Disabling plugins
+13:51:53 [INFO] Closing IO threads
+13:52:05 [INFO] Using mbed TLS based native cipher.
+13:52:05 [INFO] Using zlib based native compressor.
+13:52:05 [INFO] Enabled BungeeCord version git:BungeeCord-Bootstrap:1.21-R0.5-SNAPSHOT:3929ac4:2009
+13:52:05 [INFO] Not on Windows, attempting to use enhanced EpollEventLoop
+13:52:05 [INFO] Epoll is working, utilising it!
+13:52:05 [INFO] Discovered module: ModuleSpec(name=cmd_alert, file=modules/cmd_alert.jar, provider=JenkinsModuleSource())
+13:52:05 [INFO] Discovered module: ModuleSpec(name=cmd_find, file=modules/cmd_find.jar, provider=JenkinsModuleSource())
+13:52:05 [INFO] Discovered module: ModuleSpec(name=cmd_list, file=modules/cmd_list.jar, provider=JenkinsModuleSource())
+13:52:05 [INFO] Discovered module: ModuleSpec(name=cmd_send, file=modules/cmd_send.jar, provider=JenkinsModuleSource())
+13:52:05 [INFO] Discovered module: ModuleSpec(name=cmd_server, file=modules/cmd_server.jar, provider=JenkinsModuleSource())
+13:52:05 [INFO] Discovered module: ModuleSpec(name=reconnect_yaml, file=modules/reconnect_yaml.jar, provider=JenkinsModuleSource())
+13:52:06 [INFO] Loaded plugin reconnect_yaml version git:reconnect_yaml:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+13:52:06 [INFO] Loaded plugin cmd_find version git:cmd_find:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+13:52:06 [INFO] Loaded plugin cmd_server version git:cmd_server:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+13:52:06 [INFO] Loaded plugin cmd_alert version git:cmd_alert:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+13:52:06 [INFO] Loaded plugin cmd_send version git:cmd_send:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+13:52:06 [INFO] Loaded plugin cmd_list version git:cmd_list:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+13:52:06 [INFO] Enabled plugin reconnect_yaml version git:reconnect_yaml:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+13:52:06 [INFO] Enabled plugin cmd_find version git:cmd_find:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+13:52:06 [INFO] Enabled plugin cmd_server version git:cmd_server:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+13:52:06 [INFO] Enabled plugin cmd_alert version git:cmd_alert:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+13:52:06 [INFO] Enabled plugin cmd_send version git:cmd_send:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+13:52:06 [INFO] Enabled plugin cmd_list version git:cmd_list:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+13:52:06 [INFO] Listening on /0.0.0.0:25565
+14:00:16 [SEVERE] [/62.40.206.79:62281] <-> InitialHandler - encountered exception: net.md_5.bungee.util.QuietException: Unexpected packet received during login process! 4554202f20485454502f312e310d0a48
+14:00:17 [SEVERE] [/62.40.206.79:62287] <-> InitialHandler - encountered exception: net.md_5.bungee.util.QuietException: Unexpected packet received during login process! 4554202f20485454502f312e310d0a48
+14:00:22 [SEVERE] [/62.40.206.79:62317] <-> InitialHandler - encountered exception: net.md_5.bungee.util.QuietException: Unexpected packet received during login process! 4554202f20485454502f312e310d0a48
+14:00:52 [SEVERE] [/62.40.206.79:62469] <-> InitialHandler - encountered exception: net.md_5.bungee.util.QuietException: Unexpected packet received during login process! 4554202f20485454502f312e310d0a48
+14:01:07 [INFO] [/176.65.148.52:61673] <-> InitialHandler has pinged
+14:01:52 [SEVERE] [/62.40.206.79:62793] <-> InitialHandler - encountered exception: net.md_5.bungee.util.QuietException: Unexpected packet received during login process! 4554202f20485454502f312e310d0a48
+14:04:21 [INFO] [/208.77.244.3:49194] <-> InitialHandler has pinged
+14:04:30 [INFO] [/86.54.30.165:59954] <-> InitialHandler has pinged
+14:05:31 [INFO] [/62.40.206.79:63926] <-> InitialHandler has pinged
+14:05:31 [INFO] [/62.40.206.79:63925] <-> InitialHandler has pinged
+14:05:31 [INFO] [/62.40.206.79:63927] <-> InitialHandler has pinged
+14:05:31 [INFO] [/62.40.206.79:63928] <-> InitialHandler has pinged
+14:05:31 [INFO] [/62.40.206.79:63929] <-> InitialHandler has pinged
+14:05:56 [INFO] [/155.248.209.22:61000] <-> InitialHandler has pinged
+14:06:53 [SEVERE] [/62.40.206.79:64345] <-> InitialHandler - encountered exception: net.md_5.bungee.util.QuietException: Unexpected packet received during login process! 4554202f20485454502f312e310d0a48
+14:12:23 [INFO] [/176.65.149.126:61269] <-> InitialHandler has pinged
+14:16:53 [SEVERE] [/62.40.206.79:51045] <-> InitialHandler - encountered exception: net.md_5.bungee.util.QuietException: Unexpected packet received during login process! 4554202f20485454502f312e310d0a48
+14:23:03 [INFO] [/176.65.149.126:61269] <-> InitialHandler has pinged
+14:33:18 [INFO] [/176.65.148.52:61673] <-> InitialHandler has pinged
+14:33:38 [INFO] [/176.65.148.52:61673] <-> InitialHandler has pinged
+14:33:45 [INFO] [/176.65.149.126:61269] <-> InitialHandler has pinged
+14:34:08 [WARNING] [/176.65.148.52:61673] <-> InitialHandler - read timed out

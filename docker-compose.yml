@@ -1,5 +1,4 @@
 
-
 x-mc-server-base: &mc-server-base
   image: ghcr.io/evo42/mc-server/minecraft-base
   build:
@@ -27,6 +26,9 @@ services:
     container_name: mc-ilias
     environment:
       - MOTD=${MC_ILIAS_MOTD:-mc-ilias Server}
+      - MEMORY=5120M
+      - MAX_MEMORY=15360M
+      - MAX_PLAYERS=99
       - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./mc-ilias/data:/data
@@ -37,6 +39,9 @@ services:
     container_name: mc-niilo
     environment:
       - MOTD=${MC_NILO_MOTD:-mc-niilo Server}
+      - MEMORY=5120M
+      - MAX_MEMORY=15360M
+      - MAX_PLAYERS=99
       - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./mc-niilo/data:/data
@@ -47,6 +52,9 @@ services:
     container_name: mc-bgstpoelten
     environment:
       - MOTD=${MC_BGSTPOELEN_MOTD:-mc-bgstpoelten Server}
+      - MEMORY=5120M
+      - MAX_MEMORY=15360M
+      - MAX_PLAYERS=99
       - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./landing/bgstpoelten-mc-landing/data:/data
@@ -57,6 +65,9 @@ services:
     container_name: mc-htlstp
     environment:
       - MOTD=${MC_HTLSTP_MOTD:-mc-htlstp Server}
+      - MEMORY=5120M
+      - MAX_MEMORY=15360M
+      - MAX_PLAYERS=99
       - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./landing/htlstp-mc-landing/data:/data
@@ -67,6 +78,9 @@ services:
     container_name: mc-borgstpoelten
     environment:
       - MOTD=${MC_BORGSTPOELEN_MOTD:-mc-borgstpoelten Server}
+      - MEMORY=5120M
+      - MAX_MEMORY=15360M
+      - MAX_PLAYERS=99
       - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./landing/borgstpoelten-mc-landing/data:/data
@@ -77,6 +91,9 @@ services:
     container_name: mc-hakstpoelten
     environment:
       - MOTD=${MC_HAKSTPOELEN_MOTD:-mc-hakstpoelten Server}
+      - MEMORY=5120M
+      - MAX_MEMORY=15360M
+      - MAX_PLAYERS=99
       - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./landing/hakstpoelten-mc-landing/data:/data
@@ -87,6 +104,9 @@ services:
     container_name: mc-basop-bafep-stp
     environment:
       - MOTD=${MC_BASOP_BAFEP_STP_MOTD:-mc-basop-bafep-stp Server}
+      - MEMORY=5120M
+      - MAX_MEMORY=15360M
+      - MAX_PLAYERS=99
       - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./landing/basop-bafep-stp-mc-landing/data:/data
@@ -97,6 +117,9 @@ services:
     container_name: mc-play
     environment:
       - MOTD=${MC_PLAY_MOTD:-mc-play Server}
+      - MEMORY=5120M
+      - MAX_MEMORY=15360M
+      - MAX_PLAYERS=99
       - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./landing/play-mc-landing/data:/data
@@ -106,13 +129,12 @@ services:
     image: ghcr.io/evo42/mc-server/bungeecord
     build: ./bungeecord
     container_name: mc-bungeecord
+    network_mode: "host"
     ports:
       - "${PROXY_PORT:-25565}:25565"
     volumes:
-      - ./bungeecord/config:/home/bungee/server
+      - ./bungeecord/config:/server
     restart: unless-stopped
-    networks:
-      - minecraft-net
     depends_on:
       - mc-ilias
       - mc-niilo
@@ -201,18 +223,18 @@ services:
     depends_on:
       - admin-api
 
-  watchtower:
-    image: containrrr/watchtower
-    labels:
-      - com.centurylinklabs.watchtower.enable=false
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    env_file:
-      - .secrets
-    environment:
-      - DOCKER_API_VERSION=1.44
-    command: --interval 30 --cleanup
-    restart: unless-stopped
+#  watchtower:
+#    image: containrrr/watchtower
+#    labels:
+#      - com.centurylinklabs.watchtower.enable=false
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#    env_file:
+#      - .secrets
+#    environment:
+#      - DOCKER_API_VERSION=1.44
+#    command: --interval 30 --cleanup
+#    restart: unless-stopped
 
 networks:
   minecraft-net:
