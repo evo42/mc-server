@@ -13,17 +13,17 @@ services:
       - EULA=${MC_EULA:-TRUE}  # Must be TRUE to accept Mojang's EULA
       - VERSION=${MC_VERSION:-1.21.1}  # Minecraft version (matches build context arg)
       - TYPE=PAPER  # Server type (PAPER is recommended for performance)
-      
+
       # Memory settings (critical for performance)
       - MEMORY=${MC_ILIAS_MEMORY:-8G}  # Initial RAM allocation (set based on server load)
       - MAX_MEMORY=${MC_ILIAS_MAX_MEMORY:-16G}  # Maximum RAM allocation (don't exceed host RAM)
-      
+
       # Gameplay settings
       - ONLINE_MODE=${MC_ONLINE_MODE:-false}  # false = cracked server, true = Mojang auth required
       - ENABLE_PROXY_CONNECTIONS=${MC_ENABLE_PROXY_CONNECTIONS:-true}  # Required for BungeeCord integration
       - MOTD=${MC_ILIAS_MOTD:-"ILIAS Education Server - Welcome!"}  # Server description shown in server list
       - SERVER_DIR=/data  # Working directory inside container
-      
+
       # Advanced gameplay settings (override defaults if needed)
       - DIFFICULTY=easy  # Options: peaceful, easy, normal, hard
       - MODE=survival  # Options: survival, creative, adventure, spectator
@@ -34,7 +34,7 @@ services:
       - SNOOPER_ENABLED=false  # Disable data collection about your server
       - MAX_BUILD_HEIGHT=320  # Maximum build height (for 1.18+)
       - ALLOW_NETHER=true  # Enable nether dimension
-      - ALLOW_END=true  # Enable end dimension  
+      - ALLOW_END=true  # Enable end dimension
       - GENERATE_STRUCTURES=true  # Generate villages, temples, etc.
       - SPAWN_ANIMALS=true  # Spawn animals
       - SPAWN_MONSTERS=true  # Spawn monsters
@@ -124,7 +124,7 @@ services:
       - MAX_MEMORY=${MC_BGSTPOELEN_MAX_MEMORY:-12G}
       - ONLINE_MODE=${MC_ONLINE_MODE:-false}
       - ENABLE_PROXY_CONNECTIONS=${MC_ENABLE_PROXY_CONNECTIONS:-true}
-      - MOTD=${MC_BGSTPOELEN_MOTD:-"BGST Pöelten Server - Educational!"}
+      - MOTD=${MC_BGSTPOELEN_MOTD:-"BG STP Pöelten Server - Educational!"}
       - SERVER_DIR=/data
       # Educational server settings
       - MODE=survival
@@ -199,7 +199,7 @@ services:
       - MAX_MEMORY=${MC_BORGSTPOELEN_MAX_MEMORY:-20G}
       - ONLINE_MODE=${MC_ONLINE_MODE:-false}
       - ENABLE_PROXY_CONNECTIONS=${MC_ENABLE_PROXY_CONNECTIONS:-true}
-      - MOTD=${MC_BORGSTPOELEN_MOTD:-"BORGST Pöelten Server - Advanced Students!"}
+      - MOTD=${MC_BORGSTPOELEN_MOTD:-"BORG St. Pölten Server - Advanced Students!"}
       - SERVER_DIR=/data
       # Advanced server settings
       - MODE=survival
@@ -236,7 +236,7 @@ services:
       - MAX_MEMORY=${MC_HAKSTPOELEN_MAX_MEMORY:-14G}
       - ONLINE_MODE=${MC_ONLINE_MODE:-false}
       - ENABLE_PROXY_CONNECTIONS=${MC_ENABLE_PROXY_CONNECTIONS:-true}
-      - MOTD=${MC_HAKSTPOELEN_MOTD:-"HAKST Pöelten Server - Healthcare Focus!"}
+      - MOTD=${MC_HAKSTPOELEN_MOTD:-"HAK St. Pölten Server - Healthcare Focus!"}
       - SERVER_DIR=/data
       # Healthcare education server settings
       - MODE=survival
@@ -273,7 +273,7 @@ services:
       - MAX_MEMORY=${MC_BASOP_BAFEP_STP_MAX_MEMORY:-18G}
       - ONLINE_MODE=${MC_ONLINE_MODE:-false}
       - ENABLE_PROXY_CONNECTIONS=${MC_ENABLE_PROXY_CONNECTIONS:-true}
-      - MOTD=${MC_BASOP_BAFEP_STP_MOTD:-"BASOP BAFEP STP Server - Applied Sciences!"}
+      - MOTD=${MC_BASOP_BAFEP_STP_MOTD:-"BASOP BAFEP St. Pölten Server - Applied Sciences!"}
       - SERVER_DIR=/data
       # Applied sciences server settings
       - MODE=survival

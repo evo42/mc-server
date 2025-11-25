@@ -2,7 +2,7 @@
   <div class="datapacks">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2>
-        <i class="bi bi-box-seam"></i> 
+        <i class="bi bi-box-seam"></i>
         Datapacks for {{ getServerDisplayName(server) }}
         <span class="badge bg-secondary ms-2">{{ server }}</span>
       </h2>
@@ -11,7 +11,22 @@
       </button>
     </div>
 
-    <div class="row">
+    <!-- Error display -->
+    <error-display
+      v-if="error"
+      :error="error"
+      @dismiss="error = null"
+      class="mb-4"
+    />
+
+    <!-- Loading spinner for initial load -->
+    <loading-spinner
+      v-if="loading && allDatapacks.length === 0"
+      loading-text="Loading datapacks..."
+      container-class="my-5"
+    />
+
+    <div v-if="!loading || allDatapacks.length > 0" class="row">
       <!-- Available Datapacks -->
       <div class="col-md-6">
         <div class="card">
@@ -21,19 +36,20 @@
           <div class="card-body">
             <div class="input-group mb-3">
               <span class="input-group-text"><i class="bi bi-search"></i></span>
-              <input 
-                type="text" 
-                class="form-control" 
-                placeholder="Search datapacks..." 
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Search datapacks..."
                 v-model="searchQuery"
                 @input="searchDatapacks"
+                :disabled="loading"
               >
             </div>
-            
+
             <div class="list-group" v-if="filteredDatapacks.length > 0">
-              <div 
-                class="list-group-item d-flex justify-content-between align-items-center" 
-                v-for="datapack in filteredDatapacks" 
+              <div
+                class="list-group-item d-flex justify-content-between align-items-center"
+                v-for="datapack in filteredDatapacks"
                 :key="datapack.name"
               >
                 <div>
@@ -42,10 +58,10 @@
                     v{{ datapack.version }} | {{ datapack.gameVersion }} | {{ datapack.description }}
                   </small>
                 </div>
-                <button 
-                  class="btn btn-sm btn-success" 
+                <button
+                  class="btn btn-sm btn-success"
                   @click="installDatapack(datapack.name, datapack.version)"
-                  :disabled="isInstalling(datapack.name)"
+                  :disabled="isInstalling(datapack.name) || loading"
                 >
                   <span v-if="installing.includes(datapack.name)">
                     <span class="spinner-border spinner-border-sm" role="status"></span>
@@ -56,6 +72,9 @@
                   </span>
                 </button>
               </div>
+            </div>
+            <div v-else-if="loading" class="text-center py-4 text-muted">
+              <div class="spinner-border" role="status"></div>
             </div>
             <div v-else class="text-center py-4 text-muted">
               <i class="bi bi-inbox" style="font-size: 3rem;"></i>
@@ -70,10 +89,10 @@
         <div class="card">
           <div class="card-header d-flex justify-content-between align-items-center">
             <h5><i class="bi bi-check2-circle"></i> Installed Datapacks</h5>
-            <button 
-              class="btn btn-sm btn-primary" 
-              @click="refreshDatapacks"
-              :disabled="isRefreshing"
+            <button
+              class="btn btn-sm btn-primary"
+              @click="refreshInstalledDatapacks"
+              :disabled="isRefreshing || loading"
             >
               <span v-if="isRefreshing">
                 <span class="spinner-border spinner-border-sm" role="status"></span>
@@ -86,9 +105,9 @@
           </div>
           <div class="card-body">
             <div class="list-group" v-if="installedDatapacks.length > 0">
-              <div 
-                class="list-group-item d-flex justify-content-between align-items-center" 
-                v-for="datapack in installedDatapacks" 
+              <div
+                class="list-group-item d-flex justify-content-between align-items-center"
+                v-for="datapack in installedDatapacks"
                 :key="datapack.directory"
               >
                 <div>
@@ -97,10 +116,10 @@
                     v{{ datapack.version }} | {{ datapack.gameVersion }}
                   </small>
                 </div>
-                <button 
-                  class="btn btn-sm btn-danger" 
+                <button
+                  class="btn btn-sm btn-danger"
                   @click="uninstallDatapack(datapack.directory)"
-                  :disabled="isUninstalling(datapack.directory)"
+                  :disabled="isUninstalling(datapack.directory) || loading"
                 >
                   <span v-if="uninstalling.includes(datapack.directory)">
                     <span class="spinner-border spinner-border-sm" role="status"></span>
@@ -112,6 +131,9 @@
                 </button>
               </div>
             </div>
+            <div v-else-if="loading && allDatapacks.length > 0" class="text-center py-4 text-muted">
+              <div class="spinner-border" role="status"></div>
+            </div>
             <div v-else class="text-center py-4 text-muted">
               <i class="bi bi-folder-x" style="font-size: 3rem;"></i>
               <p class="mt-2">No datapacks installed</p>
@@ -120,21 +142,20 @@
         </div>
       </div>
     </div>
-
-    <!-- Loading overlay -->
-    <div v-if="isLoading" class="loading-overlay">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
-    </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
+import axios from 'axios';
+import LoadingSpinner from './LoadingSpinner.vue';
+import ErrorDisplay from './ErrorDisplay.vue';
 
 export default {
   name: 'Datapacks',
+  components: {
+    LoadingSpinner,
+    ErrorDisplay
+  },
   props: ['server'],
   data() {
     return {
@@ -142,18 +163,19 @@ export default {
       allDatapacks: [],
       installedDatapacks: [],
       filteredDatapacks: [],
-      isLoading: false,
+      loading: false,
       isRefreshing: false,
       installing: [],
       uninstalling: [],
+      error: null,
       serverDisplayNames: {
-        'mc-ilias': 'ILIAS Server',
-        'mc-niilo': 'Niilo Server',
-        'mc-bgstpoelten': 'BGST Pöelten Server',
-        'mc-htlstp': 'HTLSTP Server',
-        'mc-borgstpoelten': 'BORGST Pöelten Server',
-        'mc-hakstpoelten': 'HAKST Pöelten Server',
-        'mc-basop-bafep-stp': 'BASOP BAFEP STP Server',
+        'mc-ilias': 'Ikaria Games',
+        'mc-niilo': 'KDLK.net',
+        'mc-bgstpoelten': 'BG St. Pölten Server',
+        'mc-htlstp': 'HTL St. Pölten Server',
+        'mc-borgstpoelten': 'BORG St. Pölten Server',
+        'mc-hakstpoelten': 'HAK St. Pölten Server',
+        'mc-basop-bafep-stp': 'BASOP BAFEP St. Pölten Server',
         'mc-play': 'Play Server'
       }
     }
@@ -164,27 +186,37 @@ export default {
       this.$router.push('/');
       return;
     }
-    
+
     await this.loadData();
   },
   methods: {
     async loadData() {
-      this.isLoading = true;
+      this.loading = true;
+      this.error = null;
+
       try {
         // Load available datapacks
         const availableResponse = await axios.get('/api/datapacks/search');
         this.allDatapacks = availableResponse.data.datapacks;
         this.filteredDatapacks = [...this.allDatapacks];
-        
+
         // Load installed datapacks for this server
         await this.loadInstalledDatapacks();
       } catch (error) {
         console.error('Error loading data:', error);
+
+        // Check for authentication error specifically
         if (error.response && error.response.status === 401) {
           this.$emit('auth-error');
+          return; // Don't set error if it's an auth issue
         }
+
+        // Set a user-friendly error message
+        this.error = error.response?.data?.error ||
+                     error.message ||
+                     'Failed to load datapacks. Please try again.';
       } finally {
-        this.isLoading = false;
+        this.loading = false;
       }
     },
     async loadInstalledDatapacks() {
@@ -193,28 +225,45 @@ export default {
         this.installedDatapacks = response.data.datapacks;
       } catch (error) {
         console.error('Error loading installed datapacks:', error);
+
+        // Check for authentication error specifically
         if (error.response && error.response.status === 401) {
           this.$emit('auth-error');
+          return; // Don't set error if it's an auth issue
         }
+
+        // Set a user-friendly error message
+        this.error = error.response?.data?.error ||
+                     error.message ||
+                     'Failed to load installed datapacks. Please try again.';
       }
     },
     async installDatapack(name, version) {
       this.installing.push(name);
+
       try {
         await axios.post(`/api/datapacks/install/${this.server}`, {
           datapackName: name,
           version: version
         });
-        
+
         // Refresh installed datapacks
         await this.loadInstalledDatapacks();
+
+        // Show success toast notification
+        this.$emit('show-toast', `Datapack ${name} installed successfully`, 'success', 'Installation Complete');
       } catch (error) {
         console.error('Error installing datapack:', error);
+
+        // Check for authentication error specifically
         if (error.response && error.response.status === 401) {
           this.$emit('auth-error');
-        } else {
-          alert(`Error installing ${name}: ${error.message}`);
+          return;
         }
+
+        // Show error toast notification
+        const errorMessage = `Error installing ${name}: ${error.response?.data?.error || error.message}`;
+        this.$emit('show-toast', errorMessage, 'error', 'Installation Failed');
       } finally {
         this.installing = this.installing.filter(item => item !== name);
       }
@@ -223,35 +272,53 @@ export default {
       if (!confirm(`Are you sure you want to uninstall the datapack "${directory}"? This cannot be undone.`)) {
         return;
       }
-      
+
       this.uninstalling.push(directory);
       try {
         await axios.post(`/api/datapacks/uninstall/${this.server}`, {
           datapackDir: directory
         });
-        
+
         // Refresh installed datapacks
         await this.loadInstalledDatapacks();
+
+        // Show success toast notification
+        this.$emit('show-toast', `Datapack ${directory} uninstalled successfully`, 'success', 'Uninstallation Complete');
       } catch (error) {
         console.error('Error uninstalling datapack:', error);
+
+        // Check for authentication error specifically
         if (error.response && error.response.status === 401) {
           this.$emit('auth-error');
-        } else {
-          alert(`Error uninstalling ${directory}: ${error.message}`);
+          return;
         }
+
+        // Show error toast notification
+        const errorMessage = `Error uninstalling ${directory}: ${error.response?.data?.error || error.message}`;
+        this.$emit('show-toast', errorMessage, 'error', 'Uninstallation Failed');
       } finally {
         this.uninstalling = this.uninstalling.filter(item => item !== directory);
       }
     },
-    async refreshDatapacks() {
+    async refreshInstalledDatapacks() {
       this.isRefreshing = true;
+      this.error = null;
+
       try {
         await this.loadInstalledDatapacks();
       } catch (error) {
         console.error('Error refreshing datapacks:', error);
+
+        // Check for authentication error specifically
         if (error.response && error.response.status === 401) {
           this.$emit('auth-error');
+          return;
         }
+
+        // Set a user-friendly error message
+        this.error = error.response?.data?.error ||
+                     error.message ||
+                     'Failed to refresh installed datapacks. Please try again.';
       } finally {
         this.isRefreshing = false;
       }
@@ -261,8 +328,8 @@ export default {
         this.filteredDatapacks = [...this.allDatapacks];
       } else {
         const query = this.searchQuery.toLowerCase();
-        this.filteredDatapacks = this.allDatapacks.filter(dp => 
-          dp.name.toLowerCase().includes(query) || 
+        this.filteredDatapacks = this.allDatapacks.filter(dp =>
+          dp.name.toLowerCase().includes(query) ||
           dp.description.toLowerCase().includes(query)
         );
       }

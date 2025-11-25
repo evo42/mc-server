@@ -117,8 +117,8 @@ MC_BGSTPOELEN_MEMORY=6G
 # ... and more for other servers
 
 # MOTD messages
-MC_ILIAS_MOTD=mc-ilias Server
-MC_NILO_MOTD=mc-niilo Server
+MC_ILIAS_MOTD=mc-Ikaria Games
+MC_NILO_MOTD=mc-KDLK.net
 # ... and more for other servers
 ```
 

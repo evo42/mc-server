@@ -14,10 +14,18 @@
               <router-link class="nav-link" to="/">Servers</router-link>
             </li>
             <li class="nav-item">
+              <router-link class="nav-link" to="/dashboard">Dashboard</router-link>
+            </li>
+            <li class="nav-item">
               <router-link class="nav-link" to="/datapacks">Datapacks</router-link>
             </li>
           </ul>
           <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link dark-mode-toggle" href="#" @click="configStore.toggleDarkMode" title="Toggle dark mode">
+                <i :class="configStore.isDarkMode ? 'bi bi-sun' : 'bi bi-moon'"></i>
+              </a>
+            </li>
             <li class="nav-item">
               <a class="nav-link" href="#" @click="logout">
                 <i class="bi bi-box-arrow-right"></i> Logout
@@ -34,11 +42,14 @@
           <span class="visually-hidden">Loading...</span>
         </div>
       </div>
-      
+
       <div v-else>
-        <router-view @auth-error="handleAuthError"></router-view>
+        <router-view @auth-error="handleAuthError" @show-toast="showToast"></router-view>
       </div>
     </div>
+
+    <!-- Toast notifications -->
+    <toast-notifications ref="toastNotifications" />
 
     <!-- Login Modal -->
     <div class="modal fade" id="loginModal" tabindex="-1" data-bs-backdrop="static">
@@ -71,9 +82,18 @@
 
 <script>
 import axios from 'axios'
+import ToastNotifications from './components/ToastNotifications.vue'
+import { useConfigStore } from './stores/configStore'
 
 export default {
   name: 'App',
+  components: {
+    ToastNotifications
+  },
+  setup() {
+    const configStore = useConfigStore();
+    return { configStore };
+  },
   data() {
     return {
       isLoading: true,
@@ -83,6 +103,9 @@ export default {
     }
   },
   async mounted() {
+    // Initialize the config store (handles dark mode)
+    this.configStore.initializeFromStorage();
+
     // Check if we have stored credentials or need to authenticate
     this.checkAuth();
   },
@@ -142,6 +165,11 @@ export default {
     },
     handleAuthError() {
       this.logout();
+    },
+    showToast(message, type = 'info', title = null) {
+      if (this.$refs.toastNotifications) {
+        this.$refs.toastNotifications.showToast(message, type, title);
+      }
     }
   }
 }

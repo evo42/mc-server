@@ -2,12 +2,35 @@
   <div class="server-stats-page">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2><i class="bi bi-bar-chart-line"></i> Server Statistics</h2>
-      <button class="btn btn-primary" @click="refreshStatus">
-        <i class="bi bi-arrow-clockwise"></i> Refresh
+      <button class="btn btn-primary" @click="refreshStatus" :disabled="loading">
+        <i class="bi bi-arrow-clockwise" :class="{ 'animate-spin': loading }"></i> Refresh
       </button>
     </div>
 
-    <div class="row">
+    <!-- Error display -->
+    <error-display
+      v-if="error"
+      :error="error"
+      @dismiss="error = null"
+      class="mb-4"
+    />
+
+    <!-- Loading spinner -->
+    <loading-spinner
+      v-if="loading && Object.keys(servers).length === 0"
+      loading-text="Loading server statistics..."
+      container-class="my-5"
+    />
+
+    <!-- 3D Visualization Section -->
+    <div v-if="!loading || Object.keys(servers).length > 0" class="row mb-4">
+      <div class="col-12">
+        <stats-3d-visualization :server-status="servers" />
+      </div>
+    </div>
+
+    <!-- Traditional Table View -->
+    <div v-if="!loading || Object.keys(servers).length > 0" class="row">
       <div class="col-12">
         <div class="card">
           <div class="card-header">
@@ -46,41 +69,55 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { useServerStore } from '../stores/serverStore';
+import Stats3DVisualization from './Stats3DVisualization.vue';
+import LoadingSpinner from './LoadingSpinner.vue';
+import ErrorDisplay from './ErrorDisplay.vue';
 
 export default {
   name: 'ServerList',
+  components: {
+    Stats3DVisualization,
+    LoadingSpinner,
+    ErrorDisplay
+  },
+  setup() {
+    const serverStore = useServerStore();
+    return { serverStore };
+  },
   data() {
     return {
-      servers: {},
       serverDisplayNames: {
-        'mc-ilias': 'ILIAS Server',
-        'mc-niilo': 'Niilo Server',
-        'mc-bgstpoelten': 'BGST Pöelten Server',
-        'mc-htlstp': 'HTLSTP Server',
-        'mc-borgstpoelten': 'BORGST Pöelten Server',
-        'mc-hakstpoelten': 'HAKST Pöelten Server',
-        'mc-basop-bafep-stp': 'BASOP BAFEP STP Server',
+        'mc-ilias': 'Ikaria Games',
+        'mc-niilo': 'KDLK.net',
+        'mc-bgstpoelten': 'BG St. Pölten Server',
+        'mc-htlstp': 'HTL St. Pölten Server',
+        'mc-borgstpoelten': 'BORG St. Pölten Server',
+        'mc-hakstpoelten': 'HAK St. Pölten Server',
+        'mc-basop-bafep-stp': 'BASOP BAFEP St. Pölten Server',
         'mc-play': 'Play Server'
       }
     }
   },
+  computed: {
+    servers() {
+      return this.serverStore.servers;
+    },
+    loading() {
+      return this.serverStore.loading;
+    },
+    error() {
+      return this.serverStore.error;
+    }
+  },
   async mounted() {
-    await this.loadServerStatus();
+    await this.serverStore.loadServerStatus();
     // Set up auto-refresh every 30 seconds
-    setInterval(this.loadServerStatus, 30000);
+    setInterval(() => this.serverStore.loadServerStatus(), 30000);
   },
   methods: {
     async loadServerStatus() {
-      try {
-        const response = await axios.get('/api/servers/status');
-        this.servers = response.data;
-      } catch (error) {
-        console.error('Error loading server status:', error);
-        if (error.response && error.response.status === 401) {
-          this.$emit('auth-error');
-        }
-      }
+      await this.serverStore.loadServerStatus();
     },
     refreshStatus() {
       this.loadServerStatus();
@@ -104,5 +141,14 @@ export default {
 <style scoped>
 .server-stats-page {
   padding: 2rem;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>

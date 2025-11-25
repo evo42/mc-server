@@ -275,7 +275,7 @@ mc-server/
 ## 🎯 Use Cases
 
 ### Educational Institutions
-- **ILIAS Server**: Educational platform integration
+- **Ikaria Games**: Educational platform integration
 - **Subject-Specific**: Technical, healthcare, applied sciences
 - **Student Projects**: Creative and survival modes
 - **Class Management**: Controlled player limits

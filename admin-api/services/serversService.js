@@ -1,5 +1,6 @@
 const Docker = require('dockerode');
 const docker = new Docker({ socketPath: '/var/run/docker.sock' });
+const cacheService = require('./cacheService');
 
 // Define allowed server names for security
 const ALLOWED_SERVERS = [
@@ -34,6 +35,10 @@ const startServer = async (server) => {
 
     const container = docker.getContainer(server);
     await container.start();
+
+    // Clear cache for this server since its status has changed
+    cacheService.clearServerCache(server);
+    cacheService.clearAllServersStatus(); // Also clear the combined status cache
 };
 
 const stopServer = async (server) => {
@@ -44,6 +49,10 @@ const stopServer = async (server) => {
 
     const container = docker.getContainer(server);
     await container.stop();
+
+    // Clear cache for this server since its status has changed
+    cacheService.clearServerCache(server);
+    cacheService.clearAllServersStatus(); // Also clear the combined status cache
 };
 
 const restartServer = async (server) => {
@@ -54,12 +63,22 @@ const restartServer = async (server) => {
 
     const container = docker.getContainer(server);
     await container.restart();
+
+    // Clear cache for this server since its status has changed
+    cacheService.clearServerCache(server);
+    cacheService.clearAllServersStatus(); // Also clear the combined status cache
 };
 
 const getServerStatus = async (server) => {
     server = normalizeServerName(server);
     if (!isValidServer(server)) {
         throw new Error(`Invalid server name: ${server}`);
+    }
+
+    // Try to get from cache first
+    const cachedStatus = cacheService.getServerStatus(server);
+    if (cachedStatus) {
+        return cachedStatus;
     }
 
     try {
@@ -70,7 +89,7 @@ const getServerStatus = async (server) => {
         const systemDelta = stats.cpu_stats.system_cpu_usage - stats.precpu_stats.system_cpu_usage;
         const cpu = (cpuDelta / systemDelta) * stats.cpu_stats.online_cpus * 100.0;
         const memory = stats.memory_stats.usage;
-        return {
+        const status = {
             server: server,
             status: data.State.Status,
             rawStatus: data.State,
@@ -79,9 +98,14 @@ const getServerStatus = async (server) => {
             memory: `${(memory / 1024 / 1024).toFixed(2)}MB`,
             cpu: `${cpu.toFixed(2)}%`
         };
+
+        // Cache the status
+        cacheService.setServerStatus(server, status);
+
+        return status;
     } catch (error) {
         if (error.statusCode === 404) {
-            return {
+            const status = {
                 server: server,
                 status: 'Stopped',
                 rawStatus: 'container not found',
@@ -90,16 +114,31 @@ const getServerStatus = async (server) => {
                 memory: 'N/A',
                 cpu: 'N/A'
             };
+
+            // Cache the status even when container is not found
+            cacheService.setServerStatus(server, status);
+
+            return status;
         }
         throw error;
     }
 };
 
 const getAllServerStatus = async () => {
+    // Try to get from cache first
+    const cachedStatus = cacheService.getAllServersStatus();
+    if (cachedStatus) {
+        return cachedStatus;
+    }
+
     const results = {};
     for (const server of ALLOWED_SERVERS) {
         results[server] = await getServerStatus(server);
     }
+
+    // Cache the full results
+    cacheService.setAllServersStatus(results);
+
     return results;
 };
 

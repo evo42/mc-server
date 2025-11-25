@@ -11,8 +11,8 @@ The server is configured to support datapacks, including the one from the provid
 3. You should receive a .zip file containing the datapack
 4. Extract the .zip file if needed - it should contain a folder with the datapack
 5. Place the datapack folder in either:
-   - For mc-ilias server: `./mc-ilias/datapacks/`
-   - For mc-niilo server: `./mc-niilo/datapacks/`
+   - For mc-Ikaria Games: `./mc-ilias/datapacks/`
+   - For mc-KDLK.net: `./mc-niilo/datapacks/`
 
 ### Example:
 
@@ -23,7 +23,7 @@ If your downloaded datapack is named "vanillatweaks_datapack.zip" and contains a
 unzip vanillatweaks_datapack.zip
 cp -r data_pack/ ./mc-ilias/datapacks/
 
-# For mc-niilo  
+# For mc-niilo
 unzip vanillatweaks_datapack.zip
 cp -r data_pack/ ./mc-niilo/datapacks/
 ```

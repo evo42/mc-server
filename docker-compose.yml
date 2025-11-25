@@ -15,7 +15,7 @@ services:
     <<: *mc-server-base
     container_name: mc-ilias
     environment:
-      MOTD: ${MC_ILIAS_NAME:-mc-ilias Server}
+      MOTD: ${MC_ILIAS_NAME:-mc-Ikaria Games}
     volumes:
       - ./mc-ilias/data:/data
       - ./mc-ilias/datapacks:/data/datapacks
@@ -24,7 +24,7 @@ services:
     <<: *mc-server-base
     container_name: mc-niilo
     environment:
-      MOTD: ${MC_NIILO_NAME:-mc-niilo Server}
+      MOTD: ${MC_NIILO_NAME:-mc-KDLK.net}
     volumes:
       - ./mc-niilo/data:/data
       - ./mc-niilo/datapacks:/data/datapacks
@@ -42,7 +42,7 @@ services:
     <<: *mc-server-base
     container_name: mc-htlstp
     environment:
-      MOTD: ${MC_HTLSTP_NAME:-mc-htlstp Server}
+      MOTD: ${MC_HTLSTP_NAME:-mc-HTL St. Pölten Server}
     volumes:
       - ./landing/htlstp-mc-landing/data:/data
       - ./landing/htlstp-mc-landing/datapacks:/data/datapacks
