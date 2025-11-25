@@ -56,9 +56,22 @@ app.get('/mc-admin', authMiddleware, (req, res) => {
     res.sendFile(path.join(__dirname, 'admin.html'));
 });
 
+app.get('/w11-admin', authMiddleware, (req, res) => {
+    res.sendFile(path.join(__dirname, 'windows11.html'));
+});
+
+
 // Route for the stats page, without authentication
-app.get('/stats', (req, res) => {
+app.get('/mc-stats', (req, res) => {
     res.sendFile(path.join(__dirname, 'stats.html'));
+});
+
+app.get('/index', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/index-admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index-admin.html'));
 });
 
 app.get('/', (req, res) => {

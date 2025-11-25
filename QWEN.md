@@ -6,8 +6,8 @@ The Minecraft SaaS Platform is a production-ready multi-server system that enabl
 
 ### Key Components
 - **minecraft-base**: Universal Minecraft server Docker image supporting dynamic PaperMC downloads
-- **admin-api**: Secure Node.js API service for server management using Dockerode
-- **admin-ui-spa**: Vue.js single-page admin panel with server and datapack management
+- **admin-api**: Secure Node.js API service with Public API for history/stats and secure Dockerode management
+- **admin-ui-spa**: Vue.js single-page admin panel with 3D performance charts and server/datapack management
 - **Infrastructure**: BungeeCord proxy, Nginx reverse proxy, Watchtower for updates
 
 ### Architecture
@@ -40,12 +40,15 @@ The Minecraft SaaS Platform is a production-ready multi-server system that enabl
 
 ### Backend
 - **Runtime**: Node.js with Express.js
+- **Public API**: Read-only endpoints for server status, history, and datapacks
+- **History Service**: In-memory collection of server statistics (24h retention)
 - **Docker Integration**: Dockerode library for container management
 - **Authentication**: express-basic-auth with configurable credentials
 - **Logging**: Pino HTTP logging
 
 ### Frontend
 - **Framework**: Vue.js 3 with modern SPA architecture
+- **Visualization**: Chart.js and Three.js for 2D/3D performance metrics
 - **UI**: Bootstrap with custom styling
 - **Build System**: Vite for development and building
 
