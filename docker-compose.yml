@@ -24,11 +24,9 @@ services:
   mc-ilias:
     <<: *mc-server-base
     container_name: mc-ilias
+    env_file: .env
     environment:
       - MOTD=${MC_ILIAS_MOTD:-mc-ilias Server}
-      - MEMORY=5120M
-      - MAX_MEMORY=15360M
-      - MAX_PLAYERS=99
       - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./mc-ilias/data:/data
@@ -37,11 +35,9 @@ services:
   mc-niilo:
     <<: *mc-server-base
     container_name: mc-niilo
+    env_file: .env
     environment:
       - MOTD=${MC_NILO_MOTD:-mc-niilo Server}
-      - MEMORY=5120M
-      - MAX_MEMORY=15360M
-      - MAX_PLAYERS=99
       - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./mc-niilo/data:/data
@@ -50,11 +46,9 @@ services:
   mc-bgstpoelten:
     <<: *mc-server-base
     container_name: mc-bgstpoelten
+    env_file: .env
     environment:
       - MOTD=${MC_BGSTPOELEN_MOTD:-mc-bgstpoelten Server}
-      - MEMORY=5120M
-      - MAX_MEMORY=15360M
-      - MAX_PLAYERS=99
       - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./landing/bgstpoelten-mc-landing/data:/data
@@ -65,9 +59,6 @@ services:
     container_name: mc-htlstp
     environment:
       - MOTD=${MC_HTLSTP_MOTD:-mc-htlstp Server}
-      - MEMORY=5120M
-      - MAX_MEMORY=15360M
-      - MAX_PLAYERS=99
       - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./landing/htlstp-mc-landing/data:/data
@@ -76,11 +67,9 @@ services:
   mc-borgstpoelten:
     <<: *mc-server-base
     container_name: mc-borgstpoelten
+    env_file: .env
     environment:
       - MOTD=${MC_BORGSTPOELEN_MOTD:-mc-borgstpoelten Server}
-      - MEMORY=5120M
-      - MAX_MEMORY=15360M
-      - MAX_PLAYERS=99
       - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./landing/borgstpoelten-mc-landing/data:/data
@@ -89,11 +78,9 @@ services:
   mc-hakstpoelten:
     <<: *mc-server-base
     container_name: mc-hakstpoelten
+    env_file: .env
     environment:
       - MOTD=${MC_HAKSTPOELEN_MOTD:-mc-hakstpoelten Server}
-      - MEMORY=5120M
-      - MAX_MEMORY=15360M
-      - MAX_PLAYERS=99
       - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./landing/hakstpoelten-mc-landing/data:/data
@@ -102,11 +89,9 @@ services:
   mc-basop-bafep-stp:
     <<: *mc-server-base
     container_name: mc-basop-bafep-stp
+    env_file: .env
     environment:
       - MOTD=${MC_BASOP_BAFEP_STP_MOTD:-mc-basop-bafep-stp Server}
-      - MEMORY=5120M
-      - MAX_MEMORY=15360M
-      - MAX_PLAYERS=99
       - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./landing/basop-bafep-stp-mc-landing/data:/data
@@ -115,11 +100,9 @@ services:
   mc-play:
     <<: *mc-server-base
     container_name: mc-play
+    env_file: .env
     environment:
       - MOTD=${MC_PLAY_MOTD:-mc-play Server}
-      - MEMORY=5120M
-      - MAX_MEMORY=15360M
-      - MAX_PLAYERS=99
       - EULA=${MC_EULA:-TRUE}
     volumes:
       - ./landing/play-mc-landing/data:/data

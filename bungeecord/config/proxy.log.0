@@ -153,3 +153,44 @@
 16:28:58 [INFO] [/155.248.209.22:61000] <-> InitialHandler has pinged
 16:37:32 [INFO] [/176.65.148.52:64260] <-> InitialHandler has pinged
 16:49:43 [INFO] [/176.65.149.126:61269] <-> InitialHandler has pinged
+17:19:24 [INFO] Using mbed TLS based native cipher.
+17:19:24 [INFO] Using zlib based native compressor.
+17:19:24 [INFO] Enabled BungeeCord version git:BungeeCord-Bootstrap:1.21-R0.5-SNAPSHOT:3929ac4:2009
+17:19:24 [INFO] Not on Windows, attempting to use enhanced EpollEventLoop
+17:19:25 [INFO] Epoll is working, utilising it!
+17:19:25 [INFO] Discovered module: ModuleSpec(name=cmd_alert, file=modules/cmd_alert.jar, provider=JenkinsModuleSource())
+17:19:25 [INFO] Discovered module: ModuleSpec(name=cmd_find, file=modules/cmd_find.jar, provider=JenkinsModuleSource())
+17:19:25 [INFO] Discovered module: ModuleSpec(name=cmd_list, file=modules/cmd_list.jar, provider=JenkinsModuleSource())
+17:19:25 [INFO] Discovered module: ModuleSpec(name=cmd_send, file=modules/cmd_send.jar, provider=JenkinsModuleSource())
+17:19:25 [INFO] Discovered module: ModuleSpec(name=cmd_server, file=modules/cmd_server.jar, provider=JenkinsModuleSource())
+17:19:25 [INFO] Discovered module: ModuleSpec(name=reconnect_yaml, file=modules/reconnect_yaml.jar, provider=JenkinsModuleSource())
+17:19:28 [INFO] Loaded plugin reconnect_yaml version git:reconnect_yaml:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+17:19:28 [INFO] Loaded plugin cmd_find version git:cmd_find:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+17:19:28 [INFO] Loaded plugin cmd_server version git:cmd_server:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+17:19:28 [INFO] Loaded plugin cmd_alert version git:cmd_alert:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+17:19:28 [INFO] Loaded plugin cmd_send version git:cmd_send:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+17:19:28 [INFO] Loaded plugin cmd_list version git:cmd_list:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+17:20:34 [INFO] Using mbed TLS based native cipher.
+17:20:34 [INFO] Using zlib based native compressor.
+17:20:34 [INFO] Enabled BungeeCord version git:BungeeCord-Bootstrap:1.21-R0.5-SNAPSHOT:3929ac4:2009
+17:20:34 [INFO] Not on Windows, attempting to use enhanced EpollEventLoop
+17:20:38 [INFO] Epoll is working, utilising it!
+17:20:39 [INFO] Discovered module: ModuleSpec(name=cmd_alert, file=modules/cmd_alert.jar, provider=JenkinsModuleSource())
+17:20:39 [INFO] Discovered module: ModuleSpec(name=cmd_find, file=modules/cmd_find.jar, provider=JenkinsModuleSource())
+17:20:39 [INFO] Discovered module: ModuleSpec(name=cmd_list, file=modules/cmd_list.jar, provider=JenkinsModuleSource())
+17:20:39 [INFO] Discovered module: ModuleSpec(name=cmd_send, file=modules/cmd_send.jar, provider=JenkinsModuleSource())
+17:20:39 [INFO] Discovered module: ModuleSpec(name=cmd_server, file=modules/cmd_server.jar, provider=JenkinsModuleSource())
+17:20:39 [INFO] Discovered module: ModuleSpec(name=reconnect_yaml, file=modules/reconnect_yaml.jar, provider=JenkinsModuleSource())
+17:20:42 [INFO] Loaded plugin reconnect_yaml version git:reconnect_yaml:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+17:20:42 [INFO] Loaded plugin cmd_find version git:cmd_find:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+17:20:42 [INFO] Loaded plugin cmd_server version git:cmd_server:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+17:20:42 [INFO] Loaded plugin cmd_alert version git:cmd_alert:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+17:20:42 [INFO] Loaded plugin cmd_send version git:cmd_send:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+17:20:42 [INFO] Loaded plugin cmd_list version git:cmd_list:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+17:20:42 [INFO] Enabled plugin reconnect_yaml version git:reconnect_yaml:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+17:20:42 [INFO] Enabled plugin cmd_find version git:cmd_find:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+17:20:42 [INFO] Enabled plugin cmd_server version git:cmd_server:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+17:20:42 [INFO] Enabled plugin cmd_alert version git:cmd_alert:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+17:20:42 [INFO] Enabled plugin cmd_send version git:cmd_send:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+17:20:42 [INFO] Enabled plugin cmd_list version git:cmd_list:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+17:20:43 [INFO] Listening on /0.0.0.0:25565
