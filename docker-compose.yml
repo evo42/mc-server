@@ -104,55 +104,41 @@ services:
     depends_on:
       - mc-ilias
       - mc-niilo
-      - mc-bgstpoelten
-      - mc-htlstp
-      - mc-borgstpoelten
-      - mc-hakstpoelten
-      - mc-basop-bafep-stp
-      - mc-play
 
   admin-api:
     image: ghcr.io/evo42/mc-server/admin-api
     build: ./admin-api
     container_name: mc-admin-api
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./landing/borgstpoelten-mc-landing/datapacks:/app/mc-borgstpoelten/datapacks
-      - ./landing/bgstpoelten-mc-landing/datapacks:/app/mc-bgstpoelten/datapacks
-      - ./landing/hakstpoelten-mc-landing/datapacks:/app/mc-hakstpoelten/datapacks
-      - ./landing/htlstp-mc-landing/datapacks:/app/mc-htlstp/datapacks
-      - ./landing/basop-bafep-stp-mc-landing/datapacks:/app/mc-basop-bafep-stp/datapacks
-      - ./landing/play-mc-landing/datapacks:/app/mc-play/datapacks
-      - ./mc-ilias/datapacks:/app/mc-ilias/datapacks
-      - ./mc-niilo/datapacks:/app/mc-niilo/datapacks
-
     env_file:
-      - .secrets
-    environment:
-      NODE_ENV: production
-      ADMIN_USER: ${ADMIN_USER:-admin}
-      ADMIN_PASS: ${ADMIN_PASS:-admin123}
-    restart: unless-stopped
-    networks:
-      - minecraft-net
-      - proxy
+      - .env
     ports:
       - "${ADMIN_API_PORT:-3000}:3000"
-    depends_on:
-      - mc-ilias
-      - mc-niilo
-      - mc-bgstpoelten
-      - mc-htlstp
-      - mc-borgstpoelten
-      - mc-hakstpoelten
-      - mc-basop-bafep-stp
-      - mc-play
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./admin-api/admin.html:/usr/src/app/admin.html
+      - ./admin-api/stats.html:/usr/src/app/stats.html
+      - ./admin-api/services:/usr/src/app/services
+      - ./admin-api/routes:/usr/src/app/routes
+      - ./admin-api/controllers:/usr/src/app/controllers
+      - ./.env:/usr/src/app/.env
+      - ./landing:/usr/src/app/landing
+    networks:
+      - proxy
+      - minecraft-net
+    restart: unless-stopped
 
   admin-ui:
     image: ghcr.io/evo42/mc-server/admin-ui
     build: ./admin-ui-spa
-    labels:
-      - com.centurylinklabs.watchtower.enable=false
+    container_name: mc-server-admin-ui-1
+    env_file:
+      - .env
+    ports:
+      - "80"
+    networks:
+      - proxy
+    depends_on:
+      - admin-api
 
   nginx:
     build: ./nginx
@@ -165,7 +151,7 @@ services:
     volumes:
       - ./admin-ui-dist:/usr/share/nginx/html
       - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./nginx/ssl:/etc/nginx/ssl
+      - /etc/letsencrypt:/etc/letsencrypt
       - ./landing:/var/www/landing
     networks:
       - proxy

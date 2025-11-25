@@ -13,14 +13,18 @@ verify_server() {
     URL=$1
     # Extract hostname from URL (e.g., http://example.com -> example.com)
     HOSTNAME=$(echo "$URL" | awk -F/ '{print $3}')
-
-    log_info "Verifying $URL..."
     
-    # Check HTTP
-    if curl -s -I "$URL" | grep -q "200 OK"; then
-        log_success "HTTP is online (200 OK)."
+    # Check HTTPS by replacing http:// with https://
+    HTTPS_URL="${URL/http:/https:}"
+
+    log_info "Verifying $HTTPS_URL..."
+    
+    # Check HTTPS with -k to allow self-signed certs (handled by Cloudflare in prod)
+    # Also follow redirects (-L) just in case
+    if curl -s -k -L -I "$HTTPS_URL" | grep -q "200 OK"; then
+        log_success "HTTPS is online (200 OK)."
     else
-        log_error "HTTP is offline or not returning 200 OK."
+        log_error "HTTPS is offline or not returning 200 OK."
     fi
 
     # Check Minecraft MOTD
@@ -31,10 +35,7 @@ verify_server() {
             log_info "MOTD: $MOTD"
         fi
     else
-        # Optional: Log if MC server is unreachable, but maybe user only cares about MOTD if online
-        # Keeping it silent if offline to match original behavior of only verifying URL success? 
-        # But "MOTD is missing" implies we want it.
-        # I won't log error for MC offline here to avoid noise if it's not meant to be an MC server (though these all are).
+        # Optional: Log if MC server is unreachable
         :
     fi
     echo ""
