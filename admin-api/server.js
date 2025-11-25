@@ -10,10 +10,10 @@ const datapacksRouter = require('./routes/datapacks');
 const app = express(); // Create the express app
 const logger = pino({
   level: process.env.LOG_LEVEL || 'info',
-  transport: {
+  /*transport: {
     target: 'pino/file',
     options: { destination: `${__dirname}/admin-api.log` }
-  }
+  }*/
 });
 const httpLogger = pinoHttp({ logger });
 const port = process.env.PORT || 3000;

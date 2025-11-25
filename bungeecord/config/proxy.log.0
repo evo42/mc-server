@@ -121,3 +121,35 @@
 14:55:17 [WARNING] [/176.65.148.52:61673] <-> InitialHandler - read timed out
 14:55:35 [SEVERE] [/62.40.206.79:63171] <-> InitialHandler - encountered exception: net.md_5.bungee.util.QuietException: Unexpected packet received during login process! 4554202f20485454502f312e310d0a48
 14:56:35 [SEVERE] [/62.40.206.79:63451] <-> InitialHandler - encountered exception: net.md_5.bungee.util.QuietException: Unexpected packet received during login process! 4554202f20485454502f312e310d0a48
+16:00:22 [INFO] Using mbed TLS based native cipher.
+16:00:22 [INFO] Using zlib based native compressor.
+16:00:22 [INFO] Enabled BungeeCord version git:BungeeCord-Bootstrap:1.21-R0.5-SNAPSHOT:3929ac4:2009
+16:00:22 [INFO] Not on Windows, attempting to use enhanced EpollEventLoop
+16:00:22 [INFO] Epoll is working, utilising it!
+16:00:22 [INFO] Discovered module: ModuleSpec(name=cmd_alert, file=modules/cmd_alert.jar, provider=JenkinsModuleSource())
+16:00:22 [INFO] Discovered module: ModuleSpec(name=cmd_find, file=modules/cmd_find.jar, provider=JenkinsModuleSource())
+16:00:22 [INFO] Discovered module: ModuleSpec(name=cmd_list, file=modules/cmd_list.jar, provider=JenkinsModuleSource())
+16:00:22 [INFO] Discovered module: ModuleSpec(name=cmd_send, file=modules/cmd_send.jar, provider=JenkinsModuleSource())
+16:00:22 [INFO] Discovered module: ModuleSpec(name=cmd_server, file=modules/cmd_server.jar, provider=JenkinsModuleSource())
+16:00:22 [INFO] Discovered module: ModuleSpec(name=reconnect_yaml, file=modules/reconnect_yaml.jar, provider=JenkinsModuleSource())
+16:00:22 [INFO] Loaded plugin reconnect_yaml version git:reconnect_yaml:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+16:00:22 [INFO] Loaded plugin cmd_find version git:cmd_find:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+16:00:22 [INFO] Loaded plugin cmd_server version git:cmd_server:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+16:00:22 [INFO] Loaded plugin cmd_alert version git:cmd_alert:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+16:00:22 [INFO] Loaded plugin cmd_send version git:cmd_send:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+16:00:22 [INFO] Loaded plugin cmd_list version git:cmd_list:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+16:00:22 [INFO] Enabled plugin reconnect_yaml version git:reconnect_yaml:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+16:00:22 [INFO] Enabled plugin cmd_find version git:cmd_find:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+16:00:22 [INFO] Enabled plugin cmd_server version git:cmd_server:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+16:00:22 [INFO] Enabled plugin cmd_alert version git:cmd_alert:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+16:00:22 [INFO] Enabled plugin cmd_send version git:cmd_send:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+16:00:22 [INFO] Enabled plugin cmd_list version git:cmd_list:1.21-R0.5-SNAPSHOT:3929ac4:2009 by SpigotMC
+16:00:22 [INFO] Listening on /0.0.0.0:25565
+16:07:15 [INFO] [/176.65.149.126:61269] <-> InitialHandler has pinged
+16:07:45 [WARNING] [/176.65.149.126:61269] <-> InitialHandler - read timed out
+16:16:22 [INFO] [/176.65.148.52:64260] <-> InitialHandler has pinged
+16:27:13 [INFO] [/176.65.149.126:61269] <-> InitialHandler has pinged
+16:27:18 [INFO] [/176.65.148.52:64260] <-> InitialHandler has pinged
+16:28:58 [INFO] [/155.248.209.22:61000] <-> InitialHandler has pinged
+16:37:32 [INFO] [/176.65.148.52:64260] <-> InitialHandler has pinged
+16:49:43 [INFO] [/176.65.149.126:61269] <-> InitialHandler has pinged

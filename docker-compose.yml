@@ -129,12 +129,13 @@ services:
     image: ghcr.io/evo42/mc-server/bungeecord
     build: ./bungeecord
     container_name: mc-bungeecord
-    network_mode: "host"
     ports:
       - "${PROXY_PORT:-25565}:25565"
     volumes:
       - ./bungeecord/config:/server
     restart: unless-stopped
+    networks:
+      - minecraft-net
     depends_on:
       - mc-ilias
       - mc-niilo
@@ -151,33 +152,14 @@ services:
     container_name: mc-admin-api
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./landing/borgstpoelten-mc-landing/data/world/datapacks:/app/world/datapacks
-      - ./landing/borgstpoelten-mc-landing/data/datapacks:/app/data/datapacks
       - ./landing/borgstpoelten-mc-landing/datapacks:/app/borgstpoelten/datapacks
-      - ./landing/bgstpoelten-mc-landing/data/world/datapacks:/app/world/datapacks
-      - ./landing/bgstpoelten-mc-landing/data/datapacks:/app/data/datapacks
       - ./landing/bgstpoelten-mc-landing/datapacks:/app/bgstpoelten/datapacks
-      - ./landing/hakstpoelten-mc-landing/data/world/datapacks:/app/world/datapacks
-      - ./landing/hakstpoelten-mc-landing/data/datapacks:/app/data/datapacks
       - ./landing/hakstpoelten-mc-landing/datapacks:/app/hakstpoelten/datapacks
-      - ./landing/htlstp-mc-landing/data/world/datapacks:/app/world/datapacks
-      - ./landing/htlstp-mc-landing/data/datapacks:/app/data/datapacks
       - ./landing/htlstp-mc-landing/datapacks:/app/htlstp/datapacks
-      - ./landing/basop-bafep-stp-mc-landing/data/world/datapacks:/app/world/datapacks
-      - ./landing/basop-bafep-stp-mc-landing/data/datapacks:/app/data/datapacks
-      - ./landing/basop-bafep-stp-mc-landing/datapacks:/app/basop-bafep-stp/datapacks
-      - ./landing/play-mc-landing/data/world/datapacks:/app/world/datapacks
-      - ./landing/play-mc-landing/data/datapacks:/app/data/datapacks
+      - ./landing/basop-bafep-stp-mc-landing/datapacks:/app/basopbafepstp/datapacks
       - ./landing/play-mc-landing/datapacks:/app/play/datapacks
-      - ./mc-ilias/data/world/datapacks:/app/world/datapacks
-      - ./mc-ilias/data/datapacks:/app/data/datapacks
       - ./mc-ilias/datapacks:/app/mc-ilias/datapacks
-      - ./school/data/datapacks:/app/data/datapacks
-      - ./school/datapacks:/app/school/datapacks
-      - ./mc-niilo/data/world/datapacks:/app/world/datapacks
-      - ./mc-niilo/data/datapacks:/app/data/datapacks
       - ./mc-niilo/datapacks:/app/mc-niilo/datapacks
-      - ./admin-api/mc-ilias/datapacks:/app/mc-ilias/datapacks
 
     env_file:
       - .env
