@@ -92,3 +92,32 @@
 14:33:38 [INFO] [/176.65.148.52:61673] <-> InitialHandler has pinged
 14:33:45 [INFO] [/176.65.149.126:61269] <-> InitialHandler has pinged
 14:34:08 [WARNING] [/176.65.148.52:61673] <-> InitialHandler - read timed out
+14:36:43 [INFO] [/208.77.244.3:41098] <-> InitialHandler has pinged
+14:38:07 [INFO] [/62.40.206.79:57538] <-> InitialHandler has pinged
+14:44:01 [INFO] [/176.65.148.52:61673] <-> InitialHandler has pinged
+14:44:29 [INFO] [/176.65.149.126:61269] <-> InitialHandler has pinged
+14:44:31 [WARNING] [/176.65.148.52:61673] <-> InitialHandler - read timed out
+14:46:41 [INFO] [/62.40.206.79:60288] <-> InitialHandler has pinged
+14:46:41 [INFO] [/62.40.206.79:60289] <-> InitialHandler has pinged
+14:46:41 [INFO] [/62.40.206.79:60290] <-> InitialHandler has pinged
+14:46:41 [INFO] [/62.40.206.79:60292] <-> InitialHandler has pinged
+14:47:23 [INFO] [/62.40.206.79:60497] <-> InitialHandler has pinged
+14:47:23 [INFO] [/62.40.206.79:60503] <-> InitialHandler has pinged
+14:47:23 [INFO] [/62.40.206.79:60505] <-> InitialHandler has pinged
+14:47:23 [INFO] [/62.40.206.79:60506] <-> InitialHandler has pinged
+14:49:38 [INFO] [/62.40.206.79:61256] <-> InitialHandler has pinged
+14:49:38 [INFO] [/62.40.206.79:61260] <-> InitialHandler has pinged
+14:49:38 [INFO] [/62.40.206.79:61262] <-> InitialHandler has pinged
+14:49:38 [INFO] [/62.40.206.79:61261] <-> InitialHandler has pinged
+14:51:16 [INFO] [/208.77.244.3:45076] <-> InitialHandler has pinged
+14:52:02 [INFO] [/62.40.206.79:62047] <-> InitialHandler has pinged
+14:52:02 [INFO] [/62.40.206.79:62048] <-> InitialHandler has pinged
+14:52:02 [INFO] [/62.40.206.79:62053] <-> InitialHandler has pinged
+14:52:02 [INFO] [/62.40.206.79:62054] <-> InitialHandler has pinged
+14:54:47 [INFO] [/176.65.148.52:61673] <-> InitialHandler has pinged
+14:54:59 [SEVERE] [/62.40.206.79:62992] <-> InitialHandler - encountered exception: net.md_5.bungee.util.QuietException: Unexpected packet received during login process! 4554202f20485454502f312e310d0a48
+14:55:00 [SEVERE] [/62.40.206.79:62997] <-> InitialHandler - encountered exception: net.md_5.bungee.util.QuietException: Unexpected packet received during login process! 4554202f20485454502f312e310d0a48
+14:55:05 [SEVERE] [/62.40.206.79:63018] <-> InitialHandler - encountered exception: net.md_5.bungee.util.QuietException: Unexpected packet received during login process! 4554202f20485454502f312e310d0a48
+14:55:17 [WARNING] [/176.65.148.52:61673] <-> InitialHandler - read timed out
+14:55:35 [SEVERE] [/62.40.206.79:63171] <-> InitialHandler - encountered exception: net.md_5.bungee.util.QuietException: Unexpected packet received during login process! 4554202f20485454502f312e310d0a48
+14:56:35 [SEVERE] [/62.40.206.79:63451] <-> InitialHandler - encountered exception: net.md_5.bungee.util.QuietException: Unexpected packet received during login process! 4554202f20485454502f312e310d0a48
