@@ -25,7 +25,7 @@ services:
     <<: *mc-server-base
     container_name: mc-ilias
     environment:
-      - MOTD=${MC_ILIAS_MOTD:-mc-ilias Server}
+      - MOTD=${MC_ILIAS_MOTD:-Ikaria Games}
       - MEMORY=5120M
       - MAX_MEMORY=15360M
       - MAX_PLAYERS=99
@@ -38,7 +38,7 @@ services:
     <<: *mc-server-base
     container_name: mc-niilo
     environment:
-      - MOTD=${MC_NILO_MOTD:-mc-niilo Server}
+      - MOTD=${MC_NILO_MOTD:-Königreich der letzten Krieger}
       - MEMORY=5120M
       - MAX_MEMORY=15360M
       - MAX_PLAYERS=99
@@ -51,79 +51,79 @@ services:
     <<: *mc-server-base
     container_name: mc-bgstpoelten
     environment:
-      - MOTD=${MC_BGSTPOELEN_MOTD:-mc-bgstpoelten Server}
+      - MOTD=${MC_BGSTPOELEN_MOTD:-BGST Pölten}
       - MEMORY=5120M
       - MAX_MEMORY=15360M
       - MAX_PLAYERS=99
       - EULA=${MC_EULA:-TRUE}
     volumes:
-      - ./landing/bgstpoelten-mc-landing/data:/data
-      - ./landing/bgstpoelten-mc-landing/datapacks:/data/datapacks
+      - ./landing/bgstpoelten/data:/data
+      - ./landing/bgstpoelten/datapacks:/data/datapacks
 
   mc-htlstp:
     <<: *mc-server-base
     container_name: mc-htlstp
     environment:
-      - MOTD=${MC_HTLSTP_MOTD:-mc-htlstp Server}
+      - MOTD=${MC_HTLSTP_MOTD:-HTL St. Pölten}
       - MEMORY=5120M
       - MAX_MEMORY=15360M
       - MAX_PLAYERS=99
       - EULA=${MC_EULA:-TRUE}
     volumes:
-      - ./landing/htlstp-mc-landing/data:/data
-      - ./landing/htlstp-mc-landing/datapacks:/data/datapacks
+      - ./landing/htlstp/data:/data
+      - ./landing/htlstp/datapacks:/data/datapacks
 
   mc-borgstpoelten:
     <<: *mc-server-base
     container_name: mc-borgstpoelten
     environment:
-      - MOTD=${MC_BORGSTPOELEN_MOTD:-mc-borgstpoelten Server}
+      - MOTD=${MC_BORGSTPOELEN_MOTD:-BORG St. Pölten}
       - MEMORY=5120M
       - MAX_MEMORY=15360M
       - MAX_PLAYERS=99
       - EULA=${MC_EULA:-TRUE}
     volumes:
-      - ./landing/borgstpoelten-mc-landing/data:/data
-      - ./landing/borgstpoelten-mc-landing/datapacks:/data/datapacks
+      - ./landing/borgstpoelten/data:/data
+      - ./landing/borgstpoelten/datapacks:/data/datapacks
 
   mc-hakstpoelten:
     <<: *mc-server-base
     container_name: mc-hakstpoelten
     environment:
-      - MOTD=${MC_HAKSTPOELEN_MOTD:-mc-hakstpoelten Server}
+      - MOTD=${MC_HAKSTPOELEN_MOTD:-HAK St. Pölten}
       - MEMORY=5120M
       - MAX_MEMORY=15360M
       - MAX_PLAYERS=99
       - EULA=${MC_EULA:-TRUE}
     volumes:
-      - ./landing/hakstpoelten-mc-landing/data:/data
-      - ./landing/hakstpoelten-mc-landing/datapacks:/data/datapacks
+      - ./landing/hakstpoelten/data:/data
+      - ./landing/hakstpoelten/datapacks:/data/datapacks
 
   mc-basop-bafep-stp:
     <<: *mc-server-base
     container_name: mc-basop-bafep-stp
     environment:
-      - MOTD=${MC_BASOP_BAFEP_STP_MOTD:-mc-basop-bafep-stp Server}
+      - MOTD=${MC_BASOP_BAFEP_STP_MOTD:-BASOP/BAFEP St. Pölten}
       - MEMORY=5120M
       - MAX_MEMORY=15360M
       - MAX_PLAYERS=99
       - EULA=${MC_EULA:-TRUE}
     volumes:
-      - ./landing/basop-bafep-stp-mc-landing/data:/data
-      - ./landing/basop-bafep-stp-mc-landing/datapacks:/data/datapacks
+      - ./landing/basop-bafep-stp/data:/data
+      - ./landing/basop-bafep-stp/datapacks:/data/datapacks
 
   mc-play:
     <<: *mc-server-base
     container_name: mc-play
     environment:
-      - MOTD=${MC_PLAY_MOTD:-mc-play Server}
+      - MOTD=${MC_PLAY_MOTD:-Allgemeiner Spielserver}
       - MEMORY=5120M
       - MAX_MEMORY=15360M
       - MAX_PLAYERS=99
       - EULA=${MC_EULA:-TRUE}
     volumes:
-      - ./landing/play-mc-landing/data:/data
-      - ./landing/play-mc-landing/datapacks:/data/datapacks
+      - ./landing/play/data:/data
+      - ./landing/play/datapacks:/data/datapacks
 
   bungeecord:
     image: ghcr.io/evo42/mc-server/bungeecord
@@ -151,24 +151,24 @@ services:
     container_name: mc-admin-api
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./landing/borgstpoelten-mc-landing/data/world/datapacks:/app/world/datapacks
-      - ./landing/borgstpoelten-mc-landing/data/datapacks:/app/data/datapacks
-      - ./landing/borgstpoelten-mc-landing/datapacks:/app/borgstpoelten/datapacks
-      - ./landing/bgstpoelten-mc-landing/data/world/datapacks:/app/world/datapacks
-      - ./landing/bgstpoelten-mc-landing/data/datapacks:/app/data/datapacks
-      - ./landing/bgstpoelten-mc-landing/datapacks:/app/bgstpoelten/datapacks
-      - ./landing/hakstpoelten-mc-landing/data/world/datapacks:/app/world/datapacks
-      - ./landing/hakstpoelten-mc-landing/data/datapacks:/app/data/datapacks
-      - ./landing/hakstpoelten-mc-landing/datapacks:/app/hakstpoelten/datapacks
-      - ./landing/htlstp-mc-landing/data/world/datapacks:/app/world/datapacks
-      - ./landing/htlstp-mc-landing/data/datapacks:/app/data/datapacks
-      - ./landing/htlstp-mc-landing/datapacks:/app/htlstp/datapacks
-      - ./landing/basop-bafep-stp-mc-landing/data/world/datapacks:/app/world/datapacks
-      - ./landing/basop-bafep-stp-mc-landing/data/datapacks:/app/data/datapacks
-      - ./landing/basop-bafep-stp-mc-landing/datapacks:/app/basop-bafep-stp/datapacks
-      - ./landing/play-mc-landing/data/world/datapacks:/app/world/datapacks
-      - ./landing/play-mc-landing/data/datapacks:/app/data/datapacks
-      - ./landing/play-mc-landing/datapacks:/app/play/datapacks
+      - ./landing/borgstpoelten/data/world/datapacks:/app/world/datapacks
+      - ./landing/borgstpoelten/data/datapacks:/app/data/datapacks
+      - ./landing/borgstpoelten/datapacks:/app/borgstpoelten/datapacks
+      - ./landing/bgstpoelten/data/world/datapacks:/app/world/datapacks
+      - ./landing/bgstpoelten/data/datapacks:/app/data/datapacks
+      - ./landing/bgstpoelten/datapacks:/app/bgstpoelten/datapacks
+      - ./landing/hakstpoelten/data/world/datapacks:/app/world/datapacks
+      - ./landing/hakstpoelten/data/datapacks:/app/data/datapacks
+      - ./landing/hakstpoelten/datapacks:/app/hakstpoelten/datapacks
+      - ./landing/htlstp/data/world/datapacks:/app/world/datapacks
+      - ./landing/htlstp/data/datapacks:/app/data/datapacks
+      - ./landing/htlstp/datapacks:/app/htlstp/datapacks
+      - ./landing/basop-bafep-stp/data/world/datapacks:/app/world/datapacks
+      - ./landing/basop-bafep-stp/data/datapacks:/app/data/datapacks
+      - ./landing/basop-bafep-stp/datapacks:/app/basop-bafep-stp/datapacks
+      - ./landing/play/data/world/datapacks:/app/world/datapacks
+      - ./landing/play/data/datapacks:/app/data/datapacks
+      - ./landing/play/datapacks:/app/play/datapacks
       - ./mc-ilias/data/world/datapacks:/app/world/datapacks
       - ./mc-ilias/data/datapacks:/app/data/datapacks
       - ./mc-ilias/datapacks:/app/mc-ilias/datapacks
@@ -206,22 +206,18 @@ services:
     labels:
       - com.centurylinklabs.watchtower.enable=false
 
-  nginx:
-    build: ./nginx
-    container_name: mc-nginx
-    labels:
-      - com.centurylinklabs.watchtower.enable=false
-    ports:
-      - "${NGINX_PORT:-80}:80"
-      - "${NGINX_HTTPS_PORT:-443}:443"
+  mc-client:
+    image: minio/mc
+    container_name: mc-client
+    env_file:
+      - .env
     volumes:
-      - ./admin-ui-dist:/usr/share/nginx/html
-      - ./nginx/conf.d:/etc/nginx/conf.d
-    networks:
-      - minecraft-net
-      - proxy
-    depends_on:
-      - admin-api
+      - ./backups:/backups
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set s3 \\$S3_ENDPOINT \\$S3_ACCESS_KEY \\$S3_SECRET_KEY;
+      tail -f /dev/null;
+      "
 
 #  watchtower:
 #    image: containrrr/watchtower
