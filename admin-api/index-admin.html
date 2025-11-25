@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Server Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .server-card {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin: 20px;
+        }
+
+        .server-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .server-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .server-name {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .status {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .status.running {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .status.stopped {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .status-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+        }
+
+        .status-indicator.running {
+            background-color: #2ecc71;
+            box-shadow: 0 0 10px #2ecc71;
+        }
+
+        .status-indicator.stopped {
+            background-color: #e74c3c;
+        }
+
+        .server-info {
+            margin: 15px 0;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-label {
+            font-weight: 600;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-start {
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            color: white;
+        }
+
+        .btn-stop {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .btn-restart {
+            background: linear-gradient(45deg, #f39c12, #d35400);
+            color: white;
+        }
+
+        .btn-download {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .admin-section {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        input, select {
+            padding: 12px 15px;
+            border-radius: 30px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1em;
+            width: 100%;
+            backdrop-filter: blur(10px);
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .players-section {
+            margin-top: 20px;
+        }
+
+        .players-title {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            color: #3498db;
+        }
+
+        .players-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .player-tag {
+            background: rgba(52, 152, 219, 0.3);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            border: 1px solid rgba(52, 152, 219, 0.5);
+        }
+
+        .no-players {
+            color: #95a5a6;
+            font-style: italic;
+        }
+
+        .last-updated {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            opacity: 0.7;
+        }
+
+        .refresh-btn {
+            display: block;
+            margin: 30px auto;
+            padding: 12px 30px;
+            background: rgba(52, 152, 219, 0.3);
+            color: white;
+            border: 2px solid #3498db;
+            border-radius: 30px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            background: rgba(52, 152, 219, 0.5);
+            transform: scale(1.05);
+        }
+
+        .datapack-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin: 5px 0;
+        }
+
+        .search-result-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 0.9em;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            button {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 Minecraft Server Admin Dashboard 🎮</h1>
+            <p class="subtitle">Manage your Minecraft servers with ease</p>
+        </header>
+
+        <div class="dashboard-container">
+            <div class="server-card">
+                <div class="server-header">
+                    <div class="server-name"><i class="fas fa-dice-d20"></i> <a href="https://youtube.com/@ikariagames10" style="color: inherit; text-decoration: none;">Ikaria Games</a></div>
+                    <div class="status-label">
+                        <span class="status-indicator" id="ilias-status-indicator"></span>
+                    </div>
+                </div>
+
+                <div class="server-info">
+                    <div class="info-item">
+                        <span class="info-label">Server Type:</span>
+                        <span id="ilias-type">Minecraft Java</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Version:</span>
+                        <span id="ilias-version">1.21.1</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Players Online:</span>
+                        <span id="ilias-player-count">0/20</span>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn-start" onclick="startServer('mc-ilias')">Start Server</button>
+                    <button class="btn-stop" onclick="stopServer('mc-ilias')">Stop Server</button>
+                    <button class="btn-restart" onclick="restartServer('mc-ilias')">Restart Server</button>
+                </div>
+
+                <div class="actions">
+                    <button class="btn-download" onclick="downloadWorld('mc-ilias')">Download World</button>
+                </div>
+
+                <div class="players-section">
+                    <div class="players-title">Active Players:</div>
+                    <div class="players-list" id="ilias-players">Checking...</div>
+                </div>
+            </div>
+
+            <div class="server-card">
+                <div class="server-header">
+                    <div class="server-name"><i class="fas fa-crown"></i> <a href="https://youtube.com/@Melone151" style="color: inherit; text-decoration: none;">Königreich der letzten Krieger</a></div>
+                    <div class="status-label">
+                        <span class="status-indicator" id="niilo-status-indicator"></span>
+                    </div>
+                </div>
+
+                <div class="server-info">
+                    <div class="info-item">
+                        <span class="info-label">Server Type:</span>
+                        <span id="niilo-type">Minecraft Java</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Version:</span>
+                        <span id="niilo-version">1.21.1</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Players Online:</span>
+                        <span id="niilo-player-count">0/20</span>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn-start" onclick="startServer('mc-niilo')">Start Server</button>
+                    <button class="btn-stop" onclick="stopServer('mc-niilo')">Stop Server</button>
+                    <button class="btn-restart" onclick="restartServer('mc-niilo')">Restart Server</button>
+                </div>
+
+                <div class="actions">
+                    <button class="btn-download" onclick="downloadWorld('mc-niilo')">Download World</button>
+                </div>
+
+                <div class="players-section">
+                    <div class="players-title">Active Players:</div>
+                    <div class="players-list" id="niilo-players">Checking...</div>
+                </div>
+            </div>
+
+            <div class="server-card">
+                <div class="server-header">
+                    <div class="server-name"><i class="fas fa-school"></i> <a href="/bgstpoelten" style="color: inherit; text-decoration: none;">BGST Pölten</a></div>
+                    <div class="status-label">
+                        <span class="status-indicator" id="bgstpoelten-status-indicator"></span>
+                    </div>
+                </div>
+
+                <div class="server-info">
+                    <div class="info-item">
+                        <span class="info-label">Server Type:</span>
+                        <span id="bgstpoelten-type">Minecraft Java</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Version:</span>
+                        <span id="bgstpoelten-version">1.21.1</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Players Online:</span>
+                        <span id="bgstpoelten-player-count">0/20</span>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn-start" onclick="startServer('bgstpoelten')">Start Server</button>
+                    <button class="btn-stop" onclick="stopServer('bgstpoelten')">Stop Server</button>
+                    <button class="btn-restart" onclick="restartServer('bgstpoelten')">Restart Server</button>
+                </div>
+
+                <div class="actions">
+                    <button class="btn-download" onclick="downloadWorld('bgstpoelten')">Download World</button>
+                </div>
+
+                <div class="players-section">
+                    <div class="players-title">Active Players:</div>
+                    <div class="players-list" id="bgstpoelten-players">Checking...</div>
+                </div>
+            </div>
+
+            <div class="server-card">
+                <div class="server-header">
+                    <div class="server-name"><i class="fas fa-graduation-cap"></i> <a href="/htlstp" style="color: inherit; text-decoration: none;">HTL St. Pölten</a></div>
+                    <div class="status-label">
+                        <span class="status-indicator" id="htlstp-status-indicator"></span>
+                    </div>
+                </div>
+
+                <div class="server-info">
+                    <div class="info-item">
+                        <span class="info-label">Server Type:</span>
+                        <span id="htlstp-type">Minecraft Java</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Version:</span>
+                        <span id="htlstp-version">1.21.1</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Players Online:</span>
+                        <span id="htlstp-player-count">0/20</span>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn-start" onclick="startServer('htlstp')">Start Server</button>
+                    <button class="btn-stop" onclick="stopServer('htlstp')">Stop Server</button>
+                    <button class="btn-restart" onclick="restartServer('htlstp')">Restart Server</button>
+                </div>
+
+                <div class="actions">
+                    <button class="btn-download" onclick="downloadWorld('htlstp')">Download World</button>
+                </div>
+
+                <div class="players-section">
+                    <div class="players-title">Active Players:</div>
+                    <div class="players-list" id="htlstp-players">Checking...</div>
+                </div>
+            </div>
+
+            <div class="server-card">
+                <div class="server-header">
+                    <div class="server-name"><i class="fas fa-building"></i> <a href="/borgstpoelten" style="color: inherit; text-decoration: none;">BORG St. Pölten</a></div>
+                    <div class="status-label">
+                        <span class="status-indicator" id="borgstpoelten-status-indicator"></span>
+                    </div>
+                </div>
+
+                <div class="server-info">
+                    <div class="info-item">
+                        <span class="info-label">Server Type:</span>
+                        <span id="borgstpoelten-type">Minecraft Java</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Version:</span>
+                        <span id="borgstpoelten-version">1.21.1</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Players Online:</span>
+                        <span id="borgstpoelten-player-count">0/20</span>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn-start" onclick="startServer('borgstpoelten')">Start Server</button>
+                    <button class="btn-stop" onclick="stopServer('borgstpoelten')">Stop Server</button>
+                    <button class="btn-restart" onclick="restartServer('borgstpoelten')">Restart Server</button>
+                </div>
+
+                <div class="actions">
+                    <button class="btn-download" onclick="downloadWorld('borgstpoelten')">Download World</button>
+                </div>
+
+                <div class="players-section">
+                    <div class="players-title">Active Players:</div>
+                    <div class="players-list" id="borgstpoelten-players">Checking...</div>
+                </div>
+            </div>
+
+            <div class="server-card">
+                <div class="server-header">
+                    <div class="server-name"><i class="fas fa-balance-scale"></i> <a href="/hakstpoelten" style="color: inherit; text-decoration: none;">HAK St. Pölten</a></div>
+                    <div class="status-label">
+                        <span class="status-indicator" id="hakstpoelten-status-indicator"></span>
+                    </div>
+                </div>
+
+                <div class="server-info">
+                    <div class="info-item">
+                        <span class="info-label">Server Type:</span>
+                        <span id="hakstpoelten-type">Minecraft Java</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Version:</span>
+                        <span id="hakstpoelten-version">1.21.1</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Players Online:</span>
+                        <span id="hakstpoelten-player-count">0/20</span>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn-start" onclick="startServer('hakstpoelten')">Start Server</button>
+                    <button class="btn-stop" onclick="stopServer('hakstpoelten')">Stop Server</button>
+                    <button class="btn-restart" onclick="restartServer('hakstpoelten')">Restart Server</button>
+                </div>
+
+                <div class="actions">
+                    <button class="btn-download" onclick="downloadWorld('hakstpoelten')">Download World</button>
+                </div>
+
+                <div class="players-section">
+                    <div class="players-title">Active Players:</div>
+                    <div class="players-list" id="hakstpoelten-players">Checking...</div>
+                </div>
+            </div>
+
+            <div class="server-card">
+                <div class="server-header">
+                    <div class="server-name"><i class="fas fa-landmark"></i> <a href="/basop-bafep-stp" style="color: inherit; text-decoration: none;">BASOP/BAFEP St. Pölten</a></div>
+                    <div class="status-label">
+                        <span class="status-indicator" id="basopbafepstp-status-indicator"></span>
+                    </div>
+                </div>
+
+                <div class="server-info">
+                    <div class="info-item">
+                        <span class="info-label">Server Type:</span>
+                        <span id="basopbafepstp-type">Minecraft Java</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Version:</span>
+                        <span id="basopbafepstp-version">1.21.1</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Players Online:</span>
+                        <span id="basopbafepstp-player-count">0/20</span>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn-start" onclick="startServer('basopbafepstp')">Start Server</button>
+                    <button class="btn-stop" onclick="stopServer('basopbafepstp')">Stop Server</button>
+                    <button class="btn-restart" onclick="restartServer('basopbafepstp')">Restart Server</button>
+                </div>
+
+                <div class="actions">
+                    <button class="btn-download" onclick="downloadWorld('basopbafepstp')">Download World</button>
+                </div>
+
+                <div class="players-section">
+                    <div class="players-title">Active Players:</div>
+                    <div class="players-list" id="basopbafepstp-players">Checking...</div>
+                </div>
+            </div>
+
+            <div class="server-card">
+                <div class="server-header">
+                    <div class="server-name"><i class="fas fa-gamepad"></i> <a href="/play" style="color: inherit; text-decoration: none;">Allgemeiner Spielserver</a></div>
+                    <div class="status-label">
+                        <span class="status-indicator" id="play-status-indicator"></span>
+                    </div>
+                </div>
+
+                <div class="server-info">
+                    <div class="info-item">
+                        <span class="info-label">Server Type:</span>
+                        <span id="play-type">Minecraft Java</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Version:</span>
+                        <span id="play-version">1.21.1</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Players Online:</span>
+                        <span id="play-player-count">0/20</span>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn-start" onclick="startServer('play')">Start Server</button>
+                    <button class="btn-stop" onclick="stopServer('play')">Stop Server</button>
+                    <button class="btn-restart" onclick="restartServer('play')">Restart Server</button>
+                </div>
+
+                <div class="actions">
+                    <button class="btn-download" onclick="downloadWorld('play')">Download World</button>
+                </div>
+
+                <div class="players-section">
+                    <div class="players-title">Active Players:</div>
+                    <div class="players-list" id="play-players">Checking...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-section">
+            <h2 class="section-title">Admin Permissions</h2>
+            <p>Manage admin permissions for players</p>
+
+            <div class="form-group">
+                <label for="username">Player Username:</label>
+                <input type="text" id="username" placeholder="Enter player username">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group" style="flex: 1;">
+                    <label for="server-select">Select Server:</label>
+                    <select id="server-select">
+                        <option value="mc-ilias">Ikaria Games</option>
+                        <option value="mc-niilo">Königreich der letzten Krieger</option>
+                        <option value="bgstpoelten">BGST Pölten</option>
+                        <option value="htlstp">HTL St. Pölten</option>
+                        <option value="borgstpoelten">BORG St. Pölten</option>
+                        <option value="hakstpoelten">HAK St. Pölten</option>
+                        <option value="basopbafepstp">BASOP/BAFEP St. Pölten</option>
+                        <option value="play">Allgemeiner Spielserver</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="flex: 1; display: flex; align-items: flex-end;">
+                    <div class="actions" style="width: 100%;">
+                        <button class="btn-start" onclick="addAdmin()">Add Admin</button>
+                        <button class="btn-stop" onclick="removeAdmin()">Remove Admin</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="waitlist-section" style="background: rgba(0, 0, 0, 0.6); border-radius: 15px; padding: 25px; margin: 20px 0; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div class="section-header" style="text-align: center; margin-bottom: 15px;">
+                <h2 style="color: #3498db; font-size: 1.8em; margin-bottom: 10px;">Warteliste</h2>
+            </div>
+            <div class="waitlist-content" style="text-align: center; font-size: 1.2em; line-height: 1.6; margin-bottom: 20px;">
+                <p>25 Schulen mit 25 Anmeldungen erhalten einen <strong>kostenlosen eigenen Minecraft Server</strong></p>
+            </div>
+            <div class="email-form-container" style="text-align: center; margin-top: 20px;">
+                <p>Geben Sie Ihre Schule an, um Interesse zu zeigen:</p>
+                <form class="school-email-form" style="margin-top: 15px; display: flex; flex-direction: column; align-items: center;">
+                    <input
+                        type="email"
+                        placeholder="mitmachen@schul-domain.ac.at"
+                        style="padding: 12px 20px; margin: 10px 0; border-radius: 30px; border: 1px solid rgba(52, 152, 219, 0.5); background: rgba(255, 255, 255, 0.1); color: white; width: 100%; max-width: 400px; text-align: center;"
+                        required
+                    >
+                    <button
+                        type="submit"
+                        style="padding: 12px 30px; margin-top: 15px; border-radius: 30px; border: none; background: linear-gradient(45deg, #3498db, #2980b9); color: white; font-weight: bold; cursor: pointer; transition: all 0.3s ease;"
+                        onmouseover="this.style.transform='scale(1.05)';"
+                        onmouseout="this.style.transform='';"
+                    >
+                        Absenden
+                    </button>
+                    <p style="font-size: 0.9em; opacity: 0.8; margin-top: 15px;">Nur die Schul-Domain ist erforderlich und wird zur Zählung des Interesses eingereicht</p>
+                </form>
+            </div>
+        </section>
+
+        <div class="admin-section">
+            <h2 class="section-title">Installed Datapacks</h2>
+            <div class="dashboard-container">
+                <div class="server-card">
+                    <div class="server-header">
+                        <div class="server-name"><i class="fas fa-dice-d20"></i> Ikaria Games</div>
+                    </div>
+                    <div id="ilias-datapacks-list">Loading datapacks...</div>
+                </div>
+
+                <div class="server-card">
+                    <div class="server-header">
+                        <div class="server-name"><i class="fas fa-crown"></i> Königreich der letzten Krieger</div>
+                    </div>
+                    <div id="niilo-datapacks-list">Loading datapacks...</div>
+                </div>
+
+                <div class="server-card">
+                    <div class="server-header">
+                        <div class="server-name"><i class="fas fa-school"></i> BGST Pölten</div>
+                    </div>
+                    <div id="bgstpoelten-datapacks-list">Loading datapacks...</div>
+                </div>
+
+                <div class="server-card">
+                    <div class="server-header">
+                        <div class="server-name"><i class="fas fa-graduation-cap"></i> HTL St. Pölten</div>
+                    </div>
+                    <div id="htlstp-datapacks-list">Loading datapacks...</div>
+                </div>
+
+                <div class="server-card">
+                    <div class="server-header">
+                        <div class="server-name"><i class="fas fa-building"></i> BORG St. Pölten</div>
+                    </div>
+                    <div id="borgstpoelten-datapacks-list">Loading datapacks...</div>
+                </div>
+
+                <div class="server-card">
+                    <div class="server-header">
+                        <div class="server-name"><i class="fas fa-balance-scale"></i> HAK St. Pölten</div>
+                    </div>
+                    <div id="hakstpoelten-datapacks-list">Loading datapacks...</div>
+                </div>
+
+                <div class="server-card">
+                    <div class="server-header">
+                        <div class="server-name"><i class="fas fa-landmark"></i> BASOP/BAFEP St. Pölten</div>
+                    </div>
+                    <div id="basopbafepstp-datapacks-list">Loading datapacks...</div>
+                </div>
+
+                <div class="server-card">
+                    <div class="server-header">
+                        <div class="server-name"><i class="fas fa-gamepad"></i> Allgemeiner Spielserver</div>
+                    </div>
+                    <div id="play-datapacks-list">Loading datapacks...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-section">
+            <h2 class="section-title">Install New Datapacks</h2>
+            <div class="form-group">
+                <label for="search-datapacks">Search for Datapacks/Mods:</label>
+                <div class="form-row">
+                    <div class="form-group" style="flex: 1;">
+                        <input type="text" id="search-datapacks" placeholder="Enter datapack name..." onkeyup="handleSearchKeyup(event)">
+                        <button class="btn-start" onclick="searchDatapacks()" style="margin-top: 10px;">Search</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="search-results" style="margin-top: 20px;">
+                <p>Search for datapacks to install</p>
+            </div>
+        </div>
+
+        <button class="refresh-btn" onclick="refreshAll()">🔄 Refresh All Data</button>
+        <div class="last-updated" id="last-updated">Last updated: Just now</div>
+
+        <footer>
+            <p>Minecraft Server Admin Dashboard | Secure Management Interface</p>
+        </footer>
+    </div>
+
+    <script>
+        // Function to update stats
+        async function updateStats() {
+            try {
+                const response = await fetch('/api/public/status/all');
+                const data = await response.json();
+
+                // Update mc-ilias stats
+                const iliasData = data['mc-ilias'];
+                if (iliasData) {
+                    updateServerDisplay('ilias', iliasData);
+                }
+
+                // Update mc-niilo stats
+                const niiloData = data['mc-niilo'];
+                if (niiloData) {
+                    updateServerDisplay('niilo', niiloData);
+                }
+
+                // Update bgstpoelten stats
+                const bgstpoeltenData = data['bgstpoelten'];
+                if (bgstpoeltenData) {
+                    updateServerDisplay('bgstpoelten', bgstpoeltenData);
+                }
+
+                // Update htlstp stats
+                const htlstpData = data['htlstp'];
+                if (htlstpData) {
+                    updateServerDisplay('htlstp', htlstpData);
+                }
+
+                // Update borgstpoelten stats
+                const borgstpoeltenData = data['borgstpoelten'];
+                if (borgstpoeltenData) {
+                    updateServerDisplay('borgstpoelten', borgstpoeltenData);
+                }
+
+                // Update hakstpoelten stats
+                const hakstpoeltenData = data['hakstpoelten'];
+                if (hakstpoeltenData) {
+                    updateServerDisplay('hakstpoelten', hakstpoeltenData);
+                }
+
+                // Update basopbafepstp stats
+                const basopbafepstpData = data['basopbafepstp'];
+                if (basopbafepstpData) {
+                    updateServerDisplay('basopbafepstp', basopbafepstpData);
+                }
+
+                // Update play stats
+                const playData = data['play'];
+                if (playData) {
+                    updateServerDisplay('play', playData);
+                }
+
+                // Update "last updated" time
+                const now = new Date();
+                document.getElementById('last-updated').textContent = `Last updated: ${now.toLocaleTimeString()}`;
+            } catch (error) {
+                console.error('Error fetching stats:', error);
+                document.getElementById('last-updated').textContent = 'Error loading stats';
+            }
+        }
+
+        function updateServerDisplay(server, data) {
+            // Update status indicator
+            const statusIndicator = document.getElementById(`${server}-status-indicator`);
+
+            if (statusIndicator) {
+                statusIndicator.className = `status-indicator ${data.status.toLowerCase()}`;
+            }
+
+            // Update player count
+            const playerCount = document.getElementById(`${server}-player-count`);
+            if (playerCount) {
+                playerCount.textContent = `${data.playerCount}/20`;
+            }
+
+            // Update players list
+            const playersList = document.getElementById(`${server}-players`);
+            if (playersList) {
+                if (data.players && data.players.length > 0) {
+                    playersList.innerHTML = '';
+                    data.players.forEach(player => {
+                        const playerTag = document.createElement('span');
+                        playerTag.className = 'player-tag';
+                        playerTag.textContent = player;
+                        playersList.appendChild(playerTag);
+                    });
+                } else {
+                    playersList.innerHTML = '<span class="no-players">No players online</span>';
+                }
+            }
+        }
+
+        // Function to start server
+        async function startServer(serverName) {
+            if (!confirm(`Are you sure you want to start ${serverName}?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/start/${serverName}`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    alert(`${serverName} started successfully!`);
+                    setTimeout(() => updateStats(), 2000); // Refresh after 2 seconds
+                } else {
+                    const errorText = await response.text();
+                    alert(`Failed to start ${serverName}: ${response.status} - ${errorText}`);
+                }
+            } catch (error) {
+                console.error(`Error starting ${serverName}:`, error);
+                alert(`Error starting ${serverName}: ${error.message}`);
+            }
+        }
+
+        // Function to stop server
+        async function stopServer(serverName) {
+            if (!confirm(`Are you sure you want to stop ${serverName}?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/stop/${serverName}`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    alert(`${serverName} stopped successfully!`);
+                    setTimeout(() => updateStats(), 2000); // Refresh after 2 seconds
+                } else {
+                    const errorText = await response.text();
+                    alert(`Failed to stop ${serverName}: ${response.status} - ${errorText}`);
+                }
+            } catch (error) {
+                console.error(`Error stopping ${serverName}:`, error);
+                alert(`Error stopping ${serverName}: ${error.message}`);
+            }
+        }
+
+        // Function to restart server
+        async function restartServer(serverName) {
+            if (!confirm(`Are you sure you want to restart ${serverName}? This will temporarily disconnect all players.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/restart/${serverName}`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    alert(`${serverName} restarted successfully!`);
+                    setTimeout(() => updateStats(), 2000); // Refresh after 2 seconds
+                } else {
+                    const errorText = await response.text();
+                    alert(`Failed to restart ${serverName}: ${response.status} - ${errorText}`);
+                }
+            } catch (error) {
+                console.error(`Error restarting ${serverName}:`, error);
+                alert(`Error restarting ${serverName}: ${error.message}`);
+            }
+        }
+
+        // Function to download world
+        async function downloadWorld(serverName) {
+            if (!confirm(`Are you sure you want to download the world from ${serverName}? This may take a while.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/download/world/${serverName}`, {
+                    method: 'GET'
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${serverName}-world.zip`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    alert(`Download started for ${serverName} world!`);
+                } else {
+                    const errorText = await response.text();
+                    alert(`Failed to download world: ${response.status} - ${errorText}`);
+                }
+            } catch (error) {
+                console.error('Error downloading world:', error);
+                alert(`Error downloading world: ${error.message}`);
+            }
+        }
+
+        // Function to add admin
+        async function addAdmin() {
+            const username = document.getElementById('username').value.trim();
+            const serverName = document.getElementById('server-select').value;
+
+            if (!username) {
+                alert('Please enter a username');
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to add ${username} as admin to ${serverName}?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/add/${serverName}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username: username })
+                });
+
+                if (response.ok) {
+                    alert(`Added ${username} as admin to ${serverName}!`);
+                    document.getElementById('username').value = '';
+                } else {
+                    const errorText = await response.text();
+                    alert(`Failed to add admin: ${response.status} - ${errorText}`);
+                }
+            } catch (error) {
+                console.error('Error adding admin:', error);
+                alert(`Error adding admin: ${error.message}`);
+            }
+        }
+
+        // Function to remove admin
+        async function removeAdmin() {
+            const username = document.getElementById('username').value.trim();
+            const serverName = document.getElementById('server-select').value;
+
+            if (!username) {
+                alert('Please enter a username');
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to remove ${username} as admin from ${serverName}?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/remove/${serverName}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username: username })
+                });
+
+                if (response.ok) {
+                    alert(`Removed ${username} as admin from ${serverName}!`);
+                    document.getElementById('username').value = '';
+                } else {
+                    const errorText = await response.text();
+                    alert(`Failed to remove admin: ${response.status} - ${errorText}`);
+                }
+            } catch (error) {
+                console.error('Error removing admin:', error);
+                alert(`Error removing admin: ${error.message}`);
+            }
+        }
+
+        // Refresh all data function
+        function refreshAll() {
+            updateStats();
+        }
+
+        // Initial load
+        updateStats();
+
+        // Load installed datapacks
+        loadInstalledDatapacks();
+
+        // Refresh every 30 seconds
+        setInterval(updateStats, 30000);
+
+        // Function to load installed datapacks for all servers
+        async function loadInstalledDatapacks() {
+            try {
+                // Load datapacks for mc-ilias
+                const iliasResponse = await fetch('/api/datapacks/mc-ilias');
+                const iliasData = await iliasResponse.json();
+                displayDatapacks('ilias', iliasData.datapacks);
+            } catch (error) {
+                console.error('Error loading mc-ilias datapacks:', error);
+                document.getElementById('ilias-datapacks-list').innerHTML = '<p>Error loading datapacks</p>';
+            }
+
+            try {
+                // Load datapacks for mc-niilo
+                const niiloResponse = await fetch('/api/datapacks/mc-niilo');
+                const niiloData = await niiloResponse.json();
+                displayDatapacks('niilo', niiloData.datapacks);
+            } catch (error) {
+                console.error('Error loading mc-niilo datapacks:', error);
+                document.getElementById('niilo-datapacks-list').innerHTML = '<p>Error loading datapacks</p>';
+            }
+
+            try {
+                // Load datapacks for bgstpoelten
+                const bgstpoeltenResponse = await fetch('/api/datapacks/bgstpoelten');
+                const bgstpoeltenData = await bgstpoeltenResponse.json();
+                displayDatapacks('bgstpoelten', bgstpoeltenData.datapacks);
+            } catch (error) {
+                console.error('Error loading bgstpoelten datapacks:', error);
+                document.getElementById('bgstpoelten-datapacks-list').innerHTML = '<p>Error loading datapacks</p>';
+            }
+
+            try {
+                // Load datapacks for htlstp
+                const htlstpResponse = await fetch('/api/datapacks/htlstp');
+                const htlstpData = await htlstpResponse.json();
+                displayDatapacks('htlstp', htlstpData.datapacks);
+            } catch (error) {
+                console.error('Error loading htlstp datapacks:', error);
+                document.getElementById('htlstp-datapacks-list').innerHTML = '<p>Error loading datapacks</p>';
+            }
+
+            try {
+                // Load datapacks for borgstpoelten
+                const borgstpoeltenResponse = await fetch('/api/datapacks/borgstpoelten');
+                const borgstpoeltenData = await borgstpoeltenResponse.json();
+                displayDatapacks('borgstpoelten', borgstpoeltenData.datapacks);
+            } catch (error) {
+                console.error('Error loading borgstpoelten datapacks:', error);
+                document.getElementById('borgstpoelten-datapacks-list').innerHTML = '<p>Error loading datapacks</p>';
+            }
+
+            try {
+                // Load datapacks for hakstpoelten
+                const hakstpoeltenResponse = await fetch('/api/datapacks/hakstpoelten');
+                const hakstpoeltenData = await hakstpoeltenResponse.json();
+                displayDatapacks('hakstpoelten', hakstpoeltenData.datapacks);
+            } catch (error) {
+                console.error('Error loading hakstpoelten datapacks:', error);
+                document.getElementById('hakstpoelten-datapacks-list').innerHTML = '<p>Error loading datapacks</p>';
+            }
+
+            try {
+                // Load datapacks for basopbafepstp
+                const basopbafepstpResponse = await fetch('/api/datapacks/basopbafepstp');
+                const basopbafepstpData = await basopbafepstpResponse.json();
+                displayDatapacks('basopbafepstp', basopbafepstpData.datapacks);
+            } catch (error) {
+                console.error('Error loading basopbafepstp datapacks:', error);
+                document.getElementById('basopbafepstp-datapacks-list').innerHTML = '<p>Error loading datapacks</p>';
+            }
+
+            try {
+                // Load datapacks for play
+                const playResponse = await fetch('/api/datapacks/play');
+                const playData = await playResponse.json();
+                displayDatapacks('play', playData.datapacks);
+            } catch (error) {
+                console.error('Error loading play datapacks:', error);
+                document.getElementById('play-datapacks-list').innerHTML = '<p>Error loading datapacks</p>';
+            }
+        }
+
+        // Function to display datapacks in the UI
+        function displayDatapacks(server, datapacks) {
+            const containerId = `${server}-datapacks-list`;
+            const container = document.getElementById(containerId);
+
+            if (datapacks && datapacks.length > 0) {
+                const datapacksHtml = datapacks.map(dp => `
+                    <div class="datapack-item" style="padding: 8px; margin: 5px 0; background: rgba(255, 255, 255, 0.05); border-radius: 5px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <span class="datapack-tag" style="display: inline-block; background: rgba(52, 152, 219, 0.3); padding: 4px 8px; margin-right: 8px; border-radius: 20px; font-size: 0.85em; border: 1px solid rgba(52, 152, 219, 0.5);">
+                                <strong>${dp.name}</strong> (${dp.version})
+                            </span>
+                        </div>
+                        <div style="text-align: right;">
+                            <button class="btn-stop" onclick="uninstallDatapack('${server}', '${dp.directory}')"
+                                style="padding: 4px 8px; font-size: 0.8em;">Uninstall</button>
+                        </div>
+                    </div>
+                `).join('');
+
+                container.innerHTML = datapacksHtml;
+            } else {
+                container.innerHTML = '<p>No datapacks installed</p>';
+            }
+        }
+
+        // Function to uninstall a datapack (real implementation)
+        async function uninstallDatapack(server, datapackDir) {
+            if (!confirm(`Are you sure you want to uninstall ${datapackDir} from ${server}? This will delete the datapack folder.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/uninstall/datapack/${server}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ datapackDir: datapackDir })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    alert(result.message);
+                    loadInstalledDatapacks(); // Refresh the list
+                } else {
+                    const errorData = await response.json();
+                    alert(`Failed to uninstall datapack: ${response.status} - ${errorData.error || 'Unknown error'}`);
+                }
+            } catch (error) {
+                console.error('Error uninstalling datapack:', error);
+                alert(`Error uninstalling datapack: ${error.message}`);
+            }
+        }
+
+        // Function to search for datapacks
+        async function searchDatapacks() {
+            const query = document.getElementById('search-datapacks').value.trim();
+            const resultsContainer = document.getElementById('search-results');
+
+            if (!query) {
+                resultsContainer.innerHTML = '<p>Please enter a search term</p>';
+                return;
+            }
+
+            try {
+                resultsContainer.innerHTML = '<p>Searching...</p>';
+
+                const response = await fetch(`/api/search/datapacks?q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+
+                if (data.datapacks && data.datapacks.length > 0) {
+                    const resultsHtml = data.datapacks.map(dp => `
+                        <div class="search-result-item" style="padding: 15px; border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; margin: 10px 0; background: rgba(255,255,255,0.05);">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div style="flex: 1;">
+                                    <h3 style="margin: 0 0 5px 0; color: #3498db;">${dp.name}</h3>
+                                    <p style="margin: 0 0 10px 0; opacity: 0.8;">Version: ${dp.version} | Game: ${dp.gameVersion}</p>
+                                    <p style="margin: 0;">${dp.description}</p>
+                                </div>
+                                <div style="text-align: right;">
+                                    <select id="server-select-${dp.name.replace(/\s+/g, '-').toLowerCase()}" style="margin-bottom: 10px; padding: 5px; border-radius: 5px; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3);">
+                                        <option value="mc-ilias">Ikaria Games</option>
+                                        <option value="mc-niilo">Königreich der letzten Krieger</option>
+                                        <option value="bgstpoelten">BGST Pölten</option>
+                                        <option value="htlstp">HTL St. Pölten</option>
+                                        <option value="borgstpoelten">BORG St. Pölten</option>
+                                        <option value="hakstpoelten">HAK St. Pölten</option>
+                                        <option value="basopbafepstp">BASOP/BAFEP St. Pölten</option>
+                                        <option value="play">Allgemeiner Spielserver</option>
+                                    </select>
+                                    <button class="btn-start" onclick="installDatapack('${dp.name}', '${dp.version}')"
+                                        style="padding: 8px 15px; font-size: 0.9em;">Install</button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+
+                    resultsContainer.innerHTML = resultsHtml;
+                } else {
+                    resultsContainer.innerHTML = '<p>No datapacks found matching your search</p>';
+                }
+            } catch (error) {
+                console.error('Error searching datapacks:', error);
+                resultsContainer.innerHTML = '<p>Error searching for datapacks</p>';
+            }
+        }
+
+        // Function to handle enter key press in search field
+        function handleSearchKeyup(event) {
+            if (event.key === 'Enter') {
+                searchDatapacks();
+            }
+        }
+
+        // Function to install a datapack
+        async function installDatapack(name, version) {
+            // Get the selected server from the dropdown
+            const serverSelectId = `server-select-${name.replace(/\s+/g, '-').toLowerCase()}`;
+            const serverSelect = document.getElementById(serverSelectId);
+            const server = serverSelect ? serverSelect.value : 'mc-ilias';
+
+            if (!confirm(`Are you sure you want to install ${name} v${version} to ${server}?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/install/datapack/${server}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ datapackName: name, version: version })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    alert(result.message);
+
+                    // Refresh the installed datapacks list
+                    loadInstalledDatapacks();
+                } else {
+                    const errorText = await response.text();
+                    alert(`Failed to install datapack: ${response.status} - ${errorText}`);
+                }
+            } catch (error) {
+                console.error('Error installing datapack:', error);
+                alert(`Error installing datapack: ${error.message}`);
+            }
+        }
+    </script>
+</body>
+</html>
