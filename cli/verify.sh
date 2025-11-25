@@ -21,10 +21,13 @@ verify_server() {
     
     # Check HTTPS with -k to allow self-signed certs (handled by Cloudflare in prod)
     # Also follow redirects (-L) just in case
-    if curl -s -k -L -I "$HTTPS_URL" | grep -q "200 OK"; then
+    # use -o /dev/null -w "%{http_code}" to check status code reliably (handles HTTP/2)
+    HTTP_CODE=$(curl -s -k -L -o /dev/null -w "%{http_code}" "$HTTPS_URL")
+    
+    if [ "$HTTP_CODE" == "200" ]; then
         log_success "HTTPS is online (200 OK)."
     else
-        log_error "HTTPS is offline or not returning 200 OK."
+        log_error "HTTPS is offline or not returning 200 OK (Code: $HTTP_CODE)."
     fi
 
     # Check Minecraft MOTD
@@ -71,7 +74,9 @@ verify_server "http://hakstpoelten.lerncraft.xyz"
 verify_server "http://basop-bafep-stp.lerncraft.xyz"
 verify_server "http://play.lerncraft.xyz"
 verify_server "http://mc.ikaria.dev"
+verify_server "http://play.ikaria.dev"
 verify_server "http://mc.kdlk.net"
+verify_server "http://play.kdlk.net"
 
 # Verify admin-ui
 verify_server "http://lerncraft.xyz"
