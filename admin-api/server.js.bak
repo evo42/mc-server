@@ -63,7 +63,7 @@ const limiter = rateLimit({
 });
 
 // Apply rate limiting to all requests
-// app.use(limiter); //_rate_limit_disabled_
+app.use(limiter);
 
 // Middleware
 app.use(correlationIdMiddleware); // Add correlation ID middleware first
@@ -95,7 +95,7 @@ const publicLimiter = rateLimit({
 });
 
 // Public routes (no auth required)
-app.use('/api/public', publicRouter); //_rate_limit_disabled_
+app.use('/api/public', publicLimiter, publicRouter);
 
 // Rate limiting for authentication attempts to prevent brute force
 const authLimiter = rateLimit({
@@ -138,7 +138,7 @@ const basicAuthMiddleware = (req, res, next) => {
 };
 
 // Apply authentication to admin routes
-app.use('/api', basicAuthMiddleware); //_rate_limit_disabled_
+app.use('/api', authLimiter, basicAuthMiddleware);
 
 // Routes
 app.use('/api/auth', require('./routes/auth')); // Authentication routes for JWT
