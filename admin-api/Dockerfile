@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:22-alpine
 
 # Install Docker client
 RUN apk add --no-cache docker-cli curl
