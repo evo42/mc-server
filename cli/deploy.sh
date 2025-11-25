@@ -19,7 +19,7 @@ deploy() {
     docker compose down
     log_info "Deploying Minecraft SaaS Platform..."
     ./cli/build.sh containers
-    docker compose up -d --remove-orphans
+    docker compose up -d --force-recreate --remove-orphans
     log_success "Deployment completed successfully!"
 }
 
@@ -33,7 +33,7 @@ verify() {
         log_success "Deployment verification successful! $RUNNING_CONTAINERS containers are running."
         echo
         log_info "Running containers:"
-        docker ps --format "table {{.Names}}\\t{{.Image}}\\t{{.Status}}\\t{{.Ports}}" | grep mc-
+        docker ps --format "table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}" | grep mc-
         echo
         log_info "Services are accessible at:"
         log_info "  Main Admin UI: http://$(hostname):3000"
@@ -63,7 +63,7 @@ production() {
     log_info "Step 4: Verifying deployment..."
     sleep 10
     log_info "Running containers:"
-    docker ps --format "table {{.Names}}\\t{{.Image}}\\t{{.Status}}"
+    docker ps --format "table {{.Names}}\t{{.Image}}\t{{.Status}}"
 
     log_success "Production deployment completed!"
 }

@@ -16,6 +16,10 @@ yarn-error.log*
 *.log
 *.log.gz
 
+
+bungeecord/config/proxy.log*
+
+
 # Terraform secrets
 terraform.tfvars
 
