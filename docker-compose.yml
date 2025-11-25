@@ -166,6 +166,7 @@ services:
       - ./admin-ui-dist:/usr/share/nginx/html
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ./nginx/ssl:/etc/nginx/ssl
+      - ./landing:/var/www/landing
     networks:
       - proxy
     depends_on:
