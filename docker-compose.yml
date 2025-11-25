@@ -117,12 +117,12 @@ services:
     container_name: mc-admin-api
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./landing/borgstpoelten-mc-landing/datapacks:/app/borgstpoelten/datapacks
-      - ./landing/bgstpoelten-mc-landing/datapacks:/app/bgstpoelten/datapacks
-      - ./landing/hakstpoelten-mc-landing/datapacks:/app/hakstpoelten/datapacks
-      - ./landing/htlstp-mc-landing/datapacks:/app/htlstp/datapacks
-      - ./landing/basop-bafep-stp-mc-landing/datapacks:/app/basopbafepstp/datapacks
-      - ./landing/play-mc-landing/datapacks:/app/play/datapacks
+      - ./landing/borgstpoelten-mc-landing/datapacks:/app/mc-borgstpoelten/datapacks
+      - ./landing/bgstpoelten-mc-landing/datapacks:/app/mc-bgstpoelten/datapacks
+      - ./landing/hakstpoelten-mc-landing/datapacks:/app/mc-hakstpoelten/datapacks
+      - ./landing/htlstp-mc-landing/datapacks:/app/mc-htlstp/datapacks
+      - ./landing/basop-bafep-stp-mc-landing/datapacks:/app/mc-basop-bafep-stp/datapacks
+      - ./landing/play-mc-landing/datapacks:/app/mc-play/datapacks
       - ./mc-ilias/datapacks:/app/mc-ilias/datapacks
       - ./mc-niilo/datapacks:/app/mc-niilo/datapacks
 

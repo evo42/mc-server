@@ -6,6 +6,11 @@ const express = require('express');
 const basicAuth = require('express-basic-auth');
 const serversRouter = require('./routes/servers');
 const datapacksRouter = require('./routes/datapacks');
+const publicRouter = require('./routes/public');
+const historyService = require('./services/historyService');
+
+// Start history collection
+historyService.startCollection();
 
 const app = express(); // Create the express app
 const logger = pino({
@@ -28,6 +33,9 @@ app.use(express.json());
 
 // Serve static files from the root directory
 app.use(express.static(__dirname));
+
+// Public routes (no auth required)
+app.use('/api/public', publicRouter);
 
 // Middleware for authentication
 const authMiddleware = basicAuth({
