@@ -38,3 +38,5 @@ raids.dat
 raids_end.dat
 \n# Minecraft level files\nlevel.dat\nlevel.dat_old
 proxy.log*
+**/data/
+*.jar

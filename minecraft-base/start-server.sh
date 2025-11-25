@@ -27,10 +27,19 @@ if [ ! -f "server.properties" ]; then
     touch server.properties
 fi
 
-# Update server properties with environment variables
-sed -i "s/^motd=.*/motd=$MOTD/" server.properties 2>/dev/null || echo "motd=$MOTD" >> server.properties
-sed -i "s/^online-mode=.*/online-mode=$ONLINE_MODE/" server.properties 2>/dev/null || echo "online-mode=$ONLINE_MODE" >> server.properties
-sed -i "s/^enable-proxy-connections=.*/enable-proxy-connections=$ENABLE_PROXY_CONNECTIONS/" server.properties 2>/dev/null || echo "enable-proxy-connections=$ENABLE_PROXY_CONNECTIONS" >> server.properties
+# Forcefully set server properties
+sed -i '/^motd=.*/d' server.properties
+echo "motd=$MOTD" >> server.properties
+sed -i '/^online-mode=.*/d' server.properties
+echo "online-mode=false" >> server.properties
+sed -i '/^enable-proxy-connections=.*/d' server.properties
+echo "enable-proxy-connections=$ENABLE_PROXY_CONNECTIONS" >> server.properties
+sed -i '/^difficulty=.*/d' server.properties
+echo "difficulty=${DIFFICULTY:-easy}" >> server.properties
+sed -i '/^simulation-distance=.*/d' server.properties
+echo "simulation-distance=${SIMULATION_DISTANCE:-10}" >> server.properties
+sed -i '/^view-distance=.*/d' server.properties
+echo "view-distance=${VIEW_DISTANCE:-10}" >> server.properties
 
 # Check if there are any datapacks in the external datapacks directory to install
 if [ -d "/data/datapacks" ] && [ "$(ls -A /data/datapacks 2>/dev/null)" ]; then

@@ -1,4 +1,5 @@
 x-mc-server-base: &mc-server-base
+  env_file: .env
   image: ghcr.io/evo42/mc-server/minecraft-base
   build:
     context: ./minecraft-base
@@ -8,27 +9,13 @@ x-mc-server-base: &mc-server-base
     - minecraft-net
   expose:
     - "25565"
-  environment:
-    - EULA=${MC_EULA:-TRUE}
-    - VERSION=${MC_VERSION:-1.21.1}
-    - MEMORY=${MC_MEMORY:-4G}
-    - MAX_MEMORY=${MC_MAX_MEMORY:-8G}
-    - TYPE=PAPER
-    - ONLINE_MODE=${MC_ONLINE_MODE:-false}
-    - ENABLE_PROXY_CONNECTIONS=${MC_ENABLE_PROXY_CONNECTIONS:-true}
-    - MAX_PLAYERS=${MC_MAX_PLAYERS:-250}
-    - SERVER_DIR=/data
 
 services:
   mc-ilias:
     <<: *mc-server-base
     container_name: mc-ilias
     environment:
-      - MOTD=${MC_ILIAS_NAME:-mc-ilias Server}
-      - MEMORY=5120M
-      - MAX_MEMORY=15360M
-      - MAX_PLAYERS=99
-      - EULA=${MC_EULA:-TRUE}
+      MOTD: ${MC_ILIAS_NAME:-mc-ilias Server}
     volumes:
       - ./mc-ilias/data:/data
       - ./mc-ilias/datapacks:/data/datapacks
@@ -37,11 +24,7 @@ services:
     <<: *mc-server-base
     container_name: mc-niilo
     environment:
-      - MOTD=${MC_NIILO_NAME:-mc-niilo Server}
-      - MEMORY=5120M
-      - MAX_MEMORY=15360M
-      - MAX_PLAYERS=99
-      - EULA=${MC_EULA:-TRUE}
+      MOTD: ${MC_NIILO_NAME:-mc-niilo Server}
     volumes:
       - ./mc-niilo/data:/data
       - ./mc-niilo/datapacks:/data/datapacks
@@ -50,11 +33,7 @@ services:
     <<: *mc-server-base
     container_name: mc-bgstpoelten
     environment:
-      - MOTD=${MC_BGSTPOELTEN_NAME:-mc-bgstpoelten Server}
-      - MEMORY=5120M
-      - MAX_MEMORY=15360M
-      - MAX_PLAYERS=99
-      - EULA=${MC_EULA:-TRUE}
+      MOTD: ${MC_BGSTPOELTEN_NAME:-mc-bgstpoelten Server}
     volumes:
       - ./landing/bgstpoelten-mc-landing/data:/data
       - ./landing/bgstpoelten-mc-landing/datapacks:/data/datapacks
@@ -63,11 +42,7 @@ services:
     <<: *mc-server-base
     container_name: mc-htlstp
     environment:
-      - MOTD=${MC_HTLSTP_NAME:-mc-htlstp Server}
-      - MEMORY=5120M
-      - MAX_MEMORY=15360M
-      - MAX_PLAYERS=99
-      - EULA=${MC_EULA:-TRUE}
+      MOTD: ${MC_HTLSTP_NAME:-mc-htlstp Server}
     volumes:
       - ./landing/htlstp-mc-landing/data:/data
       - ./landing/htlstp-mc-landing/datapacks:/data/datapacks
@@ -76,11 +51,7 @@ services:
     <<: *mc-server-base
     container_name: mc-borgstpoelten
     environment:
-      - MOTD=${MC_BORGSTPOELTEN_NAME:-mc-borgstpoelten Server}
-      - MEMORY=5120M
-      - MAX_MEMORY=15360M
-      - MAX_PLAYERS=99
-      - EULA=${MC_EULA:-TRUE}
+      MOTD: ${MC_BORGSTPOELTEN_NAME:-mc-borgstpoelten Server}
     volumes:
       - ./landing/borgstpoelten-mc-landing/data:/data
       - ./landing/borgstpoelten-mc-landing/datapacks:/data/datapacks
@@ -89,11 +60,7 @@ services:
     <<: *mc-server-base
     container_name: mc-hakstpoelten
     environment:
-      - MOTD=${MC_HAKSTPOELTEN_NAME:-mc-hakstpoelten Server}
-      - MEMORY=5120M
-      - MAX_MEMORY=15360M
-      - MAX_PLAYERS=99
-      - EULA=${MC_EULA:-TRUE}
+      MOTD: ${MC_HAKSTPOELTEN_NAME:-mc-hakstpoelten Server}
     volumes:
       - ./landing/hakstpoelten-mc-landing/data:/data
       - ./landing/hakstpoelten-mc-landing/datapacks:/data/datapacks
@@ -102,11 +69,7 @@ services:
     <<: *mc-server-base
     container_name: mc-basop-bafep-stp
     environment:
-      - MOTD=${MC_BASOP_BAFEP_STP_NAME:-mc-basop-bafep-stp Server}
-      - MEMORY=5120M
-      - MAX_MEMORY=15360M
-      - MAX_PLAYERS=99
-      - EULA=${MC_EULA:-TRUE}
+      MOTD: ${MC_BASOP_BAFEP_STP_NAME:-mc-basop-bafep-stp Server}
     volumes:
       - ./landing/basop-bafep-stp-mc-landing/data:/data
       - ./landing/basop-bafep-stp-mc-landing/datapacks:/data/datapacks
@@ -115,11 +78,7 @@ services:
     <<: *mc-server-base
     container_name: mc-play
     environment:
-      - MOTD=${MC_PLAY_NAME:-mc-play Server}
-      - MEMORY=5120M
-      - MAX_MEMORY=15360M
-      - MAX_PLAYERS=99
-      - EULA=${MC_EULA:-TRUE}
+      MOTD: ${MC_PLAY_NAME:-mc-play Server}
     volumes:
       - ./landing/play-mc-landing/data:/data
       - ./landing/play-mc-landing/datapacks:/data/datapacks
@@ -130,6 +89,8 @@ services:
     container_name: mc-bungeecord
     env_file:
       - .env
+    environment:
+      MAX_PLAYERS: ${MC_MAX_PLAYERS:-42}
     ports:
       - "${PROXY_PORT:-25565}:25565"
     volumes:
@@ -166,9 +127,9 @@ services:
     env_file:
       - .secrets
     environment:
-      - NODE_ENV=production
-      - ADMIN_USER=${ADMIN_USER:-admin}
-      - ADMIN_PASS=${ADMIN_PASS:-admin123}
+      NODE_ENV: production
+      ADMIN_USER: ${ADMIN_USER:-admin}
+      ADMIN_PASS: ${ADMIN_PASS:-admin123}
     restart: unless-stopped
     networks:
       - minecraft-net
@@ -206,19 +167,6 @@ services:
       - proxy
     depends_on:
       - admin-api
-
-#  watchtower:
-#    image: containrrr/watchtower
-#    labels:
-#      - com.centurylinklabs.watchtower.enable=false
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock
-#    env_file:
-#      - .secrets
-#    environment:
-#      - DOCKER_API_VERSION=1.44
-#    command: --interval 30 --cleanup
-#    restart: unless-stopped
 
 networks:
   minecraft-net:
