@@ -7,34 +7,32 @@ server {
     ssl_certificate_key /etc/letsencrypt/live/lerncraft.xyz/privkey.pem;
 
     # Path-based landing pages for schools/servers
-    # Use ^~ so these locations win over the generic / proxy,
-    # and match both /name and /name/.
-    location ^~ /bgstpoelten {
+    location /bgstpoelten/ {
         alias /var/www/landing/bgstpoelten/;
         try_files $uri $uri/ /index.html;
     }
 
-    location ^~ /borgstpoelten {
+    location /borgstpoelten/ {
         alias /var/www/landing/borgstpoelten/;
         try_files $uri $uri/ /index.html;
     }
 
-    location ^~ /hakstpoelten {
+    location /hakstpoelten/ {
         alias /var/www/landing/hakstpoelten/;
         try_files $uri $uri/ /index.html;
     }
 
-    location ^~ /htlstp {
+    location /htlstp/ {
         alias /var/www/landing/htlstp/;
         try_files $uri $uri/ /index.html;
     }
 
-    location ^~ /basop-bafep-stp {
+    location /basop-bafep-stp/ {
         alias /var/www/landing/basop-bafep-stp/;
         try_files $uri $uri/ /index.html;
     }
 
-    location ^~ /play {
+    location /play/ {
         alias /var/www/landing/play/;
         try_files $uri $uri/ /index.html;
     }

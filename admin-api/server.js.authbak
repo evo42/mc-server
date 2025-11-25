@@ -137,15 +137,13 @@ const basicAuthMiddleware = (req, res, next) => {
   }
 };
 
-// Public/unauthed routes that the public site uses
-app.use('/api/datapacks', datapacksRouter); // unauthenticated for public stats page
-
-// Apply authentication to remaining admin API routes
+// Apply authentication to admin routes
 app.use('/api', basicAuthMiddleware); //_rate_limit_disabled_
 
-// Authenticated routes
+// Routes
 app.use('/api/auth', require('./routes/auth')); // Authentication routes for JWT
 app.use('/api/servers', serversRouter);
+app.use('/api/datapacks', datapacksRouter);
 app.use('/api/backup', require('./routes/backup')); // Backup and restore functionality
 
 // Route for the admin page, with authentication
