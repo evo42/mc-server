@@ -162,7 +162,7 @@ services:
       - ./mc-niilo/datapacks:/app/mc-niilo/datapacks
 
     env_file:
-      - .env
+      - .secrets
     environment:
       - NODE_ENV=production
       - ADMIN_USER=${ADMIN_USER:-admin}
