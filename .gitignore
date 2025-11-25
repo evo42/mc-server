@@ -1,42 +1,34 @@
+# Secrets
 .secrets
-landing/**/data/world/
-admin-api/coverage/
-admin-api/node_modules/
-admin-ui-spa/dist/
-admin-ui-spa/node_modules/
-.DS_Store
+.env
+
+# Logs
+*.log*
+*.log*.gz
+/logs/
+**.log*s/
+
+# Node/JS
+node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-/logs
-*.log
-.env
+admin-ui-spa/dist/
+admin-api/coverage/
 
-# Log files
-*.log
-*.log.gz
+# OS
+.DS_Store
 
-
-bungeecord/config/proxy.log*
-
-
-# Terraform secrets
+# Terraform
 terraform.tfvars
+.terraform/
 
-node_modules/
-
-# Server data
-*/data/*
-*/world/*
-*/logs/*
+# Minecraft Server Data & Binaries
+*.jar
+**/data/
+*/world/
 server.properties
 .rcon-cli.env
 .rcon-cli.yaml
-level.dat
-level.dat_old
-raids.dat
-raids_end.dat
-\n# Minecraft level files\nlevel.dat\nlevel.dat_old
-proxy.log*
-**/data/
-*.jar
+*.dat
+*.dat_old
