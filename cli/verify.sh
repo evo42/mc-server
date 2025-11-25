@@ -31,15 +31,18 @@ verify_server() {
     fi
 
     # Check Minecraft MOTD
+    # Note: This relies on an external API which may be cached or slow to update.
     RESPONSE=$(curl -s "https://api.mcsrvstat.us/2/$HOSTNAME")
     if echo "$RESPONSE" | grep -q '"online":true'; then
         if command -v jq >/dev/null 2>&1; then
             MOTD=$(echo "$RESPONSE" | jq -r '.motd.clean | join(" ")')
             log_info "MOTD: $MOTD"
+        else
+            log_info "MOTD: Online (jq not installed)"
         fi
     else
-        # Optional: Log if MC server is unreachable
-        :
+        # Log a warning instead of doing nothing, so the user knows the check was attempted
+        log_warn "MOTD: Could not fetch status from mcsrvstat.us (might be cached/offline)"
     fi
     echo ""
 }
@@ -56,7 +59,7 @@ verify_bungeecord() {
             log_info "MOTD: $MOTD"
         fi
     else
-        log_error "BungeeCord proxy is offline."
+        log_error "BungeeCord proxy is offline (according to mcsrvstat.us)."
     fi
     echo ""
 }

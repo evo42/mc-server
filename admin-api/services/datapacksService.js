@@ -1,149 +1,166 @@
-const sanitizeInput = (input) => {
-    if (!input || typeof input !== 'string') {
-        throw new Error('Invalid input: must be a non-empty string.');
-    }
-    // Add more validation rules as needed
-    return input;
-};
-
 const fs = require('fs').promises;
 const path = require('path');
 const allDatapacks = require('../datapacks.json');  // Import the datapack repository
-const { isValidServer } = require('./serversService'); // Reuse the server validation
+const { isValidServer, normalizeServerName } = require('./serversService'); // Reuse the server validation
+
+// Helper to resolve server datapacks path
+const getServerDatapacksPath = (server) => {
+    // Check if it's one of the root servers
+    if (['mc-ilias', 'mc-niilo'].includes(server)) {
+        return path.join(__dirname, '..', server, 'datapacks');
+    }
+    // Else assume it's in landing
+    // Extract base name: mc-bgstpoelten -> bgstpoelten
+    const baseName = server.replace(/^mc-/, '');
+    return path.join(__dirname, '..', 'landing', `${baseName}-mc-landing`, 'datapacks');
+};
 
 // Sanitize server name to prevent path traversal
 const sanitizeServerName = (server) => {
+    server = normalizeServerName(server);
     if (!isValidServer(server)) {
         throw new Error(`Invalid server name: ${server}`);
     }
     return server;
 };
 
-// Sanitize datapack directory name to prevent path traversal
-const sanitizeDatapackDir = (datapackDir) => {
-    if (!datapackDir || typeof datapackDir !== 'string') {
+// Sanitize datapack directory name
+const sanitizeDatapackDir = (dir) => {
+    if (!dir || typeof dir !== 'string') {
         throw new Error('Invalid datapack directory name');
     }
-
-    // Check for path traversal attempts
-    if (datapackDir.includes('../') || datapackDir.includes('..\\') || datapackDir.startsWith('..')) {
+    // Only allow alphanumeric, spaces, dashes, dots, underscores, parenthesis, brackets
+    if (!/^[a-zA-Z0-9 ._()\-\[\]]+$/.test(dir)) {
+        throw new Error('Invalid datapack directory name: contains invalid characters');
+    }
+    if (dir.includes('..') || dir.includes('/') || dir.includes('\\')) {
         throw new Error('Invalid datapack directory name: path traversal detected');
     }
-
-    return datapackDir;
+    return dir;
 };
 
 const getDatapacks = async (server) => {
-    const sanitizedServer = sanitizeServerName(server);
-    const serverPath = path.join(__dirname, '..', sanitizedServer, 'datapacks');
-    const files = await fs.readdir(serverPath);
-    // Filter out any potentially dangerous filenames
-    const safeFiles = files.filter(file => {
-        return !file.includes('../') && !file.includes('..\\') && !file.startsWith('..');
-    });
-
-    const datapacks = await Promise.all(safeFiles.map(async (file) => {
-        const filePath = path.join(serverPath, file);
+    try {
+        const sanitizedServer = sanitizeServerName(server);
+        const datapacksPath = getServerDatapacksPath(sanitizedServer);
+        
         try {
-            const stats = await fs.stat(filePath);
-            if (stats.isDirectory()) {
-                const match = file.match(/^(.*?)\s+v([\d\.]+(?:\s*[-\w]*)*)\s+\((MC\s+[\d\.\-\w]+)\)/);
-                if (match) {
-                    return {
-                        name: match[1],
-                        version: match[2],
-                        gameVersion: match[3],
-                        directory: file
-                    };
-                } else {
-                    return {
-                        name: file,
-                        version: 'unknown',
-                        gameVersion: 'unknown',
-                        directory: file
-                    };
-                }
-            }
+            await fs.access(datapacksPath);
         } catch (error) {
-            // If stat fails (e.g., broken symlink), skip this file
-            return null;
+            // Directory doesn't exist, return empty array
+            return [];
         }
-    }));
 
-    // Filter out null values
-    return datapacks.filter(dp => dp !== null);
+        const files = await fs.readdir(datapacksPath);
+        const datapacks = [];
+
+        for (const file of files) {
+            // Check if it's a directory
+            const filePath = path.join(datapacksPath, file);
+            const stats = await fs.stat(filePath);
+
+            if (stats.isDirectory()) {
+                 // Try to parse name and version
+                 // Format: "[Name] v[Version] (MC [GameVersion])"
+                 const match = file.match(/^(.+) v([\d.]+) \(MC ([\d.]+)\)$/);
+                 if (match) {
+                     datapacks.push({
+                         name: match[1],
+                         version: match[2],
+                         gameVersion: match[3],
+                         directory: file
+                     });
+                 } else {
+                     // Add as unknown format
+                      datapacks.push({
+                         name: file,
+                         version: 'unknown',
+                         gameVersion: 'unknown',
+                         directory: file
+                     });
+                 }
+            }
+        }
+        return datapacks;
+    } catch (error) {
+        throw error;
+    }
 };
 
 const installDatapack = async (server, datapackName, version) => {
     const sanitizedServer = sanitizeServerName(server);
-    const sanitizedDatapackName = sanitizeInput(datapackName);
-    const sanitizedVersion = sanitizeInput(version);
-
-    const datapack = allDatapacks.find(dp =>
-        dp.name.toLowerCase() === sanitizedDatapackName.toLowerCase() && dp.version === sanitizedVersion
-    );
+    
+    // Find datapack in repo
+    const datapack = allDatapacks.find(d => d.name === datapackName);
     if (!datapack) {
-        throw new Error(`Datapack ${sanitizedDatapackName} v${sanitizedVersion} not found in repository`);
+        throw new Error(`Datapack not found: ${datapackName}`);
     }
 
-    const datapackDirPath = path.join(__dirname, '..', sanitizedServer, 'datapacks');
-    await fs.mkdir(datapackDirPath, { recursive: true });
-
-    const directoryName = `${datapack.name} v${datapack.version} (${datapack.gameVersion})`;
-
-    // Additional check to prevent path traversal in the directory name itself
-    if (directoryName.includes('../') || directoryName.includes('..\\\\') || directoryName.startsWith('..')) {
-        throw new Error('Invalid datapack directory name: path traversal detected');
+    // Check version
+    const versionInfo = datapack.versions.find(v => v.version === version);
+    if (!versionInfo) {
+        throw new Error(`Version not found: ${version}`);
     }
 
-    const fullDatapackPath = path.join(datapackDirPath, directoryName);
+    const datapacksPath = getServerDatapacksPath(sanitizedServer);
+    const dirName = `${datapack.name} v${version} (MC ${versionInfo.gameVersion})`;
+    const sanitizedDirName = sanitizeDatapackDir(dirName);
+    const installPath = path.join(datapacksPath, sanitizedDirName);
 
+    // Check if already installed
     try {
-        await fs.access(fullDatapackPath);
-        throw new Error(`Datapack ${datapack.name} v${datapack.version} is already installed`);
-    } catch (err) {
-        // Directory doesn't exist, which is what we want
+        await fs.access(installPath);
+        throw new Error('Datapack version already installed');
+    } catch (error) {
+        if (error.code !== 'ENOENT') {
+            throw error;
+        }
     }
 
-    await fs.mkdir(fullDatapackPath, { recursive: true });
+    // Create directory
+    await fs.mkdir(installPath, { recursive: true });
+
+    // Create pack.mcmeta
     const packMcmeta = {
         pack: {
-            pack_format: 15,
-            description: datapack.description
+            pack_format: 48, // 1.21
+            description: `${datapack.name} v${version} - Installed via Admin UI`
         }
     };
-    await fs.writeFile(
-        path.join(fullDatapackPath, 'pack.mcmeta'),
-        JSON.stringify(packMcmeta, null, 2)
-    );
+    await fs.writeFile(path.join(installPath, 'pack.mcmeta'), JSON.stringify(packMcmeta, null, 4));
+    
+    return { success: true, message: 'Datapack installed' };
 };
 
 const uninstallDatapack = async (server, datapackDir) => {
     const sanitizedServer = sanitizeServerName(server);
-    const sanitizedDatapackDir = sanitizeDatapackDir(datapackDir);
+    const sanitizedDir = sanitizeDatapackDir(datapackDir);
+    
+    const datapacksPath = getServerDatapacksPath(sanitizedServer);
+    const targetPath = path.join(datapacksPath, sanitizedDir);
 
-    const datapackDirPath = path.join(__dirname, '..', sanitizedServer, 'datapacks', sanitizedDatapackDir);
     try {
-        await fs.rm(datapackDirPath, { recursive: true, force: true });
+        await fs.rm(targetPath, { recursive: true, force: true });
+        return { success: true, message: 'Datapack uninstalled' };
     } catch (error) {
-        // Log the error and re-throw a more specific error
-        console.error(`Error removing datapack directory: ${datapackDirPath}`, error);
-        throw new Error(`Failed to uninstall datapack: ${sanitizedDatapackDir}`);
+        console.error('Error uninstalling datapack:', error);
+        throw new Error('Failed to uninstall datapack');
     }
 };
 
 const searchDatapacks = async (query) => {
-    if (query) {
-        return allDatapacks.filter(dp =>
-            dp.name.toLowerCase().includes(query.toLowerCase())
-        );
-    }
-    return allDatapacks;
+    if (!query) return allDatapacks;
+    
+    const lowerQuery = query.toLowerCase();
+    return allDatapacks.filter(d => 
+        d.name.toLowerCase().includes(lowerQuery) || 
+        d.description.toLowerCase().includes(lowerQuery)
+    );
 };
 
 module.exports = {
     getDatapacks,
     installDatapack,
     uninstallDatapack,
-    searchDatapacks,
+    searchDatapacks
 };

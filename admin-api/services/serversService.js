@@ -13,12 +13,21 @@ const ALLOWED_SERVERS = [
     'mc-play'
 ];
 
+// Normalize server name (e.g. bgstpoelten -> mc-bgstpoelten)
+const normalizeServerName = (server) => {
+    if (!server) return server;
+    if (ALLOWED_SERVERS.includes(server)) return server;
+    if (ALLOWED_SERVERS.includes(`mc-${server}`)) return `mc-${server}`;
+    return server; // Return original if not found (validation will fail)
+};
+
 // Validate if a server name is allowed
 const isValidServer = (server) => {
-    return ALLOWED_SERVERS.includes(server);
+    return ALLOWED_SERVERS.includes(normalizeServerName(server));
 };
 
 const startServer = async (server) => {
+    server = normalizeServerName(server);
     if (!isValidServer(server)) {
         throw new Error(`Invalid server name: ${server}`);
     }
@@ -28,6 +37,7 @@ const startServer = async (server) => {
 };
 
 const stopServer = async (server) => {
+    server = normalizeServerName(server);
     if (!isValidServer(server)) {
         throw new Error(`Invalid server name: ${server}`);
     }
@@ -37,6 +47,7 @@ const stopServer = async (server) => {
 };
 
 const restartServer = async (server) => {
+    server = normalizeServerName(server);
     if (!isValidServer(server)) {
         throw new Error(`Invalid server name: ${server}`);
     }
@@ -46,6 +57,7 @@ const restartServer = async (server) => {
 };
 
 const getServerStatus = async (server) => {
+    server = normalizeServerName(server);
     if (!isValidServer(server)) {
         throw new Error(`Invalid server name: ${server}`);
     }
@@ -98,5 +110,6 @@ module.exports = {
     getServerStatus,
     getAllServerStatus,
     isValidServer, // Export for testing
+    normalizeServerName,
     ALLOWED_SERVERS // Export for reference
 };

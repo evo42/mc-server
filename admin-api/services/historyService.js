@@ -44,6 +44,7 @@ const startCollection = () => {
 };
 
 const getHistory = (server) => {
+    server = serversService.normalizeServerName(server);
     if (!serversService.isValidServer(server)) {
         throw new Error(`Invalid server name: ${server}`);
     }
