@@ -5,11 +5,8 @@ server {
     ssl_certificate /etc/letsencrypt/live/lerncraft.xyz/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/lerncraft.xyz/privkey.pem;
     location / {
-        proxy_pass http://admin-api:3000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        alias /var/www/landing/bgstpoelten/;
+        try_files $uri $uri/ /index.html;
     }
 }
 server {
@@ -19,11 +16,8 @@ server {
     ssl_certificate /etc/letsencrypt/live/lerncraft.xyz/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/lerncraft.xyz/privkey.pem;
     location / {
-        proxy_pass http://admin-api:3000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        alias /var/www/landing/htlstp/;
+        try_files $uri $uri/ /index.html;
     }
 }
 server {
@@ -33,11 +27,8 @@ server {
     ssl_certificate /etc/letsencrypt/live/lerncraft.xyz/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/lerncraft.xyz/privkey.pem;
     location / {
-        proxy_pass http://admin-api:3000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        alias /var/www/landing/borgstpoelten/;
+        try_files $uri $uri/ /index.html;
     }
 }
 server {
@@ -47,11 +38,8 @@ server {
     ssl_certificate /etc/letsencrypt/live/lerncraft.xyz/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/lerncraft.xyz/privkey.pem;
     location / {
-        proxy_pass http://admin-api:3000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        alias /var/www/landing/hakstpoelten/;
+        try_files $uri $uri/ /index.html;
     }
 }
 server {
@@ -61,11 +49,8 @@ server {
     ssl_certificate /etc/letsencrypt/live/lerncraft.xyz/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/lerncraft.xyz/privkey.pem;
     location / {
-        proxy_pass http://admin-api:3000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        alias /var/www/landing/basop-bafep-stp/;
+        try_files $uri $uri/ /index.html;
     }
 }
 server {
@@ -75,11 +60,8 @@ server {
     ssl_certificate /etc/letsencrypt/live/lerncraft.xyz/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/lerncraft.xyz/privkey.pem;
     location / {
-        proxy_pass http://admin-api:3000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        alias /var/www/landing/play/;
+        try_files $uri $uri/ /index.html;
     }
 }
 server {
