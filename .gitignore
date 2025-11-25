@@ -31,3 +31,4 @@ server.properties
 .rcon-cli.yaml
 *.dat
 *.dat_old
+nginx/ssl/

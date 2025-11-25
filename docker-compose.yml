@@ -165,6 +165,7 @@ services:
     volumes:
       - ./admin-ui-dist:/usr/share/nginx/html
       - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/ssl:/etc/nginx/ssl
     networks:
       - proxy
     depends_on:
