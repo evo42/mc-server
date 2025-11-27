@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Server Admin API - Advanced Testing</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+            color: white;
+            border-radius: 10px;
+        }
+        h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+        .panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .server-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .server-item {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .server-item:hover {
+            background-color: #e9ecef;
+        }
+        .server-item.active {
+            background-color: #3498db;
+            color: white;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .btn {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        .btn-success {
+            background-color: #2ecc71;
+        }
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+        .btn-danger {
+            background-color: #e74c3c;
+        }
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        .btn-warning {
+            background-color: #f39c12;
+        }
+        .btn-warning:hover {
+            background-color: #d35400;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            display: none;
+        }
+        .result.success {
+            border-left: 5px solid #2ecc71;
+        }
+        .result.error {
+            border-left: 5px solid #e74c3c;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 10px;
+        }
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .ram-controls {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        .stats-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .stat-card {
+            background-color: #e8f4fc;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .status-running {
+            background-color: #2ecc71;
+        }
+        .status-stopped {
+            background-color: #e74c3c;
+        }
+        .status-exited {
+            background-color: #95a5a6;
+        }
+        .status-paused {
+            background-color: #3498db;
+        }
+        .nav-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+        .tab.active {
+            background-color: white;
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .ram-display {
+            background-color: #e8f5e9;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .chart-container {
+            height: 200px;
+            margin-top: 15px;
+            background-color: white;
+            border-radius: 5px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Minecraft Server Admin API</h1>
+        <p class="subtitle">Advanced Testing Interface with RAM Management</p>
+    </header>
+
+    <div class="form-group">
+        <label for="username">Username:</label>
+        <input type="text" id="username" value="admin" placeholder="API Username">
+    </div>
+    <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" value="admin123" placeholder="API Password">
+    </div>
+
+    <div class="nav-tabs">
+        <div class="tab active" onclick="switchTab('dashboard')">Dashboard</div>
+        <div class="tab" onclick="switchTab('server-control')">Server Control</div>
+        <div class="tab" onclick="switchTab('config')">Configuration</div>
+        <div class="tab" onclick="switchTab('datapacks')">Datapacks</div>
+        <div class="tab" onclick="switchTab('ram')">RAM Management</div>
+    </div>
+
+    <div id="dashboard" class="tab-content active">
+        <div class="panel">
+            <h2>Server Dashboard</h2>
+            <div class="stats-display">
+                <div class="stat-card">
+                    <div>Total Servers</div>
+                    <div id="total-servers">0</div>
+                </div>
+                <div class="stat-card">
+                    <div>Running</div>
+                    <div id="running-servers">0</div>
+                </div>
+                <div class="stat-card">
+                    <div>Stopped</div>
+                    <div id="stopped-servers">0</div>
+                </div>
+                <div class="stat-card">
+                    <div>Total Players</div>
+                    <div id="total-players">0</div>
+                </div>
+            </div>
+            
+            <div id="server-status-container">
+                <h3>Server Status</h3>
+                <div id="server-status-list"></div>
+                
+                <button class="btn btn-success" onclick="refreshServerStatus()">Refresh Status</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="server-control" class="tab-content">
+        <div class="container">
+            <div class="panel">
+                <h2>Server List</h2>
+                <div id="server-list" class="server-list">
+                    <!-- Server list will be populated here -->
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h2>Server Control</h2>
+                <div id="selected-server">No server selected</div>
+                
+                <div id="server-controls" style="display:none;">
+                    <div class="form-group">
+                        <label>Current Status: <span id="current-status">-</span></label>
+                    </div>
+                    <div class="form-group">
+                        <label>Current Players: <span id="current-players">-</span></span></label>
+                    </div>
+                    <div class="form-group">
+                        <label>CPU Usage: <span id="current-cpu">-</span></label>
+                    </div>
+                    <div class="form-group">
+                        <label>Memory Usage: <span id="current-memory">-</span></label>
+                    </div>
+                    
+                    <button class="btn btn-success" onclick="startServer()">Start Server</button>
+                    <button class="btn btn-danger" onclick="stopServer()">Stop Server</button>
+                    <button class="btn btn-warning" onclick="restartServer()">Restart Server</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="config" class="tab-content">
+        <div class="container">
+            <div class="panel">
+                <h2>Server List</h2>
+                <div id="config-server-list" class="server-list">
+                    <!-- Server list for config will be populated here -->
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h2>Server Configuration</h2>
+                <div id="config-server-name">No server selected</div>
+                
+                <div id="server-config-form" style="display:none;">
+                    <div class="form-group">
+                        <label for="config-min-memory">Min Memory (e.g., 1G, 1024M):</label>
+                        <input type="text" id="config-min-memory" value="1G">
+                    </div>
+                    <div class="form-group">
+                        <label for="config-max-memory">Max Memory (e.g., 4G, 4096M):</label>
+                        <input type="text" id="config-max-memory" value="4G">
+                    </div>
+                    <div class="form-group">
+                        <label for="config-motd">MOTD:</label>
+                        <input type="text" id="config-motd" value="Welcome to the server!">
+                    </div>
+                    <div class="form-group">
+                        <label for="config-online-mode">Online Mode:</label>
+                        <select id="config-online-mode">
+                            <option value="true">True</option>
+                            <option value="false">False</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="config-max-players">Max Players:</label>
+                        <input type="number" id="config-max-players" value="20">
+                    </div>
+                    <div class="form-group">
+                        <label for="config-view-distance">View Distance:</label>
+                        <input type="number" id="config-view-distance" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="config-level-name">Level Name:</label>
+                        <input type="text" id="config-level-name" value="world">
+                    </div>
+                    <div class="form-group">
+                        <label for="config-level-seed">Level Seed:</label>
+                        <input type="text" id="config-level-seed" value="">
+                    </div>
+                    <div class="form-group">
+                        <label for="config-level-type">Level Type:</label>
+                        <input type="text" id="config-level-type" value="DEFAULT">
+                    </div>
+                    <div class="form-group">
+                        <label for="config-game-mode">Game Mode:</label>
+                        <select id="config-game-mode">
+                            <option value="survival">Survival</option>
+                            <option value="creative">Creative</option>
+                            <option value="adventure">Adventure</option>
+                            <option value="spectator">Spectator</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="config-difficulty">Difficulty:</label>
+                        <select id="config-difficulty">
+                            <option value="peaceful">Peaceful</option>
+                            <option value="easy">Easy</option>
+                            <option value="normal" selected>Normal</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn-success" onclick="saveServerConfig()">Save Configuration</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="datapacks" class="tab-content">
+        <div class="container">
+            <div class="panel">
+                <h2>Server List</h2>
+                <div id="datapacks-server-list" class="server-list">
+                    <!-- Server list for datapacks will be populated here -->
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h2>Datapacks Management</h2>
+                <div id="datapacks-server-name">No server selected</div>
+                
+                <div id="datapacks-controls" style="display:none;">
+                    <div class="form-group">
+                        <label for="search-datapacks">Search Datapacks:</label>
+                        <input type="text" id="search-datapacks" placeholder="Search for datapacks...">
+                        <button class="btn" onclick="searchDatapacks()">Search</button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Available Datapacks:</label>
+                        <select id="available-datapacks" multiple size="6" style="width:100%; height:150px;">
+                            <!-- Options will be populated dynamically -->
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Installed Datapacks:</label>
+                        <select id="installed-datapacks" multiple size="6" style="width:100%; height:150px;">
+                            <!-- Options will be populated dynamically -->
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn-success" onclick="installDatapack()">Install Selected</button>
+                    <button class="btn btn-danger" onclick="uninstallDatapack()">Uninstall Selected</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="ram" class="tab-content">
+        <div class="panel">
+            <h2>RAM Management</h2>
+            <p>Monitor and manage RAM allocation for your Minecraft servers</p>
+            
+            <div class="ram-controls">
+                <h3>RAM Allocation Summary</h3>
+                <div class="stats-display">
+                    <div class="stat-card">
+                        <div>Total Allocated</div>
+                        <div id="total-allocated-ram">0 MB</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Total Used</div>
+                        <div id="total-used-ram">0 MB</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Utilization</div>
+                        <div id="ram-utilization">0%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>Headroom</div>
+                        <div id="ram-headroom">0 MB</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="ram-server-list">
+                <!-- RAM allocation per server will be displayed here -->
+            </div>
+            
+            <div class="chart-container">
+                <h3>RAM Utilization Chart</h3>
+                <canvas id="ramChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading" id="global-loading">
+        <div class="loading-spinner"></div>
+        <p>Loading data...</p>
+    </div>
+
+    <script>
+        // Global variables
+        let currentServer = null;
+        let serversData = {};
+        let currentTab = 'dashboard';
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshServerStatus();
+            // Refresh server status every 30 seconds
+            setInterval(refreshServerStatus, 30000);
+        });
+        
+        // Tab switching
+        function switchTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(tab => tab.classList.remove('active'));
+            
+            // Deactivate all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Activate selected tab
+            event.target.classList.add('active');
+            
+            currentTab = tabName;
+            
+            // Load specific data for the tab
+            if(tabName === 'dashboard') {
+                refreshServerStatus();
+            } else if(tabName === 'ram') {
+                updateRamManagementView();
+            }
+        }
+        
+        // Get auth headers
+        function getAuthHeaders() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const credentials = btoa(`${username}:${password}`);
+            
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Basic ${credentials}`
+            };
+        }
+        
+        // Refresh server status
+        async function refreshServerStatus() {
+            const loadingElement = document.getElementById('global-loading');
+            loadingElement.style.display = 'block';
+            
+            try {
+                const response = await fetch('/api/servers/status', {
+                    method: 'GET',
+                    headers: getAuthHeaders()
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                serversData = data;
+                
+                updateDashboard(data);
+                updateServerLists(data);
+                updateRamManagementView();
+            } catch (error) {
+                console.error('Error fetching server status:', error);
+                alert('Error fetching server status: ' + error.message);
+            } finally {
+                loadingElement.style.display = 'none';
+            }
+        }
+        
+        // Update dashboard
+        function updateDashboard(data) {
+            let runningCount = 0;
+            let stoppedCount = 0;
+            let totalCount = 0;
+            let totalPlayers = 0;
+            
+            for(const serverName in data) {
+                totalCount++;
+                const server = data[serverName];
+                totalPlayers += server.playerCount || 0;
+                
+                if(server.status === 'running') {
+                    runningCount++;
+                } else {
+                    stoppedCount++;
+                }
+            }
+            
+            document.getElementById('total-servers').textContent = totalCount;
+            document.getElementById('running-servers').textContent = runningCount;
+            document.getElementById('stopped-servers').textContent = stoppedCount;
+            document.getElementById('total-players').textContent = totalPlayers;
+            
+            // Update server status list
+            const statusList = document.getElementById('server-status-list');
+            statusList.innerHTML = '';
+            
+            for(const serverName in data) {
+                const server = data[serverName];
+                const statusItem = document.createElement('div');
+                statusItem.className = 'server-item';
+                
+                const statusClass = server.status === 'running' ? 'status-running' : 
+                                   server.status === 'stopped' ? 'status-stopped' : 
+                                   server.status === 'exited' ? 'status-exited' : 'status-paused';
+                
+                statusItem.innerHTML = `
+                    <div>
+                        <span class="status-indicator ${statusClass}"></span>
+                        <strong>${formatServerName(serverName)}</strong> - 
+                        Status: ${server.status} | 
+                        Players: ${server.playerCount || 0} | 
+                        CPU: ${server.cpu || 'N/A'} | 
+                        Memory: ${server.memory || 'N/A'}
+                    </div>
+                `;
+                
+                statusList.appendChild(statusItem);
+            }
+        }
+        
+        // Update server lists (for all tabs)
+        function updateServerLists(data) {
+            // Update server list for server control
+            updateServerList('server-list', data, 'selectServer');
+            
+            // Update server list for config
+            updateServerList('config-server-list', data, 'selectConfigServer');
+            
+            // Update server list for datapacks
+            updateServerList('datapacks-server-list', data, 'selectDatapacksServer');
+        }
+        
+        // Helper to update a server list
+        function updateServerList(containerId, data, selectFunction) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            for(const serverName in data) {
+                const server = data[serverName];
+                const statusClass = server.status === 'running' ? 'status-running' : 
+                                   server.status === 'stopped' ? 'status-stopped' : 
+                                   server.status === 'exited' ? 'status-exited' : 'status-paused';
+                
+                const serverItem = document.createElement('div');
+                serverItem.className = 'server-item';
+                serverItem.onclick = () => window[selectFunction](serverName);
+                
+                serverItem.innerHTML = `
+                    <div>
+                        <span class="status-indicator ${statusClass}"></span>
+                        ${formatServerName(serverName)} (${server.status})
+                    </div>
+                `;
+                
+                container.appendChild(serverItem);
+            }
+        }
+        
+        // Format server name for display
+        function formatServerName(serverName) {
+            const nameMap = {
+                'mc-ilias': 'Ikaria Games',
+                'mc-niilo': 'KDLK.net',
+                'mc-bgstpoelten': 'BG St. Pölten Server',
+                'mc-htlstp': 'HTL St. Pölten Server',
+                'mc-borgstpoelten': 'BORG St. Pölten Server',
+                'mc-hakstpoelten': 'HAK St. Pölten Server',
+                'mc-basop-bafep-stp': 'BASOP BAFEP St. Pölten Server',
+                'mc-play': 'Play Server'
+            };
+            
+            return nameMap[serverName] || serverName;
+        }
+        
+        // Select a server for control
+        function selectServer(serverName) {
+            currentServer = serverName;
+            
+            // Highlight selected server
+            const serverItems = document.querySelectorAll('#server-list .server-item');
+            serverItems.forEach(item => item.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            
+            // Show server details
+            document.getElementById('selected-server').textContent = formatServerName(serverName);
+            
+            const server = serversData[serverName];
+            document.getElementById('current-status').textContent = server.status;
+            document.getElementById('current-players').textContent = server.playerCount || 0;
+            document.getElementById('current-cpu').textContent = server.cpu || 'N/A';
+            document.getElementById('current-memory').textContent = server.memory || 'N/A';
+            
+            document.getElementById('server-controls').style.display = 'block';
+        }
+        
+        // Select a server for config
+        function selectConfigServer(serverName) {
+            currentServer = serverName;
+            
+            // Highlight selected server
+            const serverItems = document.querySelectorAll('#config-server-list .server-item');
+            serverItems.forEach(item => item.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            
+            // Show server name
+            document.getElementById('config-server-name').textContent = formatServerName(serverName);
+            
+            // Load current configuration
+            loadServerConfig(serverName);
+            
+            document.getElementById('server-config-form').style.display = 'block';
+        }
+        
+        // Select a server for datapacks
+        function selectDatapacksServer(serverName) {
+            currentServer = serverName;
+            
+            // Highlight selected server
+            const serverItems = document.querySelectorAll('#datapacks-server-list .server-item');
+            serverItems.forEach(item => item.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            
+            // Show server name
+            document.getElementById('datapacks-server-name').textContent = formatServerName(serverName);
+            
+            // Load datapacks for this server
+            loadDatapacksForServer(serverName);
+            
+            document.getElementById('datapacks-controls').style.display = 'block';
+        }
+        
+        // Start server
+        async function startServer() {
+            if (!currentServer) {
+                alert('Please select a server first');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/servers/start/${currentServer}`, {
+                    method: 'POST',
+                    headers: getAuthHeaders()
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                alert(result.message || `Server ${currentServer} started successfully`);
+                
+                // Refresh status
+                refreshServerStatus();
+            } catch (error) {
+                console.error('Error starting server:', error);
+                alert('Error starting server: ' + error.message);
+            }
+        }
+        
+        // Stop server
+        async function stopServer() {
+            if (!currentServer) {
+                alert('Please select a server first');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/servers/stop/${currentServer}`, {
+                    method: 'POST',
+                    headers: getAuthHeaders()
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                alert(result.message || `Server ${currentServer} stopped successfully`);
+                
+                // Refresh status
+                refreshServerStatus();
+            } catch (error) {
+                console.error('Error stopping server:', error);
+                alert('Error stopping server: ' + error.message);
+            }
+        }
+        
+        // Restart server
+        async function restartServer() {
+            if (!currentServer) {
+                alert('Please select a server first');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/servers/restart/${currentServer}`, {
+                    method: 'POST',
+                    headers: getAuthHeaders()
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                alert(result.message || `Server ${currentServer} restarted successfully`);
+                
+                // Refresh status
+                refreshServerStatus();
+            } catch (error) {
+                console.error('Error restarting server:', error);
+                alert('Error restarting server: ' + error.message);
+            }
+        }
+        
+        // Load server configuration
+        async function loadServerConfig(serverName) {
+            try {
+                const response = await fetch(`/api/servers/config/${serverName}`, {
+                    method: 'GET',
+                    headers: getAuthHeaders()
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const config = await response.json();
+                
+                // Fill the form with current values
+                document.getElementById('config-min-memory').value = config.minMemory || '1G';
+                document.getElementById('config-max-memory').value = config.maxMemory || '4G';
+                document.getElementById('config-motd').value = config.motd || 'Welcome to the server!';
+                document.getElementById('config-online-mode').value = String(config.onlineMode);
+                document.getElementById('config-max-players').value = config.maxPlayers || 20;
+                document.getElementById('config-view-distance').value = config.viewDistance || 10;
+                document.getElementById('config-level-name').value = config.levelName || 'world';
+                document.getElementById('config-level-seed').value = config.levelSeed || '';
+                document.getElementById('config-level-type').value = config.levelType || 'DEFAULT';
+                document.getElementById('config-game-mode').value = config.gameMode || 'survival';
+                document.getElementById('config-difficulty').value = config.difficulty || 'normal';
+            } catch (error) {
+                console.error('Error loading server config:', error);
+                alert('Error loading server config: ' + error.message);
+            }
+        }
+        
+        // Save server configuration
+        async function saveServerConfig() {
+            if (!currentServer) {
+                alert('Please select a server first');
+                return;
+            }
+            
+            try {
+                const config = {
+                    minMemory: document.getElementById('config-min-memory').value,
+                    maxMemory: document.getElementById('config-max-memory').value,
+                    motd: document.getElementById('config-motd').value,
+                    onlineMode: document.getElementById('config-online-mode').value === 'true',
+                    maxPlayers: parseInt(document.getElementById('config-max-players').value),
+                    viewDistance: parseInt(document.getElementById('config-view-distance').value),
+                    levelName: document.getElementById('config-level-name').value,
+                    levelSeed: document.getElementById('config-level-seed').value,
+                    levelType: document.getElementById('config-level-type').value,
+                    gameMode: document.getElementById('config-game-mode').value,
+                    difficulty: document.getElementById('config-difficulty').value
+                };
+                
+                const response = await fetch(`/api/servers/config/${currentServer}`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(config)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                alert(result.message || `Configuration for ${currentServer} saved successfully`);
+                
+                // Refresh status
+                refreshServerStatus();
+            } catch (error) {
+                console.error('Error saving server config:', error);
+                alert('Error saving server config: ' + error.message);
+            }
+        }
+        
+        // Load datapacks for a server
+        async function loadDatapacksForServer(serverName) {
+            try {
+                const response = await fetch(`/api/datapacks/${serverName}`, {
+                    method: 'GET',
+                    headers: getAuthHeaders()
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                // Populate available and installed datapacks
+                const availableSelect = document.getElementById('available-datapacks');
+                const installedSelect = document.getElementById('installed-datapacks');
+                
+                availableSelect.innerHTML = '';
+                installedSelect.innerHTML = '';
+                
+                if (result.datapacks && Array.isArray(result.datapacks)) {
+                    result.datapacks.forEach(dp => {
+                        const option = document.createElement('option');
+                        option.value = dp.dir;
+                        option.textContent = `${dp.name} (${dp.version}) - ${dp.description}`;
+                        
+                        if (dp.installed) {
+                            installedSelect.appendChild(option);
+                        } else {
+                            availableSelect.appendChild(option);
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading datapacks:', error);
+                alert('Error loading datapacks: ' + error.message);
+            }
+        }
+        
+        // Search datapacks
+        async function searchDatapacks() {
+            if (!currentServer) {
+                alert('Please select a server first');
+                return;
+            }
+            
+            try {
+                const query = document.getElementById('search-datapacks').value;
+                let url = '/api/datapacks/search';
+                
+                if (query) {
+                    url += `?q=${encodeURIComponent(query)}`;
+                }
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: getAuthHeaders()
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                // For simplicity, we'll just display the search results in the available list
+                const availableSelect = document.getElementById('available-datapacks');
+                availableSelect.innerHTML = '';
+                
+                if (result.datapacks && Array.isArray(result.datapacks)) {
+                    result.datapacks.forEach(dp => {
+                        const option = document.createElement('option');
+                        option.value = dp.name;
+                        option.textContent = `${dp.name} (${dp.version}) - ${dp.description}`;
+                        availableSelect.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error searching datapacks:', error);
+                alert('Error searching datapacks: ' + error.message);
+            }
+        }
+        
+        // Install selected datapack
+        async function installDatapack() {
+            if (!currentServer) {
+                alert('Please select a server first');
+                return;
+            }
+            
+            const availableSelect = document.getElementById('available-datapacks');
+            const selectedOption = availableSelect.options[availableSelect.selectedIndex];
+            
+            if (!selectedOption) {
+                alert('Please select a datapack to install');
+                return;
+            }
+            
+            try {
+                // For simplicity, we'll assume the value is the datapack name
+                // In a real scenario, you might need to parse the name from the option text
+                const datapackName = selectedOption.value;
+                // For this demo, we'll just use the first part which should be the name
+                const name = datapackName.split(' ')[0];
+                
+                const response = await fetch(`/api/datapacks/install/${currentServer}`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        datapackName: name,
+                        version: "1.0.0"  // In a real implementation, you would get this from the selection
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                alert(result.message || 'Datapack installed successfully');
+                
+                // Refresh the datapacks list
+                loadDatapacksForServer(currentServer);
+            } catch (error) {
+                console.error('Error installing datapack:', error);
+                alert('Error installing datapack: ' + error.message);
+            }
+        }
+        
+        // Uninstall selected datapack
+        async function uninstallDatapack() {
+            if (!currentServer) {
+                alert('Please select a server first');
+                return;
+            }
+            
+            const installedSelect = document.getElementById('installed-datapacks');
+            const selectedOption = installedSelect.options[installedSelect.selectedIndex];
+            
+            if (!selectedOption) {
+                alert('Please select a datapack to uninstall');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/datapacks/uninstall/${currentServer}`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        datapackDir: selectedOption.value
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                alert(result.message || 'Datapack uninstalled successfully');
+                
+                // Refresh the datapacks list
+                loadDatapacksForServer(currentServer);
+            } catch (error) {
+                console.error('Error uninstalling datapack:', error);
+                alert('Error uninstalling datapack: ' + error.message);
+            }
+        }
+        
+        // Update RAM management view
+        function updateRamManagementView() {
+            // Calculate RAM statistics
+            let totalAllocated = 0;
+            let totalUsed = 0;
+            
+            for(const serverName in serversData) {
+                const server = serversData[serverName];
+                
+                // Parse memory values
+                if (server.maxMemory) {
+                    const maxMemMatch = server.maxMemory.match(/([\d.]+)([MGKT])/i);
+                    if (maxMemMatch) {
+                        const value = parseFloat(maxMemMatch[1]);
+                        const unit = maxMemMatch[2].toUpperCase();
+                        
+                        // Convert to MB for total
+                        switch(unit) {
+                            case 'G': totalAllocated += value * 1024; break;
+                            case 'M': totalAllocated += value; break;
+                            case 'K': totalAllocated += value / 1024; break;
+                            case 'T': totalAllocated += value * 1024 * 1024; break;
+                        }
+                    }
+                }
+                
+                if (server.memory && server.memory !== 'N/A') {
+                    const memMatch = server.memory.match(/([\d.]+)([MGKT])/i);
+                    if (memMatch) {
+                        const value = parseFloat(memMatch[1]);
+                        const unit = memMatch[2].toUpperCase();
+                        
+                        // Convert to MB for total
+                        switch(unit) {
+                            case 'G': totalUsed += value * 1024; break;
+                            case 'M': totalUsed += value; break;
+                            case 'K': totalUsed += value / 1024; break;
+                            case 'T': totalUsed += value * 1024 * 1024; break;
+                        }
+                    }
+                }
+            }
+            
+            // Update statistics
+            document.getElementById('total-allocated-ram').textContent = `${Math.round(totalAllocated)} MB`;
+            document.getElementById('total-used-ram').textContent = `${Math.round(totalUsed)} MB`;
+            
+            const utilization = totalAllocated > 0 ? (totalUsed / totalAllocated) * 100 : 0;
+            document.getElementById('ram-utilization').textContent = `${utilization.toFixed(1)}%`;
+            
+            const headroom = totalAllocated - totalUsed;
+            document.getElementById('ram-headroom').textContent = `${Math.round(headroom)} MB`;
+            
+            // Update server RAM breakdown
+            const ramServerList = document.getElementById('ram-server-list');
+            ramServerList.innerHTML = '';
+            
+            for(const serverName in serversData) {
+                const server = serversData[serverName];
+                
+                const serverDiv = document.createElement('div');
+                serverDiv.className = 'ram-display';
+                
+                // Try to get RAM allocation from server config
+                getServerConfigRam(serverName).then(ramInfo => {
+                    serverDiv.innerHTML = `
+                        <div><strong>${formatServerName(serverName)}</strong></div>
+                        <div>Allocated: ${ramInfo.min} - ${ramInfo.max} | Used: ${server.memory || 'N/A'}</div>
+                        <div>Status: ${server.status} | Players: ${server.playerCount || 0}</div>
+                    `;
+                }).catch(() => {
+                    serverDiv.innerHTML = `
+                        <div><strong>${formatServerName(serverName)}</strong></div>
+                        <div>Allocated: ? - ? | Used: ${server.memory || 'N/A'}</div>
+                        <div>Status: ${server.status} | Players: ${server.playerCount || 0}</div>
+                    `;
+                });
+                
+                ramServerList.appendChild(serverDiv);
+            }
+        }
+        
+        // Helper to get server config RAM settings
+        async function getServerConfigRam(serverName) {
+            try {
+                const response = await fetch(`/api/servers/config/${serverName}`, {
+                    method: 'GET',
+                    headers: getAuthHeaders()
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const config = await response.json();
+                
+                return {
+                    min: config.minMemory || 'N/A',
+                    max: config.maxMemory || 'N/A'
+                };
+            } catch (error) {
+                console.error(`Error getting config for ${serverName}:`, error);
+                return { min: 'N/A', max: 'N/A' };
+            }
+        }
+    </script>
+</body>
+</html>

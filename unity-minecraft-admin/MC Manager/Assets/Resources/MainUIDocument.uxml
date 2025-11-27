@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <ui:Style>
+        <ui:StyleSheet src="unity-resource://styles/main-style.uss"/>
+    </ui:Style>
+    <ui:VisualElement name="root">
+        <ui:Label name="title" text="Minecraft Server Admin Panel"/>
+        <ui:VisualElement name="content-area"/>
+    </ui:VisualElement>
+</ui:UXML>

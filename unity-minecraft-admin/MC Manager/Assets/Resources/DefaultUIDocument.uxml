@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uxml="UnityEngine.UIElements" xmlns:uss="UnityEngine.UIElements">
+  <ui:Style src="unity-minecraft-admin://sheets/main-style.uss" />
+  <ui:VisualElement name="root">
+    <ui:Label name="title" text="Minecraft Server Admin" />
+    <ui:VisualElement name="content-container" />
+  </ui:VisualElement>
+</ui:UXML>

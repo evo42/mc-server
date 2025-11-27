@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1997211142, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: UI Toolkit Panel Settings
+  m_EditorClassIdentifier: 
+  m_ScriptGuid: {fileID: 0}
+  m_AssetGuid: {fileID: 0}
+  m_ScriptStageIndices: 
+  m_ImplementsCustomStyleRuleProperty: 0
+  m_ImplementsStylesheetProperty: 0
+  m_ImplementsCommonStyleSheet: 0
+  m_CommonStyleSheet: {fileID: 0}
+  m_ImplementsCommonTemplateProperty: 0
+  m_CommonTemplate: {fileID: 0}
+  m_ImplementsTemplateProperty: 0
+  m_Template: {fileID: 0}
+  m_ImplementsTextProperty: 0
+  m_Text: {fileID: 0}
+  m_ImplementsImageProperty: 0
+  m_Image: {fileID: 0}
+  m_ImplementsVectorImageProperty: 0
+  m_VectorImage: {fileID: 0}
+  m_ImplementsScrollerProperty: 0
+  m_Scroller: {fileID: 0}
+  m_ImplementsScrollViewProperty: 0
+  m_ScrollView: {fileID: 0}
+  m_ImplementsVisualElementProperty: 0
+  m_VisualElement: {fileID: 0}
+  m_ImplementsLabelProperty: 0
+  m_Label: {fileID: 0}
+  m_ImplementsButtonProperty: 0
+  m_Button: {fileID: 0}
+  m_ImplementsToggleProperty: 0
+  m_Toggle: {fileID: 0}
+  m_ImplementsSliderProperty: 0
+  m_Slider: {fileID: 0}
+  m_ImplementsSliderIntProperty: 0
+  m_SliderInt: {fileID: 0}
+  m_ImplementsMinMaxSliderProperty: 0
+  m_MinMaxSlider: {fileID: 0}
+  m_ImplementsTextFieldProperty: 0
+  m_TextField: {fileID: 0}
+  m_ImplementsTextViewProperty: 0
+  m_TextView: {fileID: 0}
+  m_ImplementsFoldoutProperty: 0
+  m_Foldout: {fileID: 0}
+  m_ImplementsBindableElementProperty: 0
+  m_BindableElement: {fileID: 0}
+  m_ImplementsVisualElementFocusableProperty: 0
+  m_VisualElementFocusable: {fileID: 0}
+  m_ImplementsPointerCaptureUtilityProperty: 0
+  m_PointerCaptureUtility: {fileID: 0}

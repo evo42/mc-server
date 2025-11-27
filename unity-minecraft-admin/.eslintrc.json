@@ -1,0 +1,23 @@
+{
+  "rules": {
+    "indent": ["error", 4],
+    "linebreak-style": ["error", "unix"],
+    "quotes": ["error", "double"],
+    "semi": ["error", "always"],
+    "no-unused-vars": "error",
+    "no-undef": "error",
+    "no-console": "off"
+  },
+  "environments": {
+    "browser": true,
+    "node": true,
+    "unity": true
+  },
+  "globals": {
+    "UnityEngine": "readonly",
+    "MinecraftAdmin": "readonly",
+    "Debug": "readonly",
+    "MonoBehaviour": "readonly",
+    "SerializeField": "readonly"
+  }
+}

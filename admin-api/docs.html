@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Server Admin API Documentation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+            color: white;
+            border-radius: 10px;
+        }
+        h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        .endpoint {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 5px solid #3498db;
+        }
+        .method {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+            margin-right: 10px;
+            min-width: 80px;
+            text-align: center;
+        }
+        .get { background-color: #3498db; }
+        .post { background-color: #2ecc71; }
+        .delete { background-color: #e74c3c; }
+        .put { background-color: #9b59b6; }
+        .patch { background-color: #f39c12; }
+        .path {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .description {
+            margin: 10px 0;
+            color: #555;
+        }
+        .params, .response {
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-left: 3px solid #3498db;
+        }
+        .code {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+        }
+        .auth-required {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .section {
+            margin-top: 40px;
+        }
+        .nav {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .nav a {
+            display: inline-block;
+            margin: 0 10px;
+            padding: 8px 16px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .nav a:hover {
+            background-color: #2980b9;
+        }
+        .ram-section {
+            border-top: 2px solid #9b59b6;
+            padding-top: 20px;
+            margin-top: 30px;
+        }
+        .test-section {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #e8f4fc;
+            border-radius: 5px;
+        }
+        .form-group {
+            margin: 10px 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .btn {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        .btn-danger {
+            background-color: #e74c3c;
+        }
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            display: none;
+        }
+        .result.success {
+            border-left: 5px solid #2ecc71;
+        }
+        .result.error {
+            border-left: 5px solid #e74c3c;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 10px;
+        }
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .credentials-section {
+            background-color: #e8f4fc;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .ram-calculator {
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Minecraft Server Admin API</h1>
+        <p class="subtitle">Documentation for Server Management and RAM Configuration</p>
+    </header>
+
+    <div class="credentials-section">
+        <h3>Authentication</h3>
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" value="admin" placeholder="API Username">
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" value="admin123" placeholder="API Password">
+        </div>
+    </div>
+
+    <div class="nav">
+        <a href="#server-management">Server Management</a>
+        <a href="#config-management">Config Management</a>
+        <a href="#datapacks">Datapacks</a>
+        <a href="#public-endpoints">Public Endpoints</a>
+        <a href="#ram-management">RAM Management</a>
+    </div>
+
+    <section id="authentication">
+        <h2>Authentication</h2>
+        <div class="auth-required">
+            <p><strong>Required:</strong> All admin endpoints require Basic Authentication with your configured credentials (default: admin/admin123)</p>
+        </div>
+    </section>
+
+    <section class="section" id="server-management">
+        <h2>Server Management</h2>
+
+        <div class="endpoint">
+            <div>
+                <span class="method get">GET</span>
+                <span class="path">/api/servers/status</span>
+            </div>
+            <p class="description">Get status of all Minecraft servers</p>
+            <div class="test-section">
+                <button class="btn" onclick="executeRequest('GET', '/api/servers/status')">Test Request</button>
+                <div class="loading" id="loading-status-all">
+                    <div class="loading-spinner"></div>
+                    <p>Executing request...</p>
+                </div>
+                <div class="result" id="result-status-all"></div>
+            </div>
+            <div class="response">
+                <p>Expected Response:</p>
+                <div class="code">{
+  "mc-ilias": {
+    "server": "mc-ilias",
+    "status": "running",
+    "rawStatus": {},
+    "players": [],
+    "playerCount": 0,
+    "memory": "111.61MB",
+    "cpu": "70.36%"
+  },
+  "mc-niilo": {
+    "server": "mc-niilo",
+    "status": "running",
+    "rawStatus": {},
+    "players": [],
+    "playerCount": 0,
+    "memory": "127.27MB",
+    "cpu": "111.28%"
+  }
+  // ... additional servers
+}</div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div>
+                <span class="method get">GET</span>
+                <span class="path">/api/servers/status/:server</span>
+            </div>
+            <p class="description">Get status of a specific Minecraft server</p>
+            <div class="params">
+                <p>Parameters:</p>
+                <ul>
+                    <li><strong>server</strong> (string): Server identifier (e.g., mc-ilias, mc-niilo)</li>
+                </ul>
+            </div>
+            <div class="test-section">
+                <div class="form-group">
+                    <label for="status-server-name">Server Name:</label>
+                    <input type="text" id="status-server-name" placeholder="e.g., mc-ilias" value="mc-ilias">
+                </div>
+                <button class="btn" onclick="executeRequest('GET', '/api/servers/status/' + document.getElementById('status-server-name').value)">Test Request</button>
+                <div class="loading" id="loading-status-single">
+                    <div class="loading-spinner"></div>
+                    <p>Executing request...</p>
+                </div>
+                <div class="result" id="result-status-single"></div>
+            </div>
+            <div class="response">
+                <p>Expected Response:</p>
+                <div class="code">{
+  "server": "mc-ilias",
+  "status": "running",
+  "rawStatus": {},
+  "players": [],
+  "playerCount": 0,
+  "memory": "111.61MB",
+  "cpu": "70.36%"
+}</div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div>
+                <span class="method post">POST</span>
+                <span class="path">/api/servers/start/:server</span>
+            </div>
+            <p class="description">Start a specific Minecraft server</p>
+            <div class="params">
+                <p>Parameters:</p>
+                <ul>
+                    <li><strong>server</strong> (string): Server identifier</li>
+                </ul>
+            </div>
+            <div class="test-section">
+                <div class="form-group">
+                    <label for="start-server-name">Server Name:</label>
+                    <input type="text" id="start-server-name" placeholder="e.g., mc-ilias" value="mc-ilias">
+                </div>
+                <button class="btn" onclick="executeRequest('POST', '/api/servers/start/' + document.getElementById('start-server-name').value)">Test Request</button>
+                <div class="loading" id="loading-start">
+                    <div class="loading-spinner"></div>
+                    <p>Executing request...</p>
+                </div>
+                <div class="result" id="result-start"></div>
+            </div>
+            <div class="response">
+                <p>Expected Response:</p>
+                <div class="code">{
+  "success": true,
+  "message": "mc-ilias started"
+}</div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div>
+                <span class="method post">POST</span>
+                <span class="path">/api/servers/stop/:server</span>
+            </div>
+            <p class="description">Stop a specific Minecraft server</p>
+            <div class="params">
+                <p>Parameters:</p>
+                <ul>
+                    <li><strong>server</strong> (string): Server identifier</li>
+                </ul>
+            </div>
+            <div class="test-section">
+                <div class="form-group">
+                    <label for="stop-server-name">Server Name:</label>
+                    <input type="text" id="stop-server-name" placeholder="e.g., mc-ilias" value="mc-ilias">
+                </div>
+                <button class="btn" onclick="executeRequest('POST', '/api/servers/stop/' + document.getElementById('stop-server-name').value)">Test Request</button>
+                <div class="loading" id="loading-stop">
+                    <div class="loading-spinner"></div>
+                    <p>Executing request...</p>
+                </div>
+                <div class="result" id="result-stop"></div>
+            </div>
+            <div class="response">
+                <p>Expected Response:</p>
+                <div class="code">{
+  "success": true,
+  "message": "mc-ilias stopped"
+}</div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div>
+                <span class="method post">POST</span>
+                <span class="path">/api/servers/restart/:server</span>
+            </div>
+            <p class="description">Restart a specific Minecraft server</p>
+            <div class="params">
+                <p>Parameters:</p>
+                <ul>
+                    <li><strong>server</strong> (string): Server identifier</li>
+                </ul>
+            </div>
+            <div class="test-section">
+                <div class="form-group">
+                    <label for="restart-server-name">Server Name:</label>
+                    <input type="text" id="restart-server-name" placeholder="e.g., mc-ilias" value="mc-ilias">
+                </div>
+                <button class="btn" onclick="executeRequest('POST', '/api/servers/restart/' + document.getElementById('restart-server-name').value)">Test Request</button>
+                <div class="loading" id="loading-restart">
+                    <div class="loading-spinner"></div>
+                    <p>Executing request...</p>
+                </div>
+                <div class="result" id="result-restart"></div>
+            </div>
+            <div class="response">
+                <p>Expected Response:</p>
+                <div class="code">{
+  "success": true,
+  "message": "mc-ilias restarted"
+}</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="config-management">
+        <h2>Server Configuration</h2>
+
+        <div class="endpoint">
+            <div>
+                <span class="method get">GET</span>
+                <span class="path">/api/servers/config/:server</span>
+            </div>
+            <p class="description">Get configuration of a specific Minecraft server</p>
+            <div class="params">
+                <p>Parameters:</p>
+                <ul>
+                    <li><strong>server</strong> (string): Server identifier</li>
+                </ul>
+            </div>
+            <div class="test-section">
+                <div class="form-group">
+                    <label for="config-server-name">Server Name:</label>
+                    <input type="text" id="config-server-name" placeholder="e.g., mc-ilias" value="mc-ilias">
+                </div>
+                <button class="btn" onclick="executeRequest('GET', '/api/servers/config/' + document.getElementById('config-server-name').value)">Test Request</button>
+                <div class="loading" id="loading-config-get">
+                    <div class="loading-spinner"></div>
+                    <p>Executing request...</p>
+                </div>
+                <div class="result" id="result-config-get"></div>
+            </div>
+            <div class="response">
+                <p>Expected Response:</p>
+                <div class="code">{
+  "minMemory": "1G",
+  "maxMemory": "4G",
+  "motd": "Welcome to mc-ilias server!",
+  "onlineMode": true,
+  "maxPlayers": 20,
+  "viewDistance": 10,
+  "levelName": "world",
+  "levelSeed": "",
+  "levelType": "DEFAULT",
+  "gameMode": "survival",
+  "difficulty": "normal"
+}</div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div>
+                <span class="method post">POST</span>
+                <span class="path">/api/servers/config/:server</span>
+            </div>
+            <p class="description">Update configuration of a specific Minecraft server</p>
+            <div class="test-section">
+                <div class="form-group">
+                    <label for="config-post-server-name">Server Name:</label>
+                    <input type="text" id="config-post-server-name" placeholder="e.g., mc-ilias" value="mc-ilias">
+                </div>
+                <div class="form-group">
+                    <label for="config-request-body">Request Body (JSON):</label>
+                    <textarea id="config-request-body" rows="8" placeholder="Configuration JSON">{
+  "minMemory": "2G",
+  "maxMemory": "6G",
+  "motd": "New MOTD",
+  "onlineMode": false,
+  "maxPlayers": 30,
+  "viewDistance": 12,
+  "levelName": "world",
+  "levelSeed": "",
+  "levelType": "DEFAULT",
+  "gameMode": "creative",
+  "difficulty": "hard"
+}</textarea>
+                </div>
+                <button class="btn" onclick="executeConfigPost()">Test Request</button>
+                <div class="loading" id="loading-config-post">
+                    <div class="loading-spinner"></div>
+                    <p>Executing request...</p>
+                </div>
+                <div class="result" id="result-config-post"></div>
+            </div>
+            <div class="response">
+                <p>Expected Response:</p>
+                <div class="code">{
+  "success": true,
+  "message": "Configuration for mc-ilias updated successfully",
+  "config": {
+    // Updated configuration details
+  }
+}</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="datapacks">
+        <h2>Datapacks Management</h2>
+
+        <div class="endpoint">
+            <div>
+                <span class="method get">GET</span>
+                <span class="path">/api/datapacks/:server</span>
+            </div>
+            <p class="description">Get list of available and installed datapacks for a server</p>
+            <div class="params">
+                <p>Parameters:</p>
+                <ul>
+                    <li><strong>server</strong> (string): Server identifier</li>
+                    <li><strong>page</strong> (optional, number): Page number for pagination (default: 1)</li>
+                    <li><strong>limit</strong> (optional, number): Number of items per page (default: 20, max: 100)</li>
+                </ul>
+            </div>
+            <div class="test-section">
+                <div class="form-group">
+                    <label for="datapacks-server-name">Server Name:</label>
+                    <input type="text" id="datapacks-server-name" placeholder="e.g., mc-ilias" value="mc-ilias">
+                </div>
+                <div class="form-group">
+                    <label for="datapacks-page">Page (optional):</label>
+                    <input type="number" id="datapacks-page" value="1" min="1">
+                </div>
+                <div class="form-group">
+                    <label for="datapacks-limit">Limit (optional):</label>
+                    <input type="number" id="datapacks-limit" value="20" min="1" max="100">
+                </div>
+                <button class="btn" onclick="executeDatapacksGet()">Test Request</button>
+                <div class="loading" id="loading-datapacks-get">
+                    <div class="loading-spinner"></div>
+                    <p>Executing request...</p>
+                </div>
+                <div class="result" id="result-datapacks-get"></div>
+            </div>
+            <div class="response">
+                <p>Expected Response:</p>
+                <div class="code">{
+  "datapacks": [
+    {
+      "name": "example-datapack",
+      "version": "1.0.0",
+      "description": "An example datapack",
+      "installed": true,
+      "dir": "example-datapack"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 20,
+    "total": 1
+  }
+}</div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div>
+                <span class="method get">GET</span>
+                <span class="path">/api/datapacks/search</span>
+            </div>
+            <p class="description">Search for available datapacks</p>
+            <div class="params">
+                <p>Query Parameters:</p>
+                <ul>
+                    <li><strong>q</strong> (optional, string): Search query</li>
+                    <li><strong>page</strong> (optional, number): Page number for pagination (default: 1)</li>
+                    <li><strong>limit</strong> (optional, number): Number of items per page (default: 20, max: 100)</li>
+                </ul>
+            </div>
+            <div class="test-section">
+                <div class="form-group">
+                    <label for="search-query">Search Query (optional):</label>
+                    <input type="text" id="search-query" placeholder="Search term">
+                </div>
+                <div class="form-group">
+                    <label for="search-page">Page (optional):</label>
+                    <input type="number" id="search-page" value="1" min="1">
+                </div>
+                <div class="form-group">
+                    <label for="search-limit">Limit (optional):</label>
+                    <input type="number" id="search-limit" value="20" min="1" max="100">
+                </div>
+                <button class="btn" onclick="executeSearchGet()">Test Request</button>
+                <div class="loading" id="loading-search-get">
+                    <div class="loading-spinner"></div>
+                    <p>Executing request...</p>
+                </div>
+                <div class="result" id="result-search-get"></div>
+            </div>
+            <div class="response">
+                <p>Expected Response:</p>
+                <div class="code">{
+  "datapacks": [
+    {
+      "name": "example-datapack",
+      "version": "1.0.0",
+      "description": "An example datapack",
+      "author": "Example Author"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 20,
+    "total": 1
+  }
+}</div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div>
+                <span class="method post">POST</span>
+                <span class="path">/api/datapacks/install/:server</span>
+            </div>
+            <p class="description">Install a datapack on a server</p>
+            <div class="test-section">
+                <div class="form-group">
+                    <label for="install-server-name">Server Name:</label>
+                    <input type="text" id="install-server-name" placeholder="e.g., mc-ilias" value="mc-ilias">
+                </div>
+                <div class="form-group">
+                    <label for="install-datapack-name">Datapack Name:</label>
+                    <input type="text" id="install-datapack-name" placeholder="Name of datapack" value="example-datapack">
+                </div>
+                <div class="form-group">
+                    <label for="install-version">Version:</label>
+                    <input type="text" id="install-version" placeholder="Version of datapack" value="1.0.0">
+                </div>
+                <button class="btn" onclick="executeInstallPost()">Test Request</button>
+                <div class="loading" id="loading-install">
+                    <div class="loading-spinner"></div>
+                    <p>Executing request...</p>
+                </div>
+                <div class="result" id="result-install"></div>
+            </div>
+            <div class="response">
+                <p>Expected Response:</p>
+                <div class="code">{
+  "success": true,
+  "message": "Datapack installed successfully"
+}</div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div>
+                <span class="method post">POST</span>
+                <span class="path">/api/datapacks/uninstall/:server</span>
+            </div>
+            <p class="description">Uninstall a datapack from a server</p>
+            <div class="test-section">
+                <div class="form-group">
+                    <label for="uninstall-server-name">Server Name:</label>
+                    <input type="text" id="uninstall-server-name" placeholder="e.g., mc-ilias" value="mc-ilias">
+                </div>
+                <div class="form-group">
+                    <label for="uninstall-datapack-dir">Datapack Directory:</label>
+                    <input type="text" id="uninstall-datapack-dir" placeholder="Directory of datapack" value="example-datapack">
+                </div>
+                <button class="btn" onclick="executeUninstallPost()">Test Request</button>
+                <div class="loading" id="loading-uninstall">
+                    <div class="loading-spinner"></div>
+                    <p>Executing request...</p>
+                </div>
+                <div class="result" id="result-uninstall"></div>
+            </div>
+            <div class="response">
+                <p>Expected Response:</p>
+                <div class="code">{
+  "success": true,
+  "message": "Datapack uninstalled successfully"
+}</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="public-endpoints">
+        <h2>Public Endpoints (No Authentication Required)</h2>
+
+        <div class="endpoint">
+            <div>
+                <span class="method get">GET</span>
+                <span class="path">/api/public/status/all</span>
+            </div>
+            <p class="description">Get public status of all Minecraft servers</p>
+            <div class="test-section">
+                <button class="btn" onclick="executeRequest('GET', '/api/public/status/all', true)">Test Request</button>
+                <div class="loading" id="loading-public-status">
+                    <div class="loading-spinner"></div>
+                    <p>Executing request...</p>
+                </div>
+                <div class="result" id="result-public-status"></div>
+            </div>
+            <div class="response">
+                <p>Expected Response:</p>
+                <div class="code">{
+  "mc-ilias": {
+    "server": "mc-ilias",
+    "status": "running",
+    "players": [],
+    "playerCount": 0
+  }
+}</div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div>
+                <span class="method get">GET</span>
+                <span class="path">/api/public/history/:server</span>
+            </div>
+            <p class="description">Get historical data for a specific server</p>
+            <div class="params">
+                <p>Parameters:</p>
+                <ul>
+                    <li><strong>server</strong> (string): Server identifier</li>
+                </ul>
+            </div>
+            <div class="test-section">
+                <div class="form-group">
+                    <label for="history-server-name">Server Name:</label>
+                    <input type="text" id="history-server-name" placeholder="e.g., mc-ilias" value="mc-ilias">
+                </div>
+                <button class="btn" onclick="executeRequest('GET', '/api/public/history/' + document.getElementById('history-server-name').value, true)">Test Request</button>
+                <div class="loading" id="loading-public-history">
+                    <div class="loading-spinner"></div>
+                    <p>Executing request...</p>
+                </div>
+                <div class="result" id="result-public-history"></div>
+            </div>
+            <div class="response">
+                <p>Expected Response:</p>
+                <div class="code">[
+  {
+    "timestamp": 1678886400000,
+    "playerCount": 5,
+    "cpu": "25.5%",
+    "memory": "2048.00MB"
+  }
+]</div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div>
+                <span class="method get">GET</span>
+                <span class="path">/api/public/datapacks/:server</span>
+            </div>
+            <p class="description">Get public datapack information for a server</p>
+            <div class="params">
+                <p>Parameters:</p>
+                <ul>
+                    <li><strong>server</strong> (string): Server identifier</li>
+                </ul>
+            </div>
+            <div class="test-section">
+                <div class="form-group">
+                    <label for="public-datapacks-server-name">Server Name:</label>
+                    <input type="text" id="public-datapacks-server-name" placeholder="e.g., mc-ilias" value="mc-ilias">
+                </div>
+                <button class="btn" onclick="executeRequest('GET', '/api/public/datapacks/' + document.getElementById('public-datapacks-server-name').value, true)">Test Request</button>
+                <div class="loading" id="loading-public-datapacks">
+                    <div class="loading-spinner"></div>
+                    <p>Executing request...</p>
+                </div>
+                <div class="result" id="result-public-datapacks"></div>
+            </div>
+            <div class="response">
+                <p>Expected Response:</p>
+                <div class="code">{
+  "datapacks": [
+    {
+      "name": "example-datapack",
+      "version": "1.0.0",
+      "description": "An example datapack",
+      "installed": true
+    }
+  ]
+}</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section ram-section" id="ram-management">
+        <h2>RAM Management</h2>
+        <p>The API provides comprehensive RAM management capabilities through the server configuration endpoints. You can adjust both minimum and maximum memory allocation for each server:</p>
+
+        <ul>
+            <li><strong>minMemory</strong>: Minimum RAM allocation (e.g., "1G", "1024M")</li>
+            <li><strong>maxMemory</strong>: Maximum RAM allocation (e.g., "4G", "4096M")</li>
+        </ul>
+
+        <p>When updating server configuration via <code>POST /api/servers/config/:server</code>, changing these values will modify the Java runtime parameters for the Minecraft server container, allowing you to dynamically adjust the RAM allocation without restarting the service.</p>
+
+        <p>The status endpoints also provide current memory usage information, allowing you to monitor RAM utilization in real-time.</p>
+
+        <div class="ram-calculator">
+            <h3>RAM Configuration Calculator</h3>
+            <div class="form-group">
+                <label for="min-ram">Minimum RAM (e.g., 1G, 1024M):</label>
+                <input type="text" id="min-ram" value="1G" placeholder="Minimum RAM (e.g., 1G)">
+            </div>
+            <div class="form-group">
+                <label for="max-ram">Maximum RAM (e.g., 4G, 4096M):</label>
+                <input type="text" id="max-ram" value="4G" placeholder="Maximum RAM (e.g., 4G)">
+            </div>
+            <button class="btn" onclick="calculateRamBytes()">Calculate Bytes Values</button>
+            <div class="result" id="ram-calculation-result" style="margin-top: 10px; padding: 10px; background-color: #e8f4fc; border-radius: 5px;"></div>
+        </div>
+    </section>
+
+    <footer style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; color: #777;">
+        <p>Minecraft Server Admin API &copy; 2025</p>
+    </footer>
+
+    <script>
+        // Function to execute API requests
+        async function executeRequest(method, path, isPublic=false) {
+            // Determine which loading and result elements to use based on the path
+            let loadingId, resultId;
+            switch(path) {
+                case '/api/servers/status':
+                    loadingId = 'loading-status-all';
+                    resultId = 'result-status-all';
+                    break;
+                case `/api/servers/status/${document.getElementById('status-server-name').value}`:
+                    loadingId = 'loading-status-single';
+                    resultId = 'result-status-single';
+                    break;
+                case `/api/servers/start/${document.getElementById('start-server-name').value}`:
+                    loadingId = 'loading-start';
+                    resultId = 'result-start';
+                    break;
+                case `/api/servers/stop/${document.getElementById('stop-server-name').value}`:
+                    loadingId = 'loading-stop';
+                    resultId = 'result-stop';
+                    break;
+                case `/api/servers/restart/${document.getElementById('restart-server-name').value}`:
+                    loadingId = 'loading-restart';
+                    resultId = 'result-restart';
+                    break;
+                case `/api/servers/config/${document.getElementById('config-server-name').value}`:
+                    loadingId = 'loading-config-get';
+                    resultId = 'result-config-get';
+                    break;
+                case `/api/datapacks/${document.getElementById('datapacks-server-name').value}`:
+                    loadingId = 'loading-datapacks-get';
+                    resultId = 'result-datapacks-get';
+                    break;
+                case '/api/datapacks/search':
+                    loadingId = 'loading-search-get';
+                    resultId = 'result-search-get';
+                    break;
+                case `/api/datapacks/install/${document.getElementById('install-server-name').value}`:
+                    loadingId = 'loading-install';
+                    resultId = 'result-install';
+                    break;
+                case `/api/datapacks/uninstall/${document.getElementById('uninstall-server-name').value}`:
+                    loadingId = 'loading-uninstall';
+                    resultId = 'result-uninstall';
+                    break;
+                case '/api/public/status/all':
+                    loadingId = 'loading-public-status';
+                    resultId = 'result-public-status';
+                    break;
+                case `/api/public/history/${document.getElementById('history-server-name').value}`:
+                    loadingId = 'loading-public-history';
+                    resultId = 'result-public-history';
+                    break;
+                case `/api/public/datapacks/${document.getElementById('public-datapacks-server-name').value}`:
+                    loadingId = 'loading-public-datapacks';
+                    resultId = 'result-public-datapacks';
+                    break;
+                default:
+                    loadingId = 'loading-general';
+                    resultId = 'result-general';
+            }
+
+            const loadingElement = document.getElementById(loadingId);
+            const resultElement = document.getElementById(resultId);
+
+            // Show loading indicator
+            loadingElement.style.display = 'block';
+            resultElement.style.display = 'none';
+
+            try {
+                // Get credentials from input fields
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                // Prepare headers
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+
+                // Add authentication header if not public endpoint
+                if (!isPublic) {
+                    const credentials = btoa(`${username}:${password}`);
+                    headers['Authorization'] = `Basic ${credentials}`;
+                }
+
+                // Make the request
+                const response = await fetch(path, {
+                    method: method,
+                    headers: headers
+                });
+
+                // Get response data
+                let data;
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    data = await response.text();
+                }
+
+                // Format the response
+                const formattedData = typeof data === 'object'
+                    ? JSON.stringify(data, null, 2)
+                    : data;
+
+                // Determine if it was successful
+                const isSuccess = response.ok;
+
+                // Update result element
+                resultElement.innerHTML = `
+                    <h4>Response (Status: ${response.status})</h4>
+                    <div class="code">${escapeHtml(formattedData)}</div>
+                `;
+
+                // Apply appropriate class
+                resultElement.className = `result ${isSuccess ? 'success' : 'error'}`;
+
+            } catch (error) {
+                resultElement.innerHTML = `
+                    <h4>Error</h4>
+                    <p>${error.message}</p>
+                `;
+                resultElement.className = 'result error';
+            } finally {
+                // Hide loading indicator and show result
+                loadingElement.style.display = 'none';
+                resultElement.style.display = 'block';
+            }
+        }
+
+        // Function to execute the config POST request with custom body
+        async function executeConfigPost() {
+            const serverName = document.getElementById('config-post-server-name').value;
+            const path = `/api/servers/config/${serverName}`;
+            const loadingElement = document.getElementById('loading-config-post');
+            const resultElement = document.getElementById('result-config-post');
+            const requestBody = document.getElementById('config-request-body').value;
+
+            // Show loading indicator
+            loadingElement.style.display = 'block';
+            resultElement.style.display = 'none';
+
+            try {
+                // Get credentials from input fields
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                // Prepare request body
+                let body;
+                try {
+                    body = JSON.parse(requestBody);
+                } catch (e) {
+                    throw new Error('Invalid JSON in request body');
+                }
+
+                // Make the request
+                const response = await fetch(path, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Basic ${btoa(`${username}:${password}`)}`
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                // Get response data
+                let data;
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    data = await response.text();
+                }
+
+                // Format the response
+                const formattedData = typeof data === 'object'
+                    ? JSON.stringify(data, null, 2)
+                    : data;
+
+                // Determine if it was successful
+                const isSuccess = response.ok;
+
+                // Update result element
+                resultElement.innerHTML = `
+                    <h4>Response (Status: ${response.status})</h4>
+                    <div class="code">${escapeHtml(formattedData)}</div>
+                `;
+
+                // Apply appropriate class
+                resultElement.className = `result ${isSuccess ? 'success' : 'error'}`;
+
+            } catch (error) {
+                resultElement.innerHTML = `
+                    <h4>Error</h4>
+                    <p>${error.message}</p>
+                `;
+                resultElement.className = 'result error';
+            } finally {
+                // Hide loading indicator and show result
+                loadingElement.style.display = 'none';
+                resultElement.style.display = 'block';
+            }
+        }
+
+        // Function to execute datapacks get request with query params
+        async function executeDatapacksGet() {
+            const serverName = document.getElementById('datapacks-server-name').value;
+            const page = document.getElementById('datapacks-page').value || 1;
+            const limit = document.getElementById('datapacks-limit').value || 20;
+            const path = `/api/datapacks/${serverName}?page=${page}&limit=${limit}`;
+
+            await executeRequest('GET', path);
+        }
+
+        // Function to execute search get request with query params
+        async function executeSearchGet() {
+            const query = document.getElementById('search-query').value;
+            const page = document.getElementById('search-page').value || 1;
+            const limit = document.getElementById('search-limit').value || 20;
+
+            let path = '/api/datapacks/search';
+            const params = [];
+
+            if (query) params.push(`q=${encodeURIComponent(query)}`);
+            params.push(`page=${page}`);
+            params.push(`limit=${limit}`);
+
+            if (params.length > 0) {
+                path += '?' + params.join('&');
+            }
+
+            await executeRequest('GET', path);
+        }
+
+        // Function to execute install post request
+        async function executeInstallPost() {
+            const serverName = document.getElementById('install-server-name').value;
+            const datapackName = document.getElementById('install-datapack-name').value;
+            const version = document.getElementById('install-version').value;
+            const path = `/api/datapacks/install/${serverName}`;
+
+            const loadingElement = document.getElementById('loading-install');
+            const resultElement = document.getElementById('result-install');
+
+            // Show loading indicator
+            loadingElement.style.display = 'block';
+            resultElement.style.display = 'none';
+
+            try {
+                // Get credentials from input fields
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                // Make the request
+                const response = await fetch(path, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Basic ${btoa(`${username}:${password}`)}`
+                    },
+                    body: JSON.stringify({
+                        datapackName: datapackName,
+                        version: version
+                    })
+                });
+
+                // Get response data
+                let data;
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    data = await response.text();
+                }
+
+                // Format the response
+                const formattedData = typeof data === 'object'
+                    ? JSON.stringify(data, null, 2)
+                    : data;
+
+                // Determine if it was successful
+                const isSuccess = response.ok;
+
+                // Update result element
+                resultElement.innerHTML = `
+                    <h4>Response (Status: ${response.status})</h4>
+                    <div class="code">${escapeHtml(formattedData)}</div>
+                `;
+
+                // Apply appropriate class
+                resultElement.className = `result ${isSuccess ? 'success' : 'error'}`;
+
+            } catch (error) {
+                resultElement.innerHTML = `
+                    <h4>Error</h4>
+                    <p>${error.message}</p>
+                `;
+                resultElement.className = 'result error';
+            } finally {
+                // Hide loading indicator and show result
+                loadingElement.style.display = 'none';
+                resultElement.style.display = 'block';
+            }
+        }
+
+        // Function to execute uninstall post request
+        async function executeUninstallPost() {
+            const serverName = document.getElementById('uninstall-server-name').value;
+            const datapackDir = document.getElementById('uninstall-datapack-dir').value;
+            const path = `/api/datapacks/uninstall/${serverName}`;
+
+            const loadingElement = document.getElementById('loading-uninstall');
+            const resultElement = document.getElementById('result-uninstall');
+
+            // Show loading indicator
+            loadingElement.style.display = 'block';
+            resultElement.style.display = 'none';
+
+            try {
+                // Get credentials from input fields
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                // Make the request
+                const response = await fetch(path, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Basic ${btoa(`${username}:${password}`)}`
+                    },
+                    body: JSON.stringify({
+                        datapackDir: datapackDir
+                    })
+                });
+
+                // Get response data
+                let data;
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    data = await response.text();
+                }
+
+                // Format the response
+                const formattedData = typeof data === 'object'
+                    ? JSON.stringify(data, null, 2)
+                    : data;
+
+                // Determine if it was successful
+                const isSuccess = response.ok;
+
+                // Update result element
+                resultElement.innerHTML = `
+                    <h4>Response (Status: ${response.status})</h4>
+                    <div class="code">${escapeHtml(formattedData)}</div>
+                `;
+
+                // Apply appropriate class
+                resultElement.className = `result ${isSuccess ? 'success' : 'error'}`;
+
+            } catch (error) {
+                resultElement.innerHTML = `
+                    <h4>Error</h4>
+                    <p>${error.message}</p>
+                `;
+                resultElement.className = 'result error';
+            } finally {
+                // Hide loading indicator and show result
+                loadingElement.style.display = 'none';
+                resultElement.style.display = 'block';
+            }
+        }
+
+        // Helper function to escape HTML for security
+        function escapeHtml(unsafe) {
+            if (typeof unsafe !== 'string') {
+                return String(unsafe);
+            }
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // RAM Calculator function
+        function calculateRamBytes() {
+            const minRamInput = document.getElementById('min-ram').value.trim();
+            const maxRamInput = document.getElementById('max-ram').value.trim();
+            const resultElement = document.getElementById('ram-calculation-result');
+
+            function parseRam(ramStr) {
+                const match = ramStr.match(/^(\d*\.?\d+)([gmk]?)$/i);
+                if (!match) return null;
+
+                const value = parseFloat(match[1]);
+                const unit = match[2].toUpperCase();
+
+                switch(unit) {
+                    case 'G': return value * 1024 * 1024 * 1024; // GiB to B
+                    case 'M': return value * 1024 * 1024;       // MiB to B
+                    case 'K': return value * 1024;             // KiB to B
+                    default: return value;                     // B
+                }
+            }
+
+            const minBytes = parseRam(minRamInput);
+            const maxBytes = parseRam(maxRamInput);
+
+            if (minBytes === null || maxBytes === null) {
+                resultElement.innerHTML = '<div class="error">Invalid input format. Use formats like: 1G, 1024M, 2048, 100K</div>';
+                resultElement.className = 'result error';
+                return;
+            }
+
+            resultElement.innerHTML = `
+                <div class="success">
+                    <p><strong>Calculated Values:</strong></p>
+                    <p>Min RAM: ${minRamInput} = ${minBytes.toLocaleString()} bytes (${(minBytes / (1024 * 1024)).toFixed(2)} MB)</p>
+                    <p>Max RAM: ${maxRamInput} = ${maxBytes.toLocaleString()} bytes (${(maxBytes / (1024 * 1024)).toFixed(2)} MB)</p>
+                </div>
+            `;
+            resultElement.className = 'result success';
+        }
+    </script>
+</body>
+</html>

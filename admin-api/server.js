@@ -175,6 +175,16 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'stats.html'));
 });
 
+// Documentation endpoint
+app.get('/docs', (req, res) => {
+    res.sendFile(path.join(__dirname, 'docs.html'));
+});
+
+// Advanced API test page
+app.get('/advanced-test', (req, res) => {
+    res.sendFile(path.join(__dirname, 'advanced-api-test.html'));
+});
+
 // Only start the server if this file is run directly (not imported)
 let server;
 if (require.main === module) {

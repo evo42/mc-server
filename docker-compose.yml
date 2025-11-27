@@ -117,6 +117,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./admin-api/admin.html:/usr/src/app/admin.html
       - ./admin-api/stats.html:/usr/src/app/stats.html
+      - ./admin-api/docs.html:/usr/src/app/docs.html
+      - ./admin-api/advanced-api-test.html:/usr/src/app/advanced-api-test.html
       - ./admin-api/services:/usr/src/app/services
       - ./admin-api/routes:/usr/src/app/routes
       - ./admin-api/controllers:/usr/src/app/controllers
