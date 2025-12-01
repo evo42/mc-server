@@ -167,6 +167,7 @@ services:
       - "80"
     networks:
       - proxy
+      - minecraft-net
     depends_on:
       - admin-api
 
@@ -185,6 +186,7 @@ services:
       - ./landing:/var/www/landing
     networks:
       - proxy
+      - minecraft-net
     depends_on:
       - admin-api
 
@@ -194,7 +196,7 @@ services:
       dockerfile: Dockerfile
     container_name: mc-mcdash
     ports:
-      - "8082:8080"
+      - "8088:8080"
     environment:
       - ADMIN_USER=${ADMIN_USER:-admin}
       - ADMIN_PASS=${ADMIN_PASS:-admin123}
@@ -493,7 +495,7 @@ services:
     image: ghcr.io/bluemap-minecraft/bluemap:v5.10
     container_name: mc-bluemap-web-bgstpoelten
     ports:
-      - "8082:8080"
+      - "8088:8080"
     volumes:
       - ./landing/bgstpoelten-mc-landing/data:/minecraft/world:ro
       - ./bluemap-migration/configs/mc-bgstpoelten:/webapp/conf:ro
@@ -510,6 +512,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 120s
+
+    command: ["-w"]
 
   bluemap-web-mc-borgstpoelten:
     image: ghcr.io/bluemap-minecraft/bluemap:v5.10
