@@ -1,0 +1,102 @@
+name: BlueMapIntegration
+author: Lerncraft Development Team
+version: 1.0.0
+api-version: 1.19
+website: https://bluemap.lerncraft.xyz
+description: >
+  BlueMap Minecraft Plugin for real-time server integration.
+  Provides live data collection, player tracking, and performance monitoring
+  for BlueMap's 3D world visualization platform.
+
+main: com.lerncraft.bluemap.BlueMapPlugin
+
+# Dependencies
+depend: []
+soft-depend: [ProtocolLib]
+loadbefore: []
+
+# Load configuration
+load: POSTWORLD
+
+# Commands
+commands:
+  bluemap:
+    description: BlueMap main command
+    permission: bluemap.use
+    permission-message: You don't have permission to use this command!
+    usage: |
+      /bluemap help - Show help information
+      /bluemap status - Show plugin status
+      /bluemap reload - Reload configuration
+      /bluemap players - Show online players
+      /bluemap worlds - Show world information
+      /bluemap stats - Show performance statistics
+    aliases: [bm]
+    permission: bluemap.use
+  bluemapadmin:
+    description: BlueMap administrative commands
+    permission: bluemap.admin
+    permission-message: You don't have permission to use this command!
+    usage: |
+      /bluemapadmin info - Show detailed plugin information
+      /bluemapadmin config - Manage configuration
+      /bluemapadmin data - Force data collection
+      /bluemapadmin test - Test API connection
+      /bluemapadmin debug - Enable/disable debug mode
+    aliases: [bmadmin]
+    permission: bluemap.admin
+
+# Permissions
+permissions:
+  bluemap.use:
+    description: Basic BlueMap usage permissions
+    default: op
+    children:
+      bluemap.status: true
+      bluemap.players: true
+      bluemap.worlds: true
+      bluemap.stats: true
+  bluemap.admin:
+    description: Administrative BlueMap permissions
+    default: op
+    children:
+      bluemap.use: true
+      bluemap.reload: true
+      bluemap.config: true
+      bluemap.data: true
+      bluemap.debug: true
+  bluemap.status:
+    description: View plugin status
+    default: op
+  bluemap.reload:
+    description: Reload plugin configuration
+    default: op
+  bluemap.players:
+    description: View player information
+    default: op
+  bluemap.worlds:
+    description: View world information
+    default: op
+  bluemap.stats:
+    description: View performance statistics
+    default: op
+  bluemap.config:
+    description: Manage configuration
+    default: op
+  bluemap.data:
+    description: Force data collection
+    default: op
+  bluemap.debug:
+    description: Enable/disable debug mode
+    default: op
+
+# Resources
+resources:
+  - config.yml
+  - worlds.yml
+
+# Database settings
+database: false
+
+# Version control
+prefix: BlueMap

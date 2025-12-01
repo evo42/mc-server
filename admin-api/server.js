@@ -19,6 +19,11 @@ const publicRouter = require('./routes/public');
 const mcdashRouter = require('./routes/mcdash');
 const minecraftServerApiRouter = require('./routes/minecraft-serverapi');
 const overviewerRouter = require('./routes/overviewer');
+const overviewerService = require('./services/overviewerService');
+const monitoringRouter = require('./routes/monitoring');
+const analyticsRouter = require('./routes/analytics');
+const scalingRouter = require('./routes/scaling');
+const bluemapRouter = require('./routes/bluemap');
 const historyService = require('./services/historyService');
 
 // Start history collection
@@ -180,6 +185,10 @@ app.use('/api/backup', require('./routes/backup')); // Backup and restore functi
 app.use('/api/mcdash', mcdashRouter); // MCDash integration routes
 app.use('/api/minecraft-serverapi', minecraftServerApiRouter); // MinecraftServerAPI integration routes
 app.use('/api/overviewer', overviewerRouter); // Minecraft Overviewer integration routes
+app.use('/api/monitoring', monitoringRouter); // Monitoring & Observability routes
+app.use('/api/analytics', analyticsRouter); // Analytics & Insights routes
+app.use('/api/scaling', scalingRouter); // Multi-Container Scaling routes
+app.use('/api/bluemap', bluemapRouter); // BlueMap Migration Integration routes
 
 // Route for the admin page, with authentication
 app.get('/mc-admin', basicAuthMiddleware, (req, res) => {
@@ -238,6 +247,14 @@ if (require.main === module) {
             server.on('listening', () => {
                 WebSocketService.init(server);
                 logger.info('WebSocket service initialized');
+
+                // Initialize Overviewer service WebSocket integration
+                overviewerService.setSocketIO(WebSocketService.io);
+                logger.info('Overviewer WebSocket integration initialized');
+
+                // Log Overviewer service health status
+                const healthStatus = overviewerService.getHealthStatus();
+                logger.info('Overviewer service status', healthStatus);
             });
         })
         .catch(error => {

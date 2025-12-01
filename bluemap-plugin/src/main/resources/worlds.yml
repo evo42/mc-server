@@ -1,0 +1,273 @@
+# BlueMap Plugin - World Configuration
+# Configure BlueMap settings for each world
+# Sprint 3: Migration & Deployment
+
+# World-specific configurations
+worlds:
+  # Default world settings (applied to all worlds unless overridden)
+  default:
+    enabled: true
+    bluemap_enabled: true
+    scan_radius: 1000
+    update_interval: 300
+    priority: 1
+
+    # Marker types to collect for this world
+    marker_types:
+      - "players"
+      - "markers"
+      - "regions"
+      - "spawns"
+      - "warps"
+
+    # Entity tracking settings
+    entity_tracking:
+      enabled: true
+      important_only: true
+      update_interval: 30
+      max_distance: 1000
+
+    # Chunk scanning settings
+    chunk_scanning:
+      enabled: true
+      radius: 32
+      interval: 300
+      batch_size: 10
+
+    # Performance settings
+    performance:
+      max_entities: 1000
+      max_chunks: 1000
+      max_markers: 500
+
+  # Example world configurations
+  world:
+    enabled: true
+    bluemap_enabled: true
+    scan_radius: 2000
+    update_interval: 600
+    priority: 1
+
+    marker_types:
+      - "players"
+      - "markers"
+      - "regions"
+      - "spawns"
+      - "warps"
+      - "points_of_interest"
+
+    entity_tracking:
+      enabled: true
+      important_only: false
+      update_interval: 60
+      max_distance: 2000
+
+    chunk_scanning:
+      enabled: true
+      radius: 64
+      interval: 600
+      batch_size: 20
+
+    performance:
+      max_entities: 2000
+      max_chunks: 2000
+      max_markers: 1000
+
+  nether:
+    enabled: true
+    bluemap_enabled: true
+    scan_radius: 1000
+    update_interval: 900
+    priority: 2
+
+    marker_types:
+      - "players"
+      - "nether_portals"
+      - "fortresses"
+      - "nether_fortress_ruins"
+
+    entity_tracking:
+      enabled: true
+      important_only: true
+      update_interval: 90
+      max_distance: 1500
+
+    chunk_scanning:
+      enabled: true
+      radius: 32
+      interval: 900
+      batch_size: 15
+
+    performance:
+      max_entities: 800
+      max_chunks: 800
+      max_markers: 300
+
+  end:
+    enabled: true
+    bluemap_enabled: true
+    scan_radius: 1000
+    update_interval: 1200
+    priority: 3
+
+    marker_types:
+      - "players"
+      - "end_cities"
+      - "end_ships"
+      - "dragon_egg"
+
+    entity_tracking:
+      enabled: true
+      important_only: true
+      update_interval: 120
+      max_distance: 2000
+
+    chunk_scanning:
+      enabled: true
+      radius: 32
+      interval: 1200
+      batch_size: 20
+
+    performance:
+      max_entities: 500
+      max_chunks: 500
+      max_markers: 200
+
+  # Mining worlds (if any)
+  mining:
+    enabled: true
+    bluemap_enabled: true
+    scan_radius: 500
+    update_interval: 1800
+    priority: 4
+
+    marker_types:
+      - "players"
+      - "ores"
+      - "caves"
+      - "structures"
+
+    entity_tracking:
+      enabled: false
+      important_only: true
+      update_interval: 180
+      max_distance: 500
+
+    chunk_scanning:
+      enabled: true
+      radius: 16
+      interval: 1800
+      batch_size: 5
+
+    performance:
+      max_entities: 200
+      max_chunks: 200
+      max_markers: 100
+
+  # Creative worlds (if any)
+  creative:
+    enabled: true
+    bluemap_enabled: true
+    scan_radius: 500
+    update_interval: 3600
+    priority: 5
+
+    marker_types:
+      - "players"
+      - "builds"
+      - "buildings"
+      - "plots"
+
+    entity_tracking:
+      enabled: false
+      important_only: true
+      update_interval: 360
+      max_distance: 1000
+
+    chunk_scanning:
+      enabled: true
+      radius: 16
+      interval: 3600
+      batch_size: 10
+
+    performance:
+      max_entities: 100
+      max_chunks: 100
+      max_markers: 50
+
+# Global world rules
+rules:
+  # Skip worlds matching these patterns
+  skip_patterns:
+    - ".*_backup.*"
+    - ".*_temp.*"
+    - ".*_old.*"
+    - "template_.*"
+
+  # Default scanning radius for new worlds
+  default_scan_radius: 1000
+
+  # Default update interval for new worlds
+  default_update_interval: 300
+
+  # Maximum total worlds to process
+  max_total_worlds: 10
+
+  # Processing order (highest priority first)
+  processing_order:
+    - "world"
+    - "nether"
+    - "end"
+    - "mining"
+    - "creative"
+
+# Performance limits
+limits:
+  # Total maximum entities across all worlds
+  total_max_entities: 10000
+
+  # Total maximum chunks across all worlds
+  total_max_chunks: 10000
+
+  # Total maximum markers across all worlds
+  total_max_markers: 5000
+
+  # Processing timeout per world (seconds)
+  world_processing_timeout: 300
+
+# Advanced settings
+advanced:
+  # Enable parallel world processing
+  parallel_processing: true
+
+  # Maximum parallel world threads
+  max_parallel_threads: 3
+
+  # Memory usage optimization
+  memory_optimization: true
+
+  # Enable compression for large world data
+  data_compression: true
+
+  # Cache world data between collections
+  enable_caching: true
+
+  # Cache expiration time (seconds)
+  cache_expiration: 3600
+
+# Monitoring and alerting
+monitoring:
+  # Enable world processing monitoring
+  enable_monitoring: true
+
+  # Alert when world processing takes too long
+  processing_time_alerts: true
+
+  # Alert when entity limits are exceeded
+  entity_limit_alerts: true
+
+  # Alert when chunk limits are exceeded
+  chunk_limit_alerts: true
+
+  # Alert when world is disabled but still being accessed
+  disabled_world_alerts: true

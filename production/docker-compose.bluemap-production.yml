@@ -1,0 +1,180 @@
+# BlueMap Production Deployment
+# Sprint 3: Production Go-Live - Kubernetes Equivalent
+# Date: 2025-12-01
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database Layer
+  bluemap-postgres:
+    image: postgres:15
+    container_name: bluemap-postgres
+    environment:
+      POSTGRES_DB: bluemap
+      POSTGRES_USER: bluemap
+      POSTGRES_PASSWORD: bluemap-secure-2025
+    volumes:
+      - bluemap-postgres-data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
+    networks:
+      - bluemap-backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bluemap"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Redis Cache Layer
+  bluemap-redis:
+    image: redis:7-alpine
+    container_name: bluemap-redis
+    command: redis-server --appendonly yes --requirepass bluemap-redis-2025
+    volumes:
+      - bluemap-redis-data:/data
+    networks:
+      - bluemap-backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "bluemap-redis-2025", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # BlueMap Backend API
+  bluemap-backend:
+    build:
+      context: ../../admin-api
+      dockerfile: Dockerfile.bluemap
+    container_name: bluemap-backend
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=bluemap-postgres
+      - DB_PORT=5432
+      - DB_NAME=bluemap
+      - DB_USER=bluemap
+      - DB_PASSWORD=bluemap-secure-2025
+      - REDIS_HOST=bluemap-redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=bluemap-redis-2025
+      - WEBSOCKET_PORT=3001
+      - API_PORT=3000
+    volumes:
+      - bluemap-backend-data:/app/data
+      - bluemap-backend-logs:/app/logs
+    networks:
+      - bluemap-frontend
+      - bluemap-backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+    depends_on:
+      - bluemap-postgres
+      - bluemap-redis
+
+  # BlueMap Frontend
+  bluemap-frontend:
+    build:
+      context: ../../admin-ui-spa
+      dockerfile: Dockerfile.bluemap
+    container_name: bluemap-frontend
+    environment:
+      - VUE_APP_API_URL=https://api.bluemap.lerncraft.xyz
+      - VUE_APP_WEBSOCKET_URL=wss://api.bluemap.lerncraft.xyz/ws/bluemap
+    networks:
+      - bluemap-frontend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on:
+      - bluemap-backend
+
+  # Monitoring Stack - Prometheus
+  bluemap-prometheus:
+    image: prom/prometheus:latest
+    container_name: bluemap-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+    volumes:
+      - bluemap-prometheus-data:/prometheus
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - bluemap-monitoring
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+
+  # Monitoring Stack - Grafana
+  bluemap-grafana:
+    image: grafana/grafana:latest
+    container_name: bluemap-grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=bluemap-grafana-2025
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - bluemap-grafana-data:/var/lib/grafana
+      - ./monitoring/grafana-dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana-datasources:/etc/grafana/provisioning/datasources
+    networks:
+      - bluemap-monitoring
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      - bluemap-prometheus
+
+  # Load Balancer / Nginx Ingress
+  bluemap-nginx:
+    image: nginx:alpine
+    container_name: bluemap-nginx
+    volumes:
+      - ./nginx/bluemap.conf:/etc/nginx/nginx.conf
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - bluemap-static-data:/usr/share/nginx/html
+    networks:
+      - bluemap-frontend
+      - bluemap-backend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - bluemap-frontend
+      - bluemap-backend
+
+volumes:
+  bluemap-postgres-data:
+    driver: local
+  bluemap-redis-data:
+    driver: local
+  bluemap-backend-data:
+    driver: local
+  bluemap-backend-logs:
+    driver: local
+  bluemap-prometheus-data:
+    driver: local
+  bluemap-grafana-data:
+    driver: local
+  bluemap-static-data:
+    driver: local
+
+networks:
+  bluemap-frontend:
+    driver: bridge
+  bluemap-backend:
+    driver: bridge
+  bluemap-monitoring:
+    driver: bridge

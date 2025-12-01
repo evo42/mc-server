@@ -1,6 +1,6 @@
 const express = require('express');
 const axios = require('axios');
-const { body, validationResult } = require('express-validator');
+const { body, param, validationResult } = require('express-validator');
 
 const router = express.Router();
 
@@ -21,7 +21,7 @@ const handleValidationErrors = (req, res, next) => {
 
 // File Browser Bridge - Get files for a server
 router.get('/files/:server',
-    body('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
     handleValidationErrors,
     async (req, res) => {
         try {
@@ -60,7 +60,7 @@ router.get('/files/:server',
 
 // Console Bridge - Get console output for a server
 router.get('/console/:server',
-    body('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
     handleValidationErrors,
     async (req, res) => {
         try {
@@ -98,7 +98,7 @@ router.get('/console/:server',
 
 // Console Command Execution - Send command to server
 router.post('/console/:server/command',
-    body('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
     body('command').isLength({ min: 1, max: 500 }).trim(),
     handleValidationErrors,
     async (req, res) => {
@@ -175,7 +175,7 @@ router.get('/plugins/store', async (req, res) => {
 
 // Plugin Installation
 router.post('/plugins/:server/install',
-    body('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
     body('pluginId').isLength({ min: 1 }),
     body('version').optional().isLength({ min: 1 }),
     handleValidationErrors,
@@ -221,7 +221,7 @@ router.post('/plugins/:server/install',
 
 // Enhanced Backup Management
 router.get('/backups/:server',
-    body('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
     handleValidationErrors,
     async (req, res) => {
         try {
@@ -258,7 +258,7 @@ router.get('/backups/:server',
 
 // Create Backup
 router.post('/backups/:server/create',
-    body('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
     body('name').optional().isLength({ min: 1, max: 100 }),
     body('type').optional().isIn(['full', 'incremental', 'world_only']),
     handleValidationErrors,
@@ -300,6 +300,88 @@ router.post('/backups/:server/create',
 
             res.status(500).json({
                 error: 'MCDash backup creation error',
+                message: error.response?.data?.message || error.message
+            });
+        }
+    }
+);
+
+// Restore Backup
+router.post('/backups/:server/restore',
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    body('backupName').isLength({ min: 1 }),
+    handleValidationErrors,
+    async (req, res) => {
+        try {
+            const { server } = req.params;
+            const { backupName } = req.body;
+
+            const response = await axios.post(`${MCDASH_BASE_URL}/api/backups/${server}/restore`, {
+                backupName
+            }, {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                timeout: 60000
+            });
+
+            res.json({
+                success: true,
+                server,
+                backup: response.data.backup || {
+                    name: backupName,
+                    status: 'restored'
+                }
+            });
+        } catch (error) {
+            console.error('MCDash backup restore error:', error.message);
+
+            if (error.code === 'ECONNREFUSED' || error.response?.status === 502) {
+                return res.status(503).json({
+                    error: 'MCDash service unavailable',
+                    message: 'Backup restore service is currently offline'
+                });
+            }
+
+            res.status(500).json({
+                error: 'MCDash backup restore error',
+                message: error.response?.data?.message || error.message
+            });
+        }
+    }
+);
+
+// Delete Backup
+router.delete('/backups/:server/:backupName',
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    param('backupName').isLength({ min: 1 }),
+    handleValidationErrors,
+    async (req, res) => {
+        try {
+            const { server, backupName } = req.params;
+
+            const response = await axios.delete(`${MCDASH_BASE_URL}/api/backups/${server}/${encodeURIComponent(backupName)}`, {
+                timeout: 30000
+            });
+
+            res.json({
+                success: true,
+                server,
+                backupName,
+                result: response.data.result || 'Backup deleted'
+            });
+        } catch (error) {
+            console.error('MCDash backup delete error:', error.message);
+
+            if (error.code === 'ECONNREFUSED' || error.response?.status === 502) {
+                return res.status(503).json({
+                    error: 'MCDash service unavailable',
+                    message: 'Backup delete service is currently offline'
+                });
+            }
+
+            res.status(500).json({
+                error: 'MCDash backup delete error',
                 message: error.response?.data?.message || error.message
             });
         }

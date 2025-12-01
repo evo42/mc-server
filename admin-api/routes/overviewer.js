@@ -3,17 +3,113 @@ const axios = require('axios');
 const fs = require('fs').promises;
 const path = require('path');
 const { spawn } = require('child_process');
+const Joi = require('joi');
+const rateLimit = require('express-rate-limit');
+const overviewerService = require('../services/overviewerService');
 
 const router = express.Router();
+
+// Rate limiting for Overviewer endpoints
+const overviewerLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: {
+    error: 'Too many requests from this IP, please try again later.',
+    retryAfter: '15 minutes'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Input validation schemas
+const serverSchema = Joi.string().pattern(/^[a-zA-Z0-9-_]+$/).min(3).max(50);
+const worldSchema = Joi.string().pattern(/^[a-zA-Z0-9-_]+$/).min(1).max(50);
+const renderModeSchema = Joi.string().valid('lighting', 'night', 'cave', 'smooth_lighting', 'mineral');
+const jobIdSchema = Joi.string().pattern(/^[a-zA-Z0-9-_]+$/).min(5).max(100);
+const titleSchema = Joi.string().trim().min(1).max(200);
+const descriptionSchema = Joi.string().trim().max(500);
+
+// Validation middleware
+const validateServer = (req, res, next) => {
+  const { error } = serverSchema.validate(req.params.server);
+  if (error) {
+    return res.status(400).json({
+      error: 'Invalid server name format',
+      details: 'Server name must contain only alphanumeric characters, hyphens, and underscores',
+      provided: req.params.server
+    });
+  }
+  next();
+};
+
+const validateWorld = (req, res, next) => {
+  const { error } = worldSchema.validate(req.params.world);
+  if (error) {
+    return res.status(400).json({
+      error: 'Invalid world name format',
+      details: 'World name must contain only alphanumeric characters, hyphens, and underscores',
+      provided: req.params.world
+    });
+  }
+  next();
+};
+
+const validateJobId = (req, res, next) => {
+  const { error } = jobIdSchema.validate(req.params.jobId);
+  if (error) {
+    return res.status(400).json({
+      error: 'Invalid job ID format',
+      details: 'Job ID must be between 5-100 characters, containing only alphanumeric characters, hyphens, and underscores',
+      provided: req.params.jobId
+    });
+  }
+  next();
+};
+
+const validateRenderRequest = (req, res, next) => {
+  const renderSchema = Joi.object({
+    rendermode: renderModeSchema.default('lighting'),
+    forcerender: Joi.boolean().default(false)
+  });
+
+  const { error, value } = renderSchema.validate(req.body);
+  if (error) {
+    return res.status(400).json({
+      error: 'Invalid render request parameters',
+      details: error.details.map(detail => detail.message)
+    });
+  }
+
+  req.body = value;
+  next();
+};
+
+const validatePublicRequest = (req, res, next) => {
+  const publicSchema = Joi.object({
+    title: titleSchema.optional(),
+    description: descriptionSchema.optional(),
+    renderJobId: jobIdSchema.optional()
+  });
+
+  const { error, value } = publicSchema.validate(req.body);
+  if (error) {
+    return res.status(400).json({
+      error: 'Invalid public map request parameters',
+      details: error.details.map(detail => detail.message)
+    });
+  }
+
+  req.body = value;
+  next();
+};
+
+// Apply rate limiting to all Overviewer routes
+router.use(overviewerLimiter);
 
 // Overviewer service configuration
 const OVERVIEWER_SERVICE_URL = process.env.OVERVIEWER_SERVICE_URL || 'http://overviewer:8080';
 const RENDER_OUTPUT_DIR = '/data/output';
 const WORLD_DATA_DIR = '/data/worlds';
-
-// In-memory storage for render jobs (in production, use Redis or database)
-const renderJobs = new Map();
-const publicMaps = new Map();
 
 // Available servers and their world paths
 const serverWorldPaths = {
@@ -155,7 +251,7 @@ router.get('/worlds', async (req, res) => {
 });
 
 // Get worlds for a specific server
-router.get('/worlds/:server', async (req, res) => {
+router.get('/worlds/:server', validateServer, async (req, res) => {
   try {
     const { server } = req.params;
     const worldPath = serverWorldPaths[server];
@@ -203,7 +299,7 @@ router.get('/worlds/:server', async (req, res) => {
 });
 
 // Start rendering a world
-router.post('/render/:server/:world', async (req, res) => {
+router.post('/render/:server/:world', validateServer, validateWorld, validateRenderRequest, async (req, res) => {
   try {
     const { server, world } = req.params;
     const { rendermode = 'lighting',forcerender = false } = req.body;
@@ -233,7 +329,6 @@ router.post('/render/:server/:world', async (req, res) => {
     await fs.mkdir(outputPath, { recursive: true });
 
     const renderJob = {
-      id: jobId,
       server,
       world,
       worldPath,
@@ -246,14 +341,19 @@ router.post('/render/:server/:world', async (req, res) => {
       estimatedDuration: null
     };
 
-    renderJobs.set(jobId, renderJob);
+    // Save job using the new service (Redis + WebSocket)
+    const savedJob = await overviewerService.saveRenderJob(jobId, renderJob);
 
     // Start render process in background
-    renderWorldAsync(renderJob).catch(error => {
+    renderWorldAsync(savedJob).catch(error => {
       console.error(`Render job ${jobId} failed:`, error);
-      renderJob.status = 'error';
-      renderJob.error = error.message;
-      renderJob.endTime = new Date();
+      overviewerService.updateRenderJob(jobId, {
+        status: 'error',
+        error: error.message,
+        endTime: new Date()
+      }).catch(updateError => {
+        console.error(`Failed to update job ${jobId} after error:`, updateError);
+      });
     });
 
     res.json({
@@ -279,10 +379,10 @@ router.post('/render/:server/:world', async (req, res) => {
 });
 
 // Get render job status
-router.get('/status/:jobId', async (req, res) => {
+router.get('/status/:jobId', validateJobId, async (req, res) => {
   try {
     const { jobId } = req.params;
-    const job = renderJobs.get(jobId);
+    const job = await overviewerService.getRenderJob(jobId);
 
     if (!job) {
       return res.status(404).json({
@@ -313,10 +413,10 @@ router.get('/status/:jobId', async (req, res) => {
 });
 
 // Cancel render job
-router.post('/cancel/:jobId', async (req, res) => {
+router.post('/cancel/:jobId', validateJobId, async (req, res) => {
   try {
     const { jobId } = req.params;
-    const job = renderJobs.get(jobId);
+    const job = await overviewerService.getRenderJob(jobId);
 
     if (!job) {
       return res.status(404).json({
@@ -332,8 +432,10 @@ router.post('/cancel/:jobId', async (req, res) => {
       });
     }
 
-    job.status = 'cancelled';
-    job.endTime = new Date();
+    await overviewerService.updateRenderJob(jobId, {
+      status: 'cancelled',
+      endTime: new Date()
+    });
 
     res.json({
       jobId,
@@ -352,7 +454,8 @@ router.post('/cancel/:jobId', async (req, res) => {
 // Get all render jobs
 router.get('/jobs', async (req, res) => {
   try {
-    const jobs = Array.from(renderJobs.values()).map(job => ({
+    const jobs = await overviewerService.getAllRenderJobs();
+    const jobsSummary = jobs.map(job => ({
       id: job.id,
       server: job.server,
       world: job.world,
@@ -364,11 +467,11 @@ router.get('/jobs', async (req, res) => {
     }));
 
     res.json({
-      jobs,
-      total: jobs.length,
-      active: jobs.filter(j => ['pending', 'running'].includes(j.status)).length,
-      completed: jobs.filter(j => j.status === 'completed').length,
-      failed: jobs.filter(j => j.status === 'error').length
+      jobs: jobsSummary,
+      total: jobsSummary.length,
+      active: jobsSummary.filter(j => ['pending', 'running'].includes(j.status)).length,
+      completed: jobsSummary.filter(j => j.status === 'completed').length,
+      failed: jobsSummary.filter(j => j.status === 'error').length
     });
   } catch (error) {
     console.error('Error getting jobs:', error);
@@ -380,7 +483,7 @@ router.get('/jobs', async (req, res) => {
 });
 
 // Get rendered maps for a server
-router.get('/maps/:server', async (req, res) => {
+router.get('/maps/:server', validateServer, async (req, res) => {
   try {
     const { server } = req.params;
     const serverRenderPath = path.join(RENDER_OUTPUT_DIR, server);
@@ -454,8 +557,9 @@ router.get('/maps/:server', async (req, res) => {
 // Get public maps
 router.get('/public', async (req, res) => {
   try {
-    const publicMapsList = Array.from(publicMaps.entries()).map(([key, map]) => ({
-      id: key,
+    const publicMapsList = await overviewerService.getAllPublicMaps();
+    const publicMapsFormatted = publicMapsList.map((map) => ({
+      id: map.id,
       server: map.server,
       world: map.world,
       title: map.title || `${map.server} - ${map.world}`,
@@ -466,8 +570,8 @@ router.get('/public', async (req, res) => {
     }));
 
     res.json({
-      publicMaps: publicMapsList,
-      total: publicMapsList.length
+      publicMaps: publicMapsFormatted,
+      total: publicMapsFormatted.length
     });
   } catch (error) {
     console.error('Error getting public maps:', error);
@@ -479,7 +583,7 @@ router.get('/public', async (req, res) => {
 });
 
 // Make a map public
-router.post('/public/:server/:world', async (req, res) => {
+router.post('/public/:server/:world', validateServer, validateWorld, validatePublicRequest, async (req, res) => {
   try {
     const { server, world } = req.params;
     const { title, description } = req.body;
@@ -498,14 +602,17 @@ router.post('/public/:server/:world', async (req, res) => {
       });
     }
 
-    publicMaps.set(mapKey, {
+    // Save using the new service (Redis + WebSocket)
+    const publicMapData = await overviewerService.savePublicMap(mapKey, {
       server,
       world,
       title: title || `${server} - ${world}`,
       description: description || 'Minecraft World Map',
-      createdAt: new Date(),
       renderJobId: req.body.renderJobId
     });
+
+    // Broadcast update via WebSocket
+    overviewerService.broadcastMapUpdate('created', publicMapData);
 
     res.json({
       id: mapKey,
@@ -525,20 +632,16 @@ router.post('/public/:server/:world', async (req, res) => {
 });
 
 // Remove public access
-router.delete('/public/:server/:world', async (req, res) => {
+router.delete('/public/:server/:world', validateServer, validateWorld, async (req, res) => {
   try {
     const { server, world } = req.params;
     const mapKey = `${server}_${world}`;
 
-    if (!publicMaps.has(mapKey)) {
-      return res.status(404).json({
-        error: 'Map not found in public list',
-        server,
-        world
-      });
-    }
+    // Delete using the new service
+    await overviewerService.deletePublicMap(mapKey);
 
-    publicMaps.delete(mapKey);
+    // Broadcast update via WebSocket
+    overviewerService.broadcastMapUpdate('deleted', { id: mapKey, server, world });
 
     res.json({
       server,

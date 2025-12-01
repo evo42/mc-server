@@ -136,6 +136,9 @@ services:
     environment:
       - DOCKER_PROXY_URL=http://docker-proxy:3001
       - DOCKER_PROXY_TOKEN=${DOCKER_PROXY_TOKEN:-docker-proxy-secret-token}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-redissecure123}
     volumes:
       - ./admin-api/admin.html:/usr/src/app/admin.html
       - ./admin-api/stats.html:/usr/src/app/stats.html
@@ -151,6 +154,7 @@ services:
       - minecraft-net
     depends_on:
       - docker-proxy
+      - redis
     restart: unless-stopped
 
   admin-ui:
@@ -199,6 +203,12 @@ services:
       - ./mcdash-data:/data
       - ./mc-ilias/data:/minecraft-data/mc-ilias:ro
       - ./mc-niilo/data:/minecraft-data/mc-niilo:ro
+      - ./mc-bgstpoelten/data:/minecraft-data/mc-bgstpoelten:ro
+      - ./mc-htlstp/data:/minecraft-data/mc-htlstp:ro
+      - ./mc-borgstpoelten/data:/minecraft-data/mc-borgstpoelten:ro
+      - ./mc-hakstpoelten/data:/minecraft-data/mc-hakstpoelten:ro
+      - ./mc-basop-bafep-stp/data:/minecraft-data/mc-basop-bafep-stp:ro
+      - ./mc-play/data:/minecraft-data/mc-play:ro
     networks:
       - proxy
       - minecraft-net
@@ -212,6 +222,23 @@ services:
       retries: 3
       start_period: 60s
 
+  redis:
+    image: redis:7-alpine
+    container_name: mc-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis-data:/data
+    networks:
+      - minecraft-net
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redissecure123}
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   overviewer:
     build:
       context: ./overviewer-integration
@@ -223,6 +250,9 @@ services:
     environment:
       - OVERVIEWER_DATA_DIR=/data
       - OVERVIEWER_OUTPUT_DIR=/data/output
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-redissecure123}
     volumes:
       - ./mc-ilias/data:/data/worlds/mc-ilias:ro
       - ./mc-niilo/data:/data/worlds/mc-niilo:ro
@@ -239,6 +269,7 @@ services:
       - minecraft-net
     depends_on:
       - admin-api
+      - redis
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c", "import overviewer_core; print('OK')"]
@@ -246,6 +277,156 @@ services:
       timeout: 10s
       retries: 3
       start_period: 120s
+
+  # Overviewer Worker Containers for Multi-Container Scaling
+  overviewer-worker-1:
+    build:
+      context: ./overviewer-integration
+      dockerfile: Dockerfile
+    container_name: mc-overviewer-worker-1
+    environment:
+      - WORKER_ID=worker-1
+      - WORKER_CAPACITY=2
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-redissecure123}
+    volumes:
+      - ./mc-ilias/data:/data/worlds/mc-ilias:ro
+      - ./mc-niilo/data:/data/worlds/mc-niilo:ro
+      - ./mc-bgstpoelten/data:/data/worlds/mc-bgstpoelten:ro
+      - ./mc-htlstp/data:/data/worlds/mc-htlstp:ro
+      - ./mc-borgstpoelten/data:/data/worlds/mc-borgstpoelten:ro
+      - ./mc-hakstpoelten/data:/data/worlds/mc-hakstpoelten:ro
+      - ./mc-basop-bafep-stp/data:/data/worlds/mc-basop-bafep-stp:ro
+      - ./mc-play/data:/data/worlds/mc-play:ro
+      - ./overviewer-output:/data/output
+    networks:
+      - proxy
+      - minecraft-net
+    depends_on:
+      - admin-api
+      - redis
+    restart: unless-stopped
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+    healthcheck:
+      test: ["CMD", "python", "-c", "import overviewer_core; print('OK')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+  overviewer-worker-2:
+    build:
+      context: ./overviewer-integration
+      dockerfile: Dockerfile
+    container_name: mc-overviewer-worker-2
+    environment:
+      - WORKER_ID=worker-2
+      - WORKER_CAPACITY=2
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-redissecure123}
+    volumes:
+      - ./mc-ilias/data:/data/worlds/mc-ilias:ro
+      - ./mc-niilo/data:/data/worlds/mc-niilo:ro
+      - ./mc-bgstpoelten/data:/data/worlds/mc-bgstpoelten:ro
+      - ./mc-htlstp/data:/data/worlds/mc-htlstp:ro
+      - ./mc-borgstpoelten/data:/data/worlds/mc-borgstpoelten:ro
+      - ./mc-hakstpoelten/data:/data/worlds/mc-hakstpoelten:ro
+      - ./mc-basop-bafep-stp/data:/data/worlds/mc-basop-bafep-stp:ro
+      - ./mc-play/data:/data/worlds/mc-play:ro
+      - ./overviewer-output:/data/output
+    networks:
+      - proxy
+      - minecraft-net
+    depends_on:
+      - admin-api
+      - redis
+    restart: unless-stopped
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+    healthcheck:
+      test: ["CMD", "python", "-c", "import overviewer_core; print('OK')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+  overviewer-worker-3:
+    build:
+      context: ./overviewer-integration
+      dockerfile: Dockerfile
+    container_name: mc-overviewer-worker-3
+    environment:
+      - WORKER_ID=worker-3
+      - WORKER_CAPACITY=2
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-redissecure123}
+    volumes:
+      - ./mc-ilias/data:/data/worlds/mc-ilias:ro
+      - ./mc-niilo/data:/data/worlds/mc-niilo:ro
+      - ./mc-bgstpoelten/data:/data/worlds/mc-bgstpoelten:ro
+      - ./mc-htlstp/data:/data/worlds/mc-htlstp:ro
+      - ./mc-borgstpoelten/data:/data/worlds/mc-borgstpoelten:ro
+      - ./mc-hakstpoelten/data:/data/worlds/mc-hakstpoelten:ro
+      - ./mc-basop-bafep-stp/data:/data/worlds/mc-basop-bafep-stp:ro
+      - ./mc-play/data:/data/worlds/mc-play:ro
+      - ./overviewer-output:/data/output
+    networks:
+      - proxy
+      - minecraft-net
+    depends_on:
+      - admin-api
+      - redis
+    restart: unless-stopped
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+    healthcheck:
+      test: ["CMD", "python", "-c", "import overviewer_core; print('OK')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+  # Redis Cluster for High Availability
+  redis-cluster:
+    image: redis:7-alpine
+    container_name: mc-redis-cluster
+    ports:
+      - "6380:6380"
+    volumes:
+      - ./redis-cluster-data:/data
+    networks:
+      - minecraft-net
+    restart: unless-stopped
+    command: >
+      redis-server
+      --appendonly yes
+      --requirepass ${REDIS_PASSWORD:-redissecure123}
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redissecure123}", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 networks:
   minecraft-net:

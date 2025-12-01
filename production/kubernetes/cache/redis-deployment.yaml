@@ -1,0 +1,228 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: bluemap-redis
+  namespace: bluemap
+  labels:
+    app: bluemap-redis
+    tier: cache
+spec:
+  serviceName: bluemap-redis
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bluemap-redis
+  template:
+    metadata:
+      labels:
+        app: bluemap-redis
+        tier: cache
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9121"
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        ports:
+        - containerPort: 6379
+          name: redis
+        env:
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: bluemap-secrets
+              key: redis_password
+        - name: REDIS_REPLICATION_MODE
+          value: "master"
+        - name: REDIS_MAXMEMORY
+          value: "2gb"
+        - name: REDIS_MAXMEMORY_POLICY
+          value: "allkeys-lru"
+        command:
+        - redis-server
+        - /etc/redis/redis.conf
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits:
+            cpu: 1000m
+            memory: 2Gi
+        livenessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 999
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+        - name: redis-storage
+          mountPath: /data
+        - name: redis-config
+          mountPath: /etc/redis
+      - name: redis-exporter
+        image: oliver006/redis_exporter:latest
+        ports:
+        - containerPort: 9121
+          name: metrics
+        env:
+        - name: REDIS_ADDR
+          value: "redis://localhost:6379"
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: bluemap-secrets
+              key: redis_password
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1001
+          capabilities:
+            drop:
+            - ALL
+      volumes:
+      - name: redis-config
+        configMap:
+          name: redis-config
+  volumeClaimTemplates:
+  - metadata:
+      name: redis-storage
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: fast-ssd
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bluemap-redis
+  namespace: bluemap
+  labels:
+    app: bluemap-redis
+spec:
+  clusterIP: None
+  ports:
+  - port: 6379
+    targetPort: 6379
+    name: redis
+  selector:
+    app: bluemap-redis
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bluemap-redis-read
+  namespace: bluemap
+  labels:
+    app: bluemap-redis
+    role: read
+spec:
+  type: ClusterIP
+  ports:
+  - port: 6379
+    targetPort: 6379
+    protocol: TCP
+    name: redis
+  selector:
+    app: bluemap-redis
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-config
+  namespace: bluemap
+data:
+  redis.conf: |
+    # BlueMap Redis Configuration
+    bind 0.0.0.0
+    port 6379
+    timeout 0
+    tcp-keepalive 300
+
+    # Memory management
+    maxmemory 2gb
+    maxmemory-policy allkeys-lru
+    maxmemory-samples 5
+
+    # Performance tuning
+    save 900 1
+    save 300 10
+    save 60 10000
+    stop-writes-on-bgsave-error yes
+    rdbcompression yes
+    rdbchecksum yes
+
+    # Logging
+    loglevel notice
+    logfile ""
+    syslog-enabled no
+
+    # Security
+    requirepass ${REDIS_PASSWORD}
+
+    # Replication
+    repl-diskless-sync no
+    repl-diskless-sync-delay 5
+
+    # Metrics
+    latencymonitor-threshold 100
+
+    # BlueMap specific settings
+    hash-max-ziplist-entries 512
+    hash-max-ziplist-value 64
+    list-max-ziplist-size -2
+    list-compress-depth 0
+    set-max-intset-entries 512
+    zset-max-ziplist-entries 128
+    zset-max-ziplist-value 64
+    hll-sparse-max-bytes 3000
+
+    # Client output buffer limits
+    client-output-buffer-limit normal 0 0 0
+    client-output-buffer-limit replica 256mb 64mb 60
+    client-output-buffer-limit pubsub 32mb 8mb 60
+
+    # Frequency
+    hz 10
+
+    # AOF (Append Only File)
+    appendonly yes
+    appendfilename "appendonly.aof"
+    appendfsync everysec
+    no-appendfsync-on-rewrite no
+    auto-aof-rewrite-percentage 100
+    auto-aof-rewrite-min-size 64mb
+    aof-load-truncated yes
+    aof-use-rdb-preamble yes

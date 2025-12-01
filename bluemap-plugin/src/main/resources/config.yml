@@ -1,0 +1,249 @@
+# BlueMap Plugin Configuration
+# Sprint 3: Migration & Deployment
+# Generated: 2025-12-01
+
+# API Configuration
+api:
+  # BlueMap API URL
+  url: "https://api.bluemap.lerncraft.xyz"
+
+  # API timeout settings (milliseconds)
+  timeout: 10000
+
+  # Number of retry attempts for API calls
+  retry_attempts: 3
+
+  # Retry delay between attempts (milliseconds)
+  retry_delay: 2000
+
+  # Enable API authentication
+  authentication: true
+
+  # API key (if required)
+  api_key: ""
+
+# Server Configuration
+server:
+  # Unique server identifier
+  id: "minecraft-server"
+
+  # Human-readable server name
+  name: "Minecraft Server"
+
+  # Server location/region
+  location: "Austria"
+
+  # Server version
+  version: "1.21"
+
+# Core Settings
+enabled: true
+
+# Performance Settings
+performance:
+  # Data collection interval (seconds)
+  data_collection_interval: 30
+
+  # Performance check interval (seconds)
+  performance_check_interval: 60
+
+  # Enable performance monitoring
+  enable_monitoring: true
+
+  # Enable detailed logging
+  debug_mode: false
+
+  # Maximum data collection threads
+  max_threads: 3
+
+  # Memory usage limit (MB)
+  memory_limit: 512
+
+# Feature Settings
+features:
+  # Enable entity tracking
+  entity_tracking: true
+
+  # Enable marker collection
+  marker_collection: true
+
+  # Enable chunk scanning
+  chunk_scanning: true
+
+  # Enable player tracking
+  player_tracking: true
+
+  # Enable world data collection
+  world_data_collection: true
+
+  # Enable system metrics
+  system_metrics: true
+
+# Limits
+limits:
+  # Maximum number of worlds to scan
+  max_worlds_to_scan: 5
+
+  # Maximum players to track
+  max_players: 100
+
+  # Maximum entities to track per world
+  max_entities_per_world: 1000
+
+  # Maximum chunks to scan per cycle
+  max_chunks_per_scan: 100
+
+  # Maximum markers to collect
+  max_markers: 500
+
+# WebSocket Settings
+websocket:
+  # Enable WebSocket connection
+  enabled: true
+
+  # WebSocket connection timeout (milliseconds)
+  connection_timeout: 10000
+
+  # Heartbeat interval (seconds)
+  heartbeat_interval: 30
+
+  # Maximum reconnect attempts
+  max_reconnect_attempts: 5
+
+  # Reconnect delay (milliseconds)
+  reconnect_delay: 5000
+
+  # Enable message queuing
+  message_queueing: true
+
+  # Maximum message queue size
+  max_queue_size: 1000
+
+# Data Collection Settings
+data_collection:
+  # Enable automatic data collection
+  auto_collection: true
+
+  # Collection priority order
+  priority_order:
+    - "server_status"
+    - "player_data"
+    - "world_data"
+    - "entity_data"
+    - "marker_data"
+    - "performance_metrics"
+
+  # Chunk scanning settings
+  chunk_scanning:
+    # Scan radius (chunks)
+    radius: 32
+
+    # Scan interval (seconds)
+    interval: 300
+
+    # Scan batch size
+    batch_size: 10
+
+  # Entity tracking settings
+  entity_tracking:
+    # Track only important entities
+    important_only: true
+
+    # Update interval (seconds)
+    update_interval: 30
+
+    # Maximum distance to track (blocks)
+    max_distance: 1000
+
+  # Player tracking settings
+  player_tracking:
+    # Update interval (seconds)
+    update_interval: 10
+
+    # Track player inventory
+    track_inventory: false
+
+    # Track player statistics
+    track_stats: false
+
+# Logging Settings
+logging:
+  # Log level (SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST)
+  level: "INFO"
+
+  # Log to file
+  file_logging: true
+
+  # Log file location
+  log_file: "bluemap.log"
+
+  # Maximum log file size (MB)
+  max_log_size: 10
+
+  # Number of log files to keep
+  log_files_to_keep: 5
+
+  # Console logging
+  console_logging: true
+
+  # Colored console output
+  colored_console: true
+
+# Security Settings
+security:
+  # Enable API key validation
+  validate_api_key: true
+
+  # Enable IP whitelist
+  ip_whitelist_enabled: false
+
+  # Allowed IP addresses (if whitelist is enabled)
+  allowed_ips: []
+
+  # Enable data encryption
+  encryption_enabled: false
+
+  # Encryption key (if enabled)
+  encryption_key: ""
+
+# Backup Settings
+backup:
+  # Enable data backup
+  backup_enabled: true
+
+  # Backup interval (hours)
+  backup_interval: 24
+
+  # Backup location
+  backup_location: "backups/"
+
+  # Maximum backup files to keep
+  max_backups: 7
+
+  # Backup compression
+  compression: true
+
+# Update Settings
+update:
+  # Check for plugin updates
+  check_updates: true
+
+  # Auto-download updates
+  auto_download: false
+
+  # Update check interval (hours)
+  check_interval: 24
+
+# Integration Settings
+integration:
+  # Enable Discord integration
+  discord_integration: false
+
+  # Discord webhook URL (if enabled)
+  discord_webhook: ""
+
+  # Enable webhook notifications
+  webhook_notifications: true
+
+  # Webhook URL for notifications
+  notification_webhook: ""

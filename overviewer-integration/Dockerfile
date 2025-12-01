@@ -1,8 +1,11 @@
-# Minecraft Overviewer Docker Container
+# Minecraft Overviewer Docker Container - Production Ready
 FROM python:3.9-slim
 
 # Set working directory
 WORKDIR /app
+
+# Security: Create non-root user for running the application
+RUN groupadd -r overviewer && useradd -r -g overviewer overviewer
 
 # Install system dependencies for C extensions and image processing
 RUN apt-get update && apt-get install -y \
@@ -18,39 +21,49 @@ RUN apt-get update && apt-get install -y \
     git \
     curl \
     python3-dev \
+    # Clean up package cache to reduce image size
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy Overviewer source code
 COPY Minecraft-Overviewer/ /app/
 
-# Install Pillow from source to ensure headers are available
-RUN pip install --no-cache-dir --no-binary Pillow "Pillow==8.4.0"
+# Security: Install fixed dependency versions with security patches
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir \
+    "Pillow>=9.5.0,<10.0.0" \
+    "numpy>=1.24.0,<2.0.0" \
+    "requests>=2.31.0,<3.0.0" && \
+    # Clean pip cache
+    pip cache purge
 
-# Install other Python dependencies
-RUN pip install --no-cache-dir numpy==1.21.6 requests>=2.20.0
+# Install Overviewer and its dependencies
+RUN python setup.py build_ext --inplace && \
+    python setup.py install && \
+    # Clean up build artifacts
+    rm -rf build/ *.egg-info/ __pycache__/ .git/
 
-# Since direct installation of Pillow doesn't provide the needed headers,
-# we need to build it in a way that makes the headers available.
-# First download the Pillow source to access the header files
-RUN pip download --no-binary Pillow "Pillow==8.4.0" --dest /tmp/ && \
-    cd /tmp && \
-    tar -xzf Pillow-8.4.0.tar.gz
+# Create necessary directories with proper ownership
+RUN mkdir -p /data/worlds /data/output /data/renders && \
+    chown -R overviewer:overviewer /data /app
 
-# Make the Imaging.h header available in the main include path
-RUN cp /tmp/Pillow-8.4.0/src/libImaging/Imaging.h /usr/include/Imaging.h && \
-    cp -r /tmp/Pillow-8.4.0/src/libImaging /usr/include/libImaging && \
-    # Also copy the entire libImaging directory to the local app directory for the build process
-    cp -r /tmp/Pillow-8.4.0/src/libImaging ./libImaging && \
-    # Symlink the main header to current directory
-    ln -s ./libImaging/Imaging.h ./Imaging.h
+# Set environment variables
+ENV PYTHONPATH=/app:$PYTHONPATH
+ENV OVERVIEWER_DATA_DIR=/data
+ENV OVERVIEWER_OUTPUT_DIR=/data/output
 
-# Add the libImaging directory to the compiler's include path
-ENV C_INCLUDE_PATH=/app/libImaging:$C_INCLUDE_PATH
-ENV CPLUS_INCLUDE_PATH=/app/libImaging:$CPLUS_INCLUDE_PATH
+# Switch to non-root user for security
+USER overviewer
 
-# Generate the required header files first, then build
-RUN python setup.py build
-RUN python setup.py install
+# Expose port for web server (if needed)
+EXPOSE 8080
+
+# Health check - enhanced with timeout and better error handling
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
+    CMD python -c "import overviewer_core; print('OK')" || exit 1
+
+# Default command
+CMD ["python", "-c", "import overviewer_core; print('Minecraft Overviewer ready')"]
 
 # Create directories for output and world data
 RUN mkdir -p /data/worlds /data/output /data/renders

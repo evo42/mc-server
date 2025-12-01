@@ -1,0 +1,278 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bluemap-ingress
+  namespace: bluemap
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/enable-websocket: "true"
+    nginx.ingress.kubernetes.io/websocket-services: "bluemap-backend-service"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
+    nginx.ingress.kubernetes.io/cors-expose-headers: "Content-Length,Content-Range"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      add_header X-Frame-Options "SAMEORIGIN" always;
+      add_header X-Content-Type-Options "nosniff" always;
+      add_header X-XSS-Protection "1; mode=block" always;
+      add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+      add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+spec:
+  tls:
+  - hosts:
+    - bluemap.lerncraft.xyz
+    - api.bluemap.lerncraft.xyz
+    secretName: bluemap-tls
+  - hosts:
+    - admin.bluemap.lerncraft.xyz
+    secretName: bluemap-admin-tls
+  rules:
+  - host: bluemap.lerncraft.xyz
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: bluemap-frontend-service
+            port:
+              number: 80
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: bluemap-backend-service
+            port:
+              number: 3000
+      - path: /ws
+        pathType: Prefix
+        backend:
+          service:
+            name: bluemap-backend-service
+            port:
+              number: 3001
+  - host: api.bluemap.lerncraft.xyz
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: bluemap-backend-service
+            port:
+              number: 3000
+      - path: /ws
+        pathType: Prefix
+        backend:
+          service:
+            name: bluemap-backend-service
+            port:
+              number: 3001
+  - host: admin.bluemap.lerncraft.xyz
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: bluemap-frontend-service
+            port:
+              number: 80
+      - path: /grafana
+        pathType: Prefix
+        backend:
+          service:
+            name: grafana
+            port:
+              number: 3000
+      - path: /prometheus
+        pathType: Prefix
+        backend:
+          service:
+            name: prometheus
+            port:
+              number: 9090
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: bluemap
+  labels:
+    name: bluemap
+    environment: production
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bluemap-config
+  namespace: bluemap
+data:
+  api_url: "https://api.bluemap.lerncraft.xyz"
+  websocket_url: "wss://api.bluemap.lerncraft.xyz/ws"
+  minecraft_servers: |
+    basop-bafep-stp:
+      name: "MC BASOP BAFEP ST. Pölten"
+      ip: "mc-basop-bafep-stp.lerncraft.xyz"
+      port: 25565
+      version: "1.21"
+      player_count: 15
+      max_players: 50
+    bgstpoelten:
+      name: "MC BG St. Pölten"
+      ip: "mc-bgstpoelten.lerncraft.xyz"
+      port: 25565
+      version: "1.21"
+      player_count: 12
+      max_players: 50
+    borgstpoelten:
+      name: "MC BORG St. Pölten"
+      ip: "mc-borgstpoelten.lerncraft.xyz"
+      port: 25565
+      version: "1.21"
+      player_count: 8
+      max_players: 50
+    hakstpoelten:
+      name: "MC HAK St. Pölten"
+      ip: "mc-hakstpoelten.lerncraft.xyz"
+      port: 25565
+      version: "1.21"
+      player_count: 20
+      max_players: 50
+    htlstp:
+      name: "MC HTL St. Pölten"
+      ip: "mc-htlstp.lerncraft.xyz"
+      port: 25565
+      version: "1.21"
+      player_count: 18
+      max_players: 50
+    ilias:
+      name: "MC ILIAS"
+      ip: "mc-ilias.lerncraft.xyz"
+      port: 25565
+      version: "1.21"
+      player_count: 25
+      max_players: 100
+    niilo:
+      name: "MC NIILO"
+      ip: "mc-niilo.lerncraft.xyz"
+      port: 25565
+      version: "1.21"
+      player_count: 30
+      max_players: 100
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bluemap-backend-config
+  namespace: bluemap
+data:
+  server_config.json: |
+    {
+      "bluemap": {
+        "enabled": true,
+        "api_version": "v1",
+        "max_concurrent_requests": 100,
+        "request_timeout": 30000,
+        "cache_ttl": 3600,
+        "websocket": {
+          "namespace": "/ws/bluemap",
+          "max_connections": 1000,
+          "heartbeat_interval": 30000,
+          "message_queue_size": 1000
+        },
+        "performance": {
+          "enable_metrics": true,
+          "metrics_interval": 30000,
+          "log_level": "info",
+          "enable_profiling": false
+        }
+      },
+      "minecraft": {
+        "servers": {
+          "basop-bafep-stp": {
+            "enabled": true,
+            "api_endpoint": "http://mc-basop-bafep-stp:25565",
+            "timeout": 5000,
+            "retry_attempts": 3,
+            "cache_ttl": 60
+          },
+          "bgstpoelten": {
+            "enabled": true,
+            "api_endpoint": "http://mc-bgstpoelten:25565",
+            "timeout": 5000,
+            "retry_attempts": 3,
+            "cache_ttl": 60
+          },
+          "borgstpoelten": {
+            "enabled": true,
+            "api_endpoint": "http://mc-borgstpoelten:25565",
+            "timeout": 5000,
+            "retry_attempts": 3,
+            "cache_ttl": 60
+          },
+          "hakstpoelten": {
+            "enabled": true,
+            "api_endpoint": "http://mc-hakstpoelten:25565",
+            "timeout": 5000,
+            "retry_attempts": 3,
+            "cache_ttl": 60
+          },
+          "htlstp": {
+            "enabled": true,
+            "api_endpoint": "http://mc-htlstp:25565",
+            "timeout": 5000,
+            "retry_attempts": 3,
+            "cache_ttl": 60
+          },
+          "ilias": {
+            "enabled": true,
+            "api_endpoint": "http://mc-ilias:25565",
+            "timeout": 5000,
+            "retry_attempts": 3,
+            "cache_ttl": 60
+          },
+          "niilo": {
+            "enabled": true,
+            "api_endpoint": "http://mc-niilo:25565",
+            "timeout": 5000,
+            "retry_attempts": 3,
+            "cache_ttl": 60
+          }
+        }
+      }
+    }
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: bluemap-secrets
+  namespace: bluemap
+type: Opaque
+stringData:
+  database_url: "postgresql://bluemap_user:secure_password_123@bluemap-postgres:5432/bluemap"
+  postgres_user: "bluemap_user"
+  postgres_password: "secure_password_123"
+  redis_password: "redis_password_456"
+  redis_url: "redis://:redis_password_456@bluemap-redis:6379"
+  jwt_secret: "bluemap_jwt_secret_key_789"
+  grafana_admin_password: "grafana_admin_123"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: bluemap-tls
+  namespace: bluemap
+type: kubernetes.io/tls
+data:
+  tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCi4uLnRscwotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0t
+  tls.key: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCi4uLnRscwotLS0tLUVORCBQUklWQVRFIEtFWS0tLS0t
