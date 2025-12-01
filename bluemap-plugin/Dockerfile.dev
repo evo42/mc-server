@@ -1,0 +1,38 @@
+# BlueMap Plugin Development Dockerfile
+FROM openjdk:17-jdk-alpine
+
+# Install Maven
+RUN apk add --no-cache maven curl
+
+# Set working directory
+WORKDIR /plugin
+
+# Copy Maven files
+COPY bluemap-plugin/pom.xml .
+COPY bluemap-plugin/src ./src
+
+# Build the plugin
+RUN mvn clean package -DskipTests
+
+# Copy built plugin
+RUN cp target/BlueMapIntegration-*.jar /plugin/bluemap-plugin.jar
+
+# Copy configuration
+COPY bluemap-plugin/src/main/resources /plugin/conf
+RUN mkdir -p /plugin/logs
+
+# Set environment variables
+ENV MINECRAFT_SERVER_HOST=mc-niilo
+ENV MINECRAFT_SERVER_PORT=25565
+ENV BLUEMAP_API_URL=http://bluemap-api:3001
+ENV PLUGIN_DEBUG=true
+
+# Expose debug port for remote debugging
+EXPOSE 5005
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:8080/health || exit 1
+
+# Development command with debug enabled
+CMD ["java", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005", "-Xmx1G", "-jar", "/plugin/bluemap-plugin.jar"]

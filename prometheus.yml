@@ -1,0 +1,116 @@
+# Prometheus Configuration for BlueMap Integration
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'mc-server'
+    replica: 'prometheus-1'
+
+rule_files:
+  - "bluemap_alerts.yml"
+  - "minecraft_alerts.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+scrape_configs:
+  # BlueMap API Metrics
+  - job_name: 'bluemap-api'
+    static_configs:
+      - targets: ['bluemap-api:3001']
+    scrape_interval: 30s
+    metrics_path: '/api/bluemap/metrics'
+    scrape_timeout: 10s
+
+  # BlueMap Web Interfaces (7 Servers)
+  - job_name: 'bluemap-web-mc-basop-bafep-stp'
+    static_configs:
+      - targets: ['bluemap-web-mc-basop-bafep-stp:8080']
+    scrape_interval: 60s
+    metrics_path: '/metrics'
+
+  - job_name: 'bluemap-web-mc-bgstpoelten'
+    static_configs:
+      - targets: ['bluemap-web-mc-bgstpoelten:8080']
+    scrape_interval: 60s
+    metrics_path: '/metrics'
+
+  - job_name: 'bluemap-web-mc-borgstpoelten'
+    static_configs:
+      - targets: ['bluemap-web-mc-borgstpoelten:8080']
+    scrape_interval: 60s
+    metrics_path: '/metrics'
+
+  - job_name: 'bluemap-web-mc-hakstpoelten'
+    static_configs:
+      - targets: ['bluemap-web-mc-hakstpoelten:8080']
+    scrape_interval: 60s
+    metrics_path: '/metrics'
+
+  - job_name: 'bluemap-web-mc-htlstp'
+    static_configs:
+      - targets: ['bluemap-web-mc-htlstp:8080']
+    scrape_interval: 60s
+    metrics_path: '/metrics'
+
+  - job_name: 'bluemap-web-mc-ilias'
+    static_configs:
+      - targets: ['bluemap-web-mc-ilias:8080']
+    scrape_interval: 60s
+    metrics_path: '/metrics'
+
+  - job_name: 'bluemap-web-mc-niilo'
+    static_configs:
+      - targets: ['bluemap-web-mc-niilo:8080']
+    scrape_interval: 60s
+    metrics_path: '/metrics'
+
+  # BlueMap Render Engine
+  - job_name: 'bluemap-render-engine'
+    static_configs:
+      - targets: ['bluemap-render-engine:8088']
+    scrape_interval: 30s
+    metrics_path: '/metrics'
+
+  # Minecraft Servers Metrics
+  - job_name: 'minecraft-servers'
+    static_configs:
+      - targets: ['mc-basop-bafep-stp:25565']
+      - targets: ['mc-bgstpoelten:25565']
+      - targets: ['mc-borgstpoelten:25565']
+      - targets: ['mc-hakstpoelten:25565']
+      - targets: ['mc-htlstp:25565']
+      - targets: ['mc-ilias:25565']
+      - targets: ['mc-niilo:25565']
+    scrape_interval: 30s
+    metrics_path: '/metrics'
+
+  # Redis Metrics
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+    scrape_interval: 30s
+    metrics_path: '/metrics'
+
+  # Admin API Metrics
+  - job_name: 'admin-api'
+    static_configs:
+      - targets: ['admin-api:3000']
+    scrape_interval: 30s
+    metrics_path: '/api/metrics'
+
+  # Docker Container Metrics (cAdvisor)
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+    scrape_interval: 30s
+    metrics_path: '/metrics'
+
+  # Node Exporter for System Metrics
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 30s

@@ -16,11 +16,7 @@ USER docker-proxy
 
 EXPOSE 3001
 
-<<<<<<< HEAD
 # Start only the Node.js Docker proxy API.
 # We rely on the host Docker daemon via the mounted /var/run/docker.sock,
 # so we do NOT start dockerd inside this container to avoid rootless dockerd issues.
 ENTRYPOINT ["node", "/app/docker-proxy-server.js"]
-=======
-CMD ["node", "/app/docker-proxy-server.js"]
->>>>>>> 81a751b (render maps as webpage)

@@ -428,6 +428,295 @@ services:
       timeout: 10s
       retries: 3
 
+  # =============================================================================
+  # BlueMap Integration Services
+  # =============================================================================
+
+  # BlueMap API Service
+  bluemap-api:
+    build:
+      context: ./admin-api
+      dockerfile: Dockerfile.bluemap
+    container_name: mc-bluemap-api
+    env_file:
+      - .env
+    ports:
+      - "${BLUEMAP_API_PORT:-3001}:3001"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-redissecure123}
+      - BLUEMAP_API_URL=http://bluemap-api:3001
+      - BLUEMAP_WS_URL=ws://bluemap-api:3001/ws/bluemap
+    volumes:
+      - ./admin-api/routes/bluemap.js:/usr/src/app/routes/bluemap.js:ro
+      - ./admin-api/services/bluemapLazyService.js:/usr/src/app/services/bluemapLazyService.js:ro
+      - ./admin-api/services/bluemapMetricsService.js:/usr/src/app/services/bluemapMetricsService.js:ro
+      - ./bluemap-migration:/usr/src/app/bluemap-migration:ro
+    networks:
+      - proxy
+      - minecraft-net
+    depends_on:
+      - redis
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/api/bluemap/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # BlueMap Web Interface Servers (one per Minecraft server)
+  bluemap-web-mc-basop-bafep-stp:
+    image: bluemap/minecraft-web:3.4.0
+    container_name: mc-bluemap-web-basop-bafep-stp
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./mc-basop-bafep-stp/data:/minecraft/world:ro
+      - ./bluemap-migration/configs/mc-basop-bafep-stp:/webapp/conf:ro
+      - ./bluemap-data/mc-basop-bafep-stp:/webapp/data
+    environment:
+      - BLUEWEB_CONFIG_PATH=/webapp/conf
+      - BLUEWEB_DATA_PATH=/webapp/data
+    networks:
+      - minecraft-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+  bluemap-web-mc-bgstpoelten:
+    image: bluemap/minecraft-web:3.4.0
+    container_name: mc-bluemap-web-bgstpoelten
+    ports:
+      - "8082:8080"
+    volumes:
+      - ./landing/bgstpoelten-mc-landing/data:/minecraft/world:ro
+      - ./bluemap-migration/configs/mc-bgstpoelten:/webapp/conf:ro
+      - ./bluemap-data/mc-bgstpoelten:/webapp/data
+    environment:
+      - BLUEWEB_CONFIG_PATH=/webapp/conf
+      - BLUEWEB_DATA_PATH=/webapp/data
+    networks:
+      - minecraft-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+  bluemap-web-mc-borgstpoelten:
+    image: bluemap/minecraft-web:3.4.0
+    container_name: mc-bluemap-web-borgstpoelten
+    ports:
+      - "8083:8080"
+    volumes:
+      - ./landing/borgstpoelten-mc-landing/data:/minecraft/world:ro
+      - ./bluemap-migration/configs/mc-borgstpoelten:/webapp/conf:ro
+      - ./bluemap-data/mc-borgstpoelten:/webapp/data
+    environment:
+      - BLUEWEB_CONFIG_PATH=/webapp/conf
+      - BLUEWEB_DATA_PATH=/webapp/data
+    networks:
+      - minecraft-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+  bluemap-web-mc-hakstpoelten:
+    image: bluemap/minecraft-web:3.4.0
+    container_name: mc-bluemap-web-hakstpoelten
+    ports:
+      - "8084:8080"
+    volumes:
+      - ./landing/hakstpoelten-mc-landing/data:/minecraft/world:ro
+      - ./bluemap-migration/configs/mc-hakstpoelten:/webapp/conf:ro
+      - ./bluemap-data/mc-hakstpoelten:/webapp/data
+    environment:
+      - BLUEWEB_CONFIG_PATH=/webapp/conf
+      - BLUEWEB_DATA_PATH=/webapp/data
+    networks:
+      - minecraft-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+  bluemap-web-mc-htlstp:
+    image: bluemap/minecraft-web:3.4.0
+    container_name: mc-bluemap-web-htlstp
+    ports:
+      - "8085:8080"
+    volumes:
+      - ./landing/htlstp-mc-landing/data:/minecraft/world:ro
+      - ./bluemap-migration/configs/mc-htlstp:/webapp/conf:ro
+      - ./bluemap-data/mc-htlstp:/webapp/data
+    environment:
+      - BLUEWEB_CONFIG_PATH=/webapp/conf
+      - BLUEWEB_DATA_PATH=/webapp/data
+    networks:
+      - minecraft-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+  bluemap-web-mc-ilias:
+    image: bluemap/minecraft-web:3.4.0
+    container_name: mc-bluemap-web-ilias
+    ports:
+      - "8086:8080"
+    volumes:
+      - ./mc-ilias/data:/minecraft/world:ro
+      - ./bluemap-migration/configs/mc-ilias:/webapp/conf:ro
+      - ./bluemap-data/mc-ilias:/webapp/data
+    environment:
+      - BLUEWEB_CONFIG_PATH=/webapp/conf
+      - BLUEWEB_DATA_PATH=/webapp/data
+    networks:
+      - minecraft-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+  bluemap-web-mc-niilo:
+    image: bluemap/minecraft-web:3.4.0
+    container_name: mc-bluemap-web-niilo
+    ports:
+      - "8087:8080"
+    volumes:
+      - ./mc-niilo/data:/minecraft/world:ro
+      - ./bluemap-migration/configs/mc-niilo:/webapp/conf:ro
+      - ./bluemap-data/mc-niilo:/webapp/data
+    environment:
+      - BLUEWEB_CONFIG_PATH=/webapp/conf
+      - BLUEWEB_DATA_PATH=/webapp/data
+    networks:
+      - minecraft-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+  # BlueMap Render Engine (Lazy Server)
+  bluemap-render-engine:
+    build:
+      context: ./bluemap-render-engine
+      dockerfile: Dockerfile
+    container_name: mc-bluemap-render-engine
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-redissecure123}
+      - JAVA_OPTS=-Xmx2G -Xms1G
+    volumes:
+      - ./mc-basop-bafep-stp/data:/data/worlds/mc-basop-bafep-stp:ro
+      - ./landing/bgstpoelten-mc-landing/data:/data/worlds/mc-bgstpoelten:ro
+      - ./landing/borgstpoelten-mc-landing/data:/data/worlds/mc-borgstpoelten:ro
+      - ./landing/hakstpoelten-mc-landing/data:/data/worlds/mc-hakstpoelten:ro
+      - ./landing/htlstp-mc-landing/data:/data/worlds/mc-htlstp:ro
+      - ./mc-ilias/data:/data/worlds/mc-ilias:ro
+      - ./mc-niilo/data:/data/worlds/mc-niilo:ro
+      - ./bluemap-render-cache:/data/cache
+      - ./bluemap-render-logs:/data/logs
+    networks:
+      - minecraft-net
+    depends_on:
+      - redis
+    restart: unless-stopped
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          memory: 3G
+          cpus: '2.0'
+
+  # Prometheus for BlueMap Metrics
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: mc-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus-data:/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - proxy
+      - minecraft-net
+    restart: unless-stopped
+
+  # Grafana for BlueMap Visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: mc-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin123}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    networks:
+      - proxy
+      - minecraft-net
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+  # BlueMap Plugin Minecraft Integration
+  bluemap-plugin-dev:
+    build:
+      context: ./bluemap-plugin
+      dockerfile: Dockerfile.dev
+    container_name: mc-bluemap-plugin-dev
+    environment:
+      - MINECRAFT_SERVER_HOST=mc-niilo
+      - MINECRAFT_SERVER_PORT=25565
+      - BLUEMAP_API_URL=http://bluemap-api:3001
+      - PLUGIN_DEBUG=true
+    volumes:
+      - ./mc-niilo/data:/data:rw
+      - ./bluemap-plugin/target:/plugin/target:ro
+    networks:
+      - minecraft-net
+    depends_on:
+      - mc-niilo
+      - bluemap-api
+    restart: unless-stopped
+    profiles:
+      - development
+
 networks:
   minecraft-net:
     driver: bridge
