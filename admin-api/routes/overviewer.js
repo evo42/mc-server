@@ -740,4 +740,11 @@ renders['${job.world}_lighting'] = {
   }
 }
 
+// Overviewer routes disabled
+router.use((req, res) => {
+  return res.status(503).json({
+    error: 'Overviewer integration is currently disabled',
+  });
+});
+
 module.exports = router;

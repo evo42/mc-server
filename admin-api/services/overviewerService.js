@@ -379,6 +379,8 @@ class OverviewerService {
 }
 
 // Singleton Instance
+// NOTE: OverviewerService is currently disabled. Importing code still works,
+// but overviewer routes return 503 and no jobs are processed.
 const overviewerService = new OverviewerService();
 
 module.exports = overviewerService;
