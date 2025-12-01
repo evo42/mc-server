@@ -15,8 +15,8 @@ COPY webui ./webui
 # Build the application
 # RUN mvn clean package -DskipTests
 
-# Production stage - Updated to Java 11
-FROM eclipse-temurin:11-jre-alpine
+# Production stage - Use Python runtime on Alpine (no Java needed in final image)
+FROM python:3.11-alpine
 
 # Install curl for health checks
 RUN apk add --no-cache curl wget

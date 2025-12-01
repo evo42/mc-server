@@ -7,6 +7,7 @@ const WebSocketService = require('./services/websocketService');
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 const { correlationIdMiddleware } = require('./middleware/correlationId');
 const prometheusMetrics = require('./services/prometheusMetrics');
+const { secretsValidationMiddleware, validateSecretsBeforeStart } = require('./middleware/secretsValidation');
 
 const path = require('path');
 const express = require('express');
@@ -131,7 +132,8 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Create users object for basic auth
+// Create users object for basic auth - will be validated by secrets service
+// Reuse the ADMIN_USER and ADMIN_PASS constants defined above.
 const users = { [ADMIN_USER]: ADMIN_PASS };
 
 // Custom basic auth middleware that also sets user info for JWT generation
@@ -151,8 +153,11 @@ const basicAuthMiddleware = (req, res, next) => {
     return res.status(401).json({ error: 'Invalid basic authentication format' });
   }
 
-  // Check credentials
-  if (users[username] && users[username] === password) {
+  // Check credentials against environment or secrets manager
+  const adminPass = req.secrets ? req.secrets.getSecret('ADMIN_PASS') : process.env.ADMIN_PASS || 'admin123';
+  const adminUser = process.env.ADMIN_USER || 'admin';
+
+  if (username === adminUser && password === adminPass) {
     // Set user info for potential JWT generation
     req.user = { userId: 1, username: username };
     next();
@@ -213,22 +218,32 @@ app.get('/advanced-test', (req, res) => {
     res.sendFile(path.join(__dirname, 'advanced-api-test.html'));
 });
 
-// Only start the server if this file is run directly (not imported)
-let server;
-if (require.main === module) {
-    server = app.listen(port, '0.0.0.0', () => {
-        logger.info(`Admin API server running at http://localhost:${port}`);
-    });
-
-    // Initialize WebSocket service after the server is listening
-    server.on('listening', () => {
-        WebSocketService.init(server);
-        logger.info('WebSocket service initialized');
-    });
-}
-
 // Error handling middleware - should be last
 app.use(notFoundHandler);
 app.use(errorHandler);
+
+// Only start the server if this file is run directly (not imported)
+let server;
+if (require.main === module) {
+    // Validate secrets before starting the server
+    validateSecretsBeforeStart()
+        .then(() => {
+            app.use(secretsValidationMiddleware); // Add secrets validation middleware after other middlewares
+
+            server = app.listen(port, '0.0.0.0', () => {
+                logger.info(`Admin API server running at http://localhost:${port}`);
+            });
+
+            // Initialize WebSocket service after the server is listening
+            server.on('listening', () => {
+                WebSocketService.init(server);
+                logger.info('WebSocket service initialized');
+            });
+        })
+        .catch(error => {
+            logger.error(`Failed to start server due to secrets validation error: ${error.message}`);
+            process.exit(1);
+        });
+}
 
 module.exports = app; // For testing

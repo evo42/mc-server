@@ -14,11 +14,8 @@ WORKDIR /app
 RUN npm init -y && \
     npm install express dockerode cors helmet
 
-# Create a non-root user
+# Create a non-root user (currently unused for running the process)
 RUN adduser -D docker-proxy -u 1001
-
-# Create necessary directories
-RUN mkdir -p /app /var/run/docker.sock
 
 # Copy the proxy application
 COPY docker-proxy-server.js /app/
@@ -26,11 +23,10 @@ COPY docker-proxy-server.js /app/
 # Change ownership
 RUN chown -R docker-proxy:docker-proxy /app
 
-# Switch to non-root user
-USER docker-proxy
-
 # Expose the proxy port
 EXPOSE 3001
 
-# Start the Docker proxy
-CMD ["dockerd", "&", "node", "/app/docker-proxy-server.js"]
+# Start only the Node.js Docker proxy API.
+# We rely on the host Docker daemon via the mounted /var/run/docker.sock,
+# so we do NOT start dockerd inside this container to avoid rootless dockerd issues.
+CMD ["node", "/app/docker-proxy-server.js"]
