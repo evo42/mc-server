@@ -1,0 +1,19 @@
+html {
+    box-sizing: border-box;
+    overflow-y: scroll;
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: inherit;
+}
+
+body {
+    margin: 0 !important;
+    background: #fafafa;
+}
+
+.download-url-wrapper {
+    display: none !important;
+}

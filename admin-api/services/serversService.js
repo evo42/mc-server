@@ -1,6 +1,19 @@
-const Docker = require('dockerode');
-const docker = new Docker({ socketPath: '/var/run/docker.sock' });
+const axios = require('axios');
 const cacheService = require('./cacheService');
+
+// Get Docker proxy configuration
+const DOCKER_PROXY_URL = process.env.DOCKER_PROXY_URL || 'http://docker-proxy:3001';
+const DOCKER_PROXY_TOKEN = process.env.DOCKER_PROXY_TOKEN || 'docker-proxy-secret-token';
+
+// Create axios instance with default config
+const dockerProxy = axios.create({
+    baseURL: DOCKER_PROXY_URL,
+    timeout: 30000, // 30 seconds timeout
+    headers: {
+        'Authorization': `Bearer ${DOCKER_PROXY_TOKEN}`,
+        'Content-Type': 'application/json'
+    }
+});
 
 // Define allowed server names for security
 const ALLOWED_SERVERS = [
@@ -33,8 +46,7 @@ const startServer = async (server) => {
         throw new Error(`Invalid server name: ${server}`);
     }
 
-    const container = docker.getContainer(server);
-    await container.start();
+    await makeProxyRequest('POST', `/containers/${server}/start`);
 
     // Clear cache for this server since its status has changed
     cacheService.clearServerCache(server);
@@ -47,8 +59,7 @@ const stopServer = async (server) => {
         throw new Error(`Invalid server name: ${server}`);
     }
 
-    const container = docker.getContainer(server);
-    await container.stop();
+    await makeProxyRequest('POST', `/containers/${server}/stop`);
 
     // Clear cache for this server since its status has changed
     cacheService.clearServerCache(server);
@@ -61,12 +72,29 @@ const restartServer = async (server) => {
         throw new Error(`Invalid server name: ${server}`);
     }
 
-    const container = docker.getContainer(server);
-    await container.restart();
+    await makeProxyRequest('POST', `/containers/${server}/restart`);
 
     // Clear cache for this server since its status has changed
     cacheService.clearServerCache(server);
     cacheService.clearAllServersStatus(); // Also clear the combined status cache
+};
+
+// Function to make requests to Docker proxy with error handling
+const makeProxyRequest = async (method, url, data = null) => {
+    try {
+        const response = await dockerProxy({
+            method,
+            url,
+            data
+        });
+        return response.data;
+    } catch (error) {
+        // Log the error but don't expose internal details
+        console.error(`Docker proxy request failed: ${method} ${url}`, error.message);
+
+        // Return a generic error that's safe to expose
+        throw new Error(`Docker operation failed: ${error.message}`);
+    }
 };
 
 const getServerStatus = async (server) => {
@@ -82,30 +110,53 @@ const getServerStatus = async (server) => {
     }
 
     try {
-        const container = docker.getContainer(server);
-        const data = await container.inspect();
-        const stats = await container.stats({ stream: false });
-        const cpuDelta = stats.cpu_stats.cpu_usage.total_usage - stats.precpu_stats.cpu_usage.total_usage;
-        const systemDelta = stats.cpu_stats.system_cpu_usage - stats.precpu_stats.system_cpu_usage;
-        const cpu = (cpuDelta / systemDelta) * stats.cpu_stats.online_cpus * 100.0;
-        const memory = stats.memory_stats.usage;
-        const status = {
+        const status = await makeProxyRequest('GET', `/containers/${server}/status`);
+
+        // Get additional stats if container is running
+        let cpu = 'N/A';
+        let memory = 'N/A';
+
+        if (status.running) {
+            try {
+                const stats = await makeProxyRequest('GET', `/containers/${server}/stats`);
+
+                // Calculate CPU usage
+                if (stats.cpu_stats && stats.precpu_stats) {
+                    const cpuDelta = stats.cpu_stats.cpu_usage.total_usage - stats.precpu_stats.cpu_usage.total_usage;
+                    const systemDelta = stats.cpu_stats.system_cpu_usage - stats.precpu_stats.system_cpu_usage;
+                    if (systemDelta > 0) {
+                        cpu = `${((cpuDelta / systemDelta) * stats.cpu_stats.online_cpus * 100.0).toFixed(2)}%`;
+                    }
+                }
+
+                // Get memory usage
+                if (stats.memory_stats && stats.memory_stats.usage) {
+                    memory = `${(stats.memory_stats.usage / 1024 / 1024).toFixed(2)}MB`;
+                }
+            } catch (statsError) {
+                // If stats fetch fails, continue with N/A values
+                console.warn(`Failed to get stats for ${server}:`, statsError.message);
+            }
+        }
+
+        const result = {
             server: server,
-            status: data.State.Status,
-            rawStatus: data.State,
+            status: status.status,
+            rawStatus: status,
             players: [],
             playerCount: 0,
-            memory: `${(memory / 1024 / 1024).toFixed(2)}MB`,
-            cpu: `${cpu.toFixed(2)}%`
+            memory,
+            cpu
         };
 
         // Cache the status
-        cacheService.setServerStatus(server, status);
+        cacheService.setServerStatus(server, result);
 
-        return status;
+        return result;
     } catch (error) {
-        if (error.statusCode === 404) {
-            const status = {
+        // If proxy request fails, return a stopped status
+        if (error.message.includes('404') || error.message.includes('not found')) {
+            const result = {
                 server: server,
                 status: 'Stopped',
                 rawStatus: 'container not found',
@@ -115,10 +166,10 @@ const getServerStatus = async (server) => {
                 cpu: 'N/A'
             };
 
-            // Cache the status even when container is not found
-            cacheService.setServerStatus(server, status);
+            // Cache the status
+            cacheService.setServerStatus(server, result);
 
-            return status;
+            return result;
         }
         throw error;
     }

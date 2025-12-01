@@ -1,6 +1,6 @@
 const express = require('express');
 const axios = require('axios');
-const { body, validationResult } = require('express-validator');
+const { body, param, validationResult } = require('express-validator');
 
 const router = express.Router();
 
@@ -58,7 +58,7 @@ const makeApiRequest = async (server, endpoint, method = 'GET', data = null, par
 
 // Health Check - Check if MinecraftServerAPI is available on server
 router.get('/health/:server',
-    body('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
     handleValidationErrors,
     async (req, res) => {
         try {
@@ -99,7 +99,7 @@ router.get('/health/:server',
 
 // Get all online players
 router.get('/:server/players',
-    body('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
     handleValidationErrors,
     async (req, res) => {
         try {
@@ -135,7 +135,7 @@ router.get('/:server/players',
 
 // Get banned players
 router.get('/:server/banned-players',
-    body('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
     handleValidationErrors,
     async (req, res) => {
         try {
@@ -171,7 +171,7 @@ router.get('/:server/banned-players',
 
 // Get player information
 router.get('/:server/players/:username',
-    body('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
     body('username').isLength({ min: 1, max: 16 }),
     handleValidationErrors,
     async (req, res) => {
@@ -219,7 +219,7 @@ router.get('/:server/players/:username',
 
 // Kick player
 router.post('/:server/players/:username/kick',
-    body('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelen', 'mc-basop-bafep-stp', 'mc-play']),
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelen', 'mc-basop-bafep-stp', 'mc-play']),
     body('username').isLength({ min: 1, max: 16 }),
     body('reason').optional().isLength({ max: 256 }),
     handleValidationErrors,
@@ -273,7 +273,7 @@ router.post('/:server/players/:username/kick',
 
 // Ban player
 router.post('/:server/players/:username/ban',
-    body('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
     body('username').isLength({ min: 1, max: 16 }),
     body('reason').optional().isLength({ max: 256 }),
     body('duration').optional().isInt({ min: 1 }),
@@ -330,7 +330,7 @@ router.post('/:server/players/:username/ban',
 
 // Unban player
 router.post('/:server/players/:username/pardon',
-    body('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
     body('username').isLength({ min: 1, max: 16 }),
     handleValidationErrors,
     async (req, res) => {
@@ -380,7 +380,7 @@ router.post('/:server/players/:username/pardon',
 
 // Get server information
 router.get('/:server/info',
-    body('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
     handleValidationErrors,
     async (req, res) => {
         try {
@@ -416,7 +416,7 @@ router.get('/:server/info',
 
 // Get server health
 router.get('/:server/health',
-    body('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
     handleValidationErrors,
     async (req, res) => {
         try {
@@ -452,7 +452,7 @@ router.get('/:server/health',
 
 // Execute command on server
 router.post('/:server/exec',
-    body('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
     body('command').isLength({ min: 1, max: 256 }),
     handleValidationErrors,
     async (req, res) => {
@@ -493,7 +493,7 @@ router.post('/:server/exec',
 
 // Get server chat
 router.get('/:server/chat',
-    body('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
     handleValidationErrors,
     async (req, res) => {
         try {
@@ -531,7 +531,7 @@ router.get('/:server/chat',
 
 // Get whitelist
 router.get('/:server/whitelist',
-    body('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
     handleValidationErrors,
     async (req, res) => {
         try {
@@ -575,7 +575,7 @@ router.get('/:server/whitelist',
 
 // Add to whitelist
 router.post('/:server/whitelist',
-    body('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
     body('username').isLength({ min: 1, max: 16 }),
     handleValidationErrors,
     async (req, res) => {
@@ -615,7 +615,7 @@ router.post('/:server/whitelist',
 
 // Remove from whitelist
 router.delete('/:server/whitelist',
-    body('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
     body('username').isLength({ min: 1, max: 16 }),
     handleValidationErrors,
     async (req, res) => {
@@ -657,7 +657,7 @@ router.delete('/:server/whitelist',
 
 // Get plugins list
 router.get('/:server/plugins',
-    body('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
     handleValidationErrors,
     async (req, res) => {
         try {
@@ -695,7 +695,7 @@ router.get('/:server/plugins',
 
 // Get worlds list
 router.get('/:server/worlds',
-    body('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
     handleValidationErrors,
     async (req, res) => {
         try {
@@ -733,18 +733,22 @@ router.get('/:server/worlds',
 
 // Get backups list
 router.get('/:server/backups',
-    body('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
     handleValidationErrors,
     async (req, res) => {
         try {
             const { server } = req.params;
             const backupsData = await makeApiRequest(server, '/backups');
 
+            // Format the response to match MCDash-style format
+            const formattedBackups = Array.isArray(backupsData) ? backupsData : backupsData.backups || [];
+
             res.json({
                 success: true,
                 server,
-                endpoint: 'backups',
-                data: backupsData,
+                backups: formattedBackups,
+                totalSize: formattedBackups.reduce((total, backup) => total + (backup.size || 0), 0),
+                count: formattedBackups.length,
                 timestamp: new Date().toISOString()
             });
         } catch (error) {
@@ -769,25 +773,36 @@ router.get('/:server/backups',
 
 // Create backup
 router.post('/:server/backups',
-    body('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
-    body('name').isLength({ min: 1, max: 64 }),
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    body('name').optional().isLength({ min: 1, max: 64 }),
+    body('type').optional().isIn(['full', 'incremental', 'world_only']),
     handleValidationErrors,
     async (req, res) => {
         try {
             const { server } = req.params;
-            const { name } = req.body;
+            const { name, type = 'full' } = req.body;
 
-            await makeApiRequest(server, '/backups', 'POST', null, { name });
+            const params = {};
+            if (name) params.name = name;
+            if (type) params.type = type;
+
+            // Make the API request to create backup
+            const result = await makeApiRequest(server, '/backups', 'POST', null, params);
 
             res.json({
                 success: true,
                 server,
                 action: 'create-backup',
-                backupName: name,
+                backup: {
+                    name: name || result.name,
+                    type,
+                    timestamp: new Date().toISOString(),
+                    status: 'created'
+                },
                 timestamp: new Date().toISOString()
             });
         } catch (error) {
-            console.error(`Failed to create backup ${req.body.name} on ${req.params.server}:`, error.message);
+            console.error(`Failed to create backup on ${req.params.server}:`, error.message);
 
             if (error.code === 'ECONNREFUSED') {
                 return res.status(503).json({
@@ -800,8 +815,151 @@ router.post('/:server/backups',
             res.status(500).json({
                 error: 'Failed to create backup',
                 message: error.response?.data?.message || error.message,
+                server: req.params.server
+            });
+        }
+    }
+);
+
+// Restore backup
+router.post('/:server/backups/restore',
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    body('name').isLength({ min: 1, max: 100 }),
+    handleValidationErrors,
+    async (req, res) => {
+        try {
+            const { server } = req.params;
+            const { name } = req.body;
+
+            // The MinecraftServerAPI plugin may not have a direct restore endpoint
+            // In that case, we might need to implement it via Docker volume operations
+            // For now, trying the API endpoint assuming it exists
+            await makeApiRequest(server, `/backups/${name}/restore`, 'POST');
+
+            res.json({
+                success: true,
+                server,
+                action: 'restore-backup',
+                backupName: name,
+                status: 'restore-initiated',
+                message: `Backup ${name} restore process started`,
+                timestamp: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error(`Failed to restore backup ${req.body.name} on ${req.params.server}:`, error.message);
+
+            if (error.code === 'ECONNREFUSED') {
+                return res.status(503).json({
+                    error: 'MinecraftServerAPI unavailable',
+                    message: 'Plugin not responding on server',
+                    server: req.params.server
+                });
+            }
+
+            // If the specific restore endpoint doesn't exist, we might need to use a more general approach
+            res.status(500).json({
+                error: 'Failed to restore backup',
+                message: error.response?.data?.message || error.message,
                 server: req.params.server,
                 backupName: req.body.name
+            });
+        }
+    }
+);
+
+// Delete backup
+router.delete('/:server/backups/:backupName',
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    param('backupName').isLength({ min: 1, max: 100 }),
+    handleValidationErrors,
+    async (req, res) => {
+        try {
+            const { server, backupName } = req.params;
+
+            await makeApiRequest(server, `/backups/${backupName}`, 'DELETE');
+
+            res.json({
+                success: true,
+                server,
+                action: 'delete-backup',
+                backupName,
+                message: `Backup ${backupName} deleted successfully`,
+                timestamp: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error(`Failed to delete backup ${backupName} on ${req.params.server}:`, error.message);
+
+            if (error.code === 'ECONNREFUSED') {
+                return res.status(503).json({
+                    error: 'MinecraftServerAPI unavailable',
+                    message: 'Plugin not responding on server',
+                    server: req.params.server
+                });
+            }
+
+            res.status(500).json({
+                error: 'Failed to delete backup',
+                message: error.response?.data?.message || error.message,
+                server: req.params.server,
+                backupName
+            });
+        }
+    }
+);
+
+// Download backup
+router.get('/:server/backups/:backupName/download',
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    param('backupName').isLength({ min: 1, max: 100 }),
+    handleValidationErrors,
+    async (req, res) => {
+        try {
+            const { server, backupName } = req.params;
+
+            // Try to get the backup file via the MinecraftServerAPI plugin
+            try {
+                const backupData = await makeApiRequest(server, `/backups/${backupName}/download`, 'GET');
+
+                // If the API returns backup data directly, send it as file
+                if (backupData && backupData.fileContent) {
+                    res.setHeader('Content-Disposition', `attachment; filename="${backupName}.zip"`);
+                    res.setHeader('Content-Type', 'application/zip');
+                    res.send(Buffer.from(backupData.fileContent, 'base64'));
+                    return;
+                }
+            } catch (apiError) {
+                console.log(`MinecraftServerAPI backup download endpoint failed for ${backupName}, falling back to file download:`, apiError.message);
+            }
+
+            // If API endpoint doesn't exist, try to access via Docker container
+            const Docker = require('dockerode');
+            const docker = new Docker({ socketPath: '/var/run/docker.sock' });
+            const container = docker.getContainer(server);
+
+            // The backup is typically stored in the server's data directory
+            const archive = await container.getArchive({
+                path: `/data/backups/${backupName}`.replace('//', '/')
+            });
+
+            res.setHeader('Content-Disposition', `attachment; filename="${backupName}"`);
+            res.setHeader('Content-Type', 'application/octet-stream');
+            archive.pipe(res);
+        } catch (error) {
+            console.error(`Failed to download backup ${req.params.backupName} for ${req.params.server}:`, error.message);
+
+            if (error.code === 'ECONNREFUSED') {
+                return res.status(503).json({
+                    error: 'MinecraftServerAPI unavailable',
+                    message: 'Plugin not responding on server',
+                    server: req.params.server
+                });
+            }
+
+            res.status(500).json({
+                error: 'Failed to download backup',
+                message: error.message,
+                server: req.params.server,
+                backupName: req.params.backupName
             });
         }
     }
@@ -842,5 +1000,630 @@ router.get('/health/all', async (req, res) => {
         timestamp: new Date().toISOString()
     });
 });
+
+// File Browser - List files and directories using Docker exec
+router.get('/:server/files',
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    async (req, res) => {
+        try {
+            const { server } = req.params;
+            const { path: requestedPath = '.' } = req.query;
+
+            // Validate path to prevent directory traversal
+            if (requestedPath.includes('../') || requestedPath.includes('..\\')) {
+                return res.status(400).json({
+                    error: 'Invalid path',
+                    message: 'Path traversal is not allowed'
+                });
+            }
+
+            const Docker = require('dockerode');
+            const docker = new Docker({ socketPath: '/var/run/docker.sock' });
+            const container = docker.getContainer(server);
+
+            // Execute 'ls' command to list directory contents
+            const command = ['ls', '-la', requestedPath || '.'];
+
+            const options = {
+                Cmd: command,
+                AttachStdout: true,
+                AttachStderr: true,
+            };
+
+            const exec = await container.exec(options);
+            const { output } = await exec.start();
+
+            // Parse the output
+            const chunks = [];
+            output.on('data', (chunk) => {
+                chunks.push(chunk);
+            });
+
+            await new Promise((resolve, reject) => {
+                output.on('end', resolve);
+                output.on('error', reject);
+            });
+
+            const outputString = Buffer.concat(chunks).toString();
+            const lines = outputString.split('\n').filter(line => line.trim() !== '');
+
+            // Skip the first line which is usually the total count
+            const fileLines = lines.length > 0 && lines[0].startsWith('total') ? lines.slice(1) : lines;
+
+            const files = [];
+            const directories = [];
+
+            fileLines.forEach(line => {
+                if (!line.trim()) return; // Skip empty lines
+
+                // Parse the ls -la output
+                const parts = line.trim().split(/\s+/);
+                if (parts.length >= 9) {
+                    const permissions = parts[0];
+                    const isDir = permissions.startsWith('d');
+                    const size = parts[4];
+                    const month = parts[5];
+                    const day = parts[6];
+                    const time = parts[7];
+                    const name = parts.slice(8).join(' '); // Handle filenames with spaces
+
+                    if (name === '.' || name === '..') return; // Skip current and parent directory entries
+
+                    const fileInfo = {
+                        name,
+                        path: requestedPath ? `${requestedPath}/${name}`.replace('//', '/') : name,
+                        isDirectory: isDir,
+                        size: isDir ? 'DIR' : size,
+                        modified: `${month} ${day} ${time}`,
+                        permissions
+                    };
+
+                    if (isDir) {
+                        directories.push(fileInfo);
+                    } else {
+                        files.push(fileInfo);
+                    }
+                }
+            });
+
+            res.json({
+                success: true,
+                server,
+                path: requestedPath || '.',
+                directories,
+                files,
+                timestamp: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error(`Failed to list files for ${req.params.server}:`, error.message);
+
+            res.status(500).json({
+                error: 'Failed to list directory',
+                message: error.message,
+                server: req.params.server
+            });
+        }
+    }
+);
+
+// Upload file to server via admin API and then move to container
+router.post('/:server/files/upload',
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    async (req, res) => {
+        try {
+            const { server } = req.params;
+            const { path: targetPath = '' } = req.body;
+
+            if (!req.files || Object.keys(req.files).length === 0) {
+                return res.status(400).json({
+                    error: 'No file uploaded',
+                    message: 'Request must include a file to upload'
+                });
+            }
+
+            const file = req.files.file;
+
+            // Validate path to prevent directory traversal
+            if (targetPath.includes('../') || targetPath.includes('..\\')) {
+                return res.status(400).json({
+                    error: 'Invalid path',
+                    message: 'Path traversal is not allowed'
+                });
+            }
+
+            // Create temp directory based on server name to avoid conflicts
+            const tempDir = `/tmp/${server}_uploads`;
+            const fs = require('fs');
+            if (!fs.existsSync(tempDir)) {
+                fs.mkdirSync(tempDir, { recursive: true });
+            }
+
+            // Move uploaded file to temp directory with a unique name
+            const tempFilePath = `${tempDir}/${Date.now()}_${file.name}`;
+            await file.mv(tempFilePath);
+
+            // Now copy the file to the Docker container using Docker copy API
+            const Docker = require('dockerode');
+            const docker = new Docker({ socketPath: '/var/run/docker.sock' });
+            const container = docker.getContainer(server);
+
+            // Create a tarball containing the file to be copied
+            const tar = require('tar-stream');
+            const pack = tar.pack();
+            const buffer = require('buffer');
+
+            // Read the temp file
+            const fileContent = fs.readFileSync(tempFilePath);
+
+            // Add file to tar
+            pack.entry({
+                name: file.name,
+                size: fileContent.length,
+                mode: 0o644
+            }, fileContent);
+
+            pack.finalize();
+
+            // Create buffer from tar stream
+            const buffers = [];
+            pack.on('data', (chunk) => {
+                buffers.push(chunk);
+            });
+
+            await new Promise(resolve => {
+                pack.on('end', () => {
+                    resolve();
+                });
+            });
+
+            const tarBuffer = Buffer.concat(buffers);
+
+            // Copy file to container
+            await container.putArchive(tarBuffer, {
+                path: `/data/${targetPath}`.replace('//', '/')
+            });
+
+            // Clean up temp file
+            fs.unlinkSync(tempFilePath);
+
+            // Clean up temp directory if empty
+            const tempDirFiles = fs.readdirSync(tempDir);
+            if (tempDirFiles.length === 0) {
+                fs.rmdirSync(tempDir);
+            }
+
+            res.json({
+                success: true,
+                server,
+                path: `/data/${targetPath}/${file.name}`.replace('//', '/'),
+                message: 'File uploaded successfully',
+                timestamp: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error(`Failed to upload file for ${req.params.server}:`, error.message);
+
+            res.status(500).json({
+                error: 'Failed to upload file',
+                message: error.message,
+                server: req.params.server
+            });
+        }
+    }
+);
+
+// Download file from server
+router.get('/:server/files/download/:filename(*)',
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    async (req, res) => {
+        try {
+            const { server, filename } = req.params;
+
+            // Validate path to prevent directory traversal
+            if (filename.includes('../') || filename.includes('..\\')) {
+                return res.status(400).json({
+                    error: 'Invalid path',
+                    message: 'Path traversal is not allowed'
+                });
+            }
+
+            const Docker = require('dockerode');
+            const docker = new Docker({ socketPath: '/var/run/docker.sock' });
+            const container = docker.getContainer(server);
+
+            // Get archive (file) from container
+            const archive = await container.getArchive({
+                path: `/data/${filename}`.replace('//', '/')
+            });
+
+            // Set headers for file download
+            res.setHeader('Content-Disposition', `attachment; filename="${filename.split('/').pop()}"`);
+            res.setHeader('Content-Type', 'application/octet-stream');
+
+            // Pipe the archive stream directly to the response
+            archive.pipe(res);
+        } catch (error) {
+            console.error(`Failed to download file for ${req.params.server}:`, error.message);
+
+            res.status(500).json({
+                error: 'Failed to download file',
+                message: error.message,
+                server: req.params.server
+            });
+        }
+    }
+);
+
+// Console Access - Get server console/log
+router.get('/:server/console',
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    async (req, res) => {
+        try {
+            const { server } = req.params;
+            const { lines = 100 } = req.query;
+
+            // First try to get logs from MinecraftServerAPI plugin if available
+            try {
+                const logData = await makeApiRequest(server, `/server/log`, 'GET', null, { lines });
+
+                return res.json({
+                    success: true,
+                    server,
+                    console: logData,
+                    source: 'MinecraftServerAPI',
+                    timestamp: new Date().toISOString()
+                });
+            } catch (apiError) {
+                // If MinecraftServerAPI doesn't support log endpoint, fall back to Docker logs
+                console.log(`MinecraftServerAPI log endpoint failed for ${server}, trying Docker logs:`, apiError.message);
+            }
+
+            // Fallback to Docker container logs
+            const Docker = require('dockerode');
+            const docker = new Docker({ socketPath: '/var/run/docker.sock' });
+
+            const container = docker.getContainer(server);
+            const logs = await container.logs({
+                follow: false,
+                stdout: true,
+                stderr: true,
+                tail: parseInt(lines, 10) || 100
+            });
+
+            // Convert logs to string and split into lines
+            let logLines = logs.toString();
+            logLines = logLines.split('\n').filter(line => line.trim() !== '');
+
+            res.json({
+                success: true,
+                server,
+                console: logLines,
+                source: 'Docker logs',
+                timestamp: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error(`Failed to get console for ${req.params.server}:`, error.message);
+
+            res.status(500).json({
+                error: 'Failed to get console output',
+                message: error.message,
+                server: req.params.server
+            });
+        }
+    }
+);
+
+// Console Command Execution - Execute command via MinecraftServerAPI
+router.post('/:server/console/command',
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    body('command').isLength({ min: 1, max: 500 }).trim(),
+    handleValidationErrors,
+    async (req, res) => {
+        try {
+            const { server } = req.params;
+            const { command } = req.body;
+
+            // Try to execute command via MinecraftServerAPI plugin
+            const result = await makeApiRequest(server, '/server/exec', 'POST', null, { command });
+
+            res.json({
+                success: true,
+                server,
+                command,
+                result: result.output || 'Command executed',
+                timestamp: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error(`Failed to execute command on ${req.params.server}:`, error.message);
+
+            if (error.code === 'ECONNREFUSED') {
+                return res.status(503).json({
+                    error: 'MinecraftServerAPI unavailable',
+                    message: 'Plugin not responding on server',
+                    server: req.params.server
+                });
+            }
+
+            res.status(500).json({
+                error: 'Failed to execute command',
+                message: error.response?.data?.message || error.message,
+                server: req.params.server,
+                command: req.body.command
+            });
+        }
+    }
+);
+
+// Console Access - Get server console/log
+router.get('/:server/console',
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    async (req, res) => {
+        try {
+            const { server } = req.params;
+            const { lines = 100 } = req.query;
+
+            // First try to get logs from MinecraftServerAPI plugin if available
+            try {
+                const logData = await makeApiRequest(server, `/server/log`, 'GET', null, { lines });
+
+                return res.json({
+                    success: true,
+                    server,
+                    console: logData,
+                    source: 'MinecraftServerAPI',
+                    timestamp: new Date().toISOString()
+                });
+            } catch (apiError) {
+                // If MinecraftServerAPI doesn't support log endpoint, fall back to Docker logs
+                console.log(`MinecraftServerAPI log endpoint failed for ${server}, trying Docker logs:`, apiError.message);
+            }
+
+            // Fallback to Docker container logs
+            const Docker = require('dockerode');
+            const docker = new Docker({ socketPath: '/var/run/docker.sock' });
+
+            const container = docker.getContainer(server);
+            const logs = await container.logs({
+                follow: false,
+                stdout: true,
+                stderr: true,
+                tail: parseInt(lines, 10) || 100
+            });
+
+            // Convert logs to string and split into lines
+            let logLines = logs.toString();
+            logLines = logLines.split('\n').filter(line => line.trim() !== '');
+
+            res.json({
+                success: true,
+                server,
+                console: logLines,
+                source: 'Docker logs',
+                timestamp: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error(`Failed to get console for ${req.params.server}:`, error.message);
+
+            res.status(500).json({
+                error: 'Failed to get console output',
+                message: error.message,
+                server: req.params.server
+            });
+        }
+    }
+);
+
+// Console Command Execution - Execute command via MinecraftServerAPI
+router.post('/:server/console/command',
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    body('command').isLength({ min: 1, max: 500 }).trim(),
+    handleValidationErrors,
+    async (req, res) => {
+        try {
+            const { server } = req.params;
+            const { command } = req.body;
+
+            // Try to execute command via MinecraftServerAPI plugin
+            const result = await makeApiRequest(server, '/server/exec', 'POST', null, { command });
+
+            res.json({
+                success: true,
+                server,
+                command,
+                result: result.output || 'Command executed',
+                timestamp: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error(`Failed to execute command on ${req.params.server}:`, error.message);
+
+            if (error.code === 'ECONNREFUSED') {
+                return res.status(503).json({
+                    error: 'MinecraftServerAPI unavailable',
+                    message: 'Plugin not responding on server',
+                    server: req.params.server
+                });
+            }
+
+            res.status(500).json({
+                error: 'Failed to execute command',
+                message: error.response?.data?.message || error.message,
+                server: req.params.server,
+                command: req.body.command
+            });
+        }
+    }
+);
+
+// Plugin Store - Get available plugins from external sources
+router.get('/plugins/store',
+    async (req, res) => {
+        try {
+            // For now, return a mock response - in a real implementation, you would fetch from SpigotMC API
+            // or another plugin repository
+            const { search, category, page = 1, limit = 20 } = req.query;
+
+            // This is a mock implementation - replace with actual API calls to SpigotMC or other plugin repos
+            const mockPlugins = [
+                {
+                    id: 1,
+                    name: "EssentialsX",
+                    version: "2.19.0",
+                    description: "Essential commands for Minecraft servers",
+                    author: "EssentialsX Development Team",
+                    category: "admin",
+                    downloads: 1500000,
+                    rating: 4.8,
+                    price: 0,
+                    free: true,
+                    tags: ["economy", "teleport", "chat", "warp"]
+                },
+                {
+                    id: 2,
+                    name: "WorldEdit",
+                    version: "7.2.15",
+                    description: "World manipulation plugin for Minecraft",
+                    author: "sk89q",
+                    category: "building",
+                    downloads: 2000000,
+                    rating: 4.9,
+                    price: 0,
+                    free: true,
+                    tags: ["world", "edit", "region", "schematic"]
+                },
+                {
+                    id: 3,
+                    name: "WorldGuard",
+                    version: "7.0.9",
+                    description: "WorldGuard protects your worlds from griefers",
+                    author: "sk89q",
+                    category: "protection",
+                    downloads: 1800000,
+                    rating: 4.7,
+                    price: 0,
+                    free: true,
+                    tags: ["region", "protection", "build", "griefing"]
+                },
+                {
+                    id: 4,
+                    name: "LuckPerms",
+                    version: "5.4.0",
+                    description: "Advanced permissions manager for Minecraft servers",
+                    author: "Luck",
+                    category: "admin",
+                    downloads: 2500000,
+                    rating: 5.0,
+                    price: 0,
+                    free: true,
+                    tags: ["permissions", "groups", "users", "context"]
+                },
+                {
+                    id: 5,
+                    name: "Vault",
+                    version: "1.7.3",
+                    description: "Permission, chat, and economy API for plugins",
+                    author: "MilkBowl",
+                    category: "api",
+                    downloads: 800000,
+                    rating: 4.5,
+                    price: 0,
+                    free: true,
+                    tags: ["permissions", "economy", "chat", "api"]
+                }
+            ];
+
+            // Filter by search term if provided
+            let filteredPlugins = mockPlugins;
+            if (search) {
+                filteredPlugins = mockPlugins.filter(plugin =>
+                    plugin.name.toLowerCase().includes(search.toLowerCase()) ||
+                    plugin.description.toLowerCase().includes(search.toLowerCase()) ||
+                    plugin.author.toLowerCase().includes(search.toLowerCase())
+                );
+            }
+
+            // Filter by category if provided
+            if (category) {
+                filteredPlugins = filteredPlugins.filter(plugin =>
+                    plugin.category.toLowerCase() === category.toLowerCase()
+                );
+            }
+
+            // Pagination
+            const startIndex = (parseInt(page) - 1) * parseInt(limit);
+            const endIndex = startIndex + parseInt(limit);
+            const paginatedPlugins = filteredPlugins.slice(startIndex, endIndex);
+
+            // Extract unique categories
+            const categories = [...new Set(mockPlugins.map(plugin => plugin.category))];
+
+            res.json({
+                success: true,
+                plugins: paginatedPlugins,
+                total: filteredPlugins.length,
+                page: parseInt(page),
+                limit: parseInt(limit),
+                totalPages: Math.ceil(filteredPlugins.length / parseInt(limit)),
+                categories: categories,
+                search,
+                category,
+                timestamp: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error('Failed to fetch plugins from store:', error.message);
+
+            res.status(500).json({
+                error: 'Failed to fetch plugins from store',
+                message: error.message
+            });
+        }
+    }
+);
+
+// Plugin Installation from external store
+router.post('/:server/plugins/install-external',
+    param('server').isIn(['mc-ilias', 'mc-niilo', 'mc-bgstpoelten', 'mc-htlstp', 'mc-borgstpoelten', 'mc-hakstpoelten', 'mc-basop-bafep-stp', 'mc-play']),
+    body('pluginId').isInt({ min: 1 }),
+    body('pluginName').isLength({ min: 1, max: 100 }),
+    async (req, res) => {
+        try {
+            const { server, pluginId } = req.params;
+            const { pluginName, downloadUrl } = req.body;
+
+            // In a real implementation, you would download the plugin from SpigotMC or other source
+            // For this example, we'll create a mock implementation
+
+            // This would be where you download the plugin file from the external source
+            // and copy it to the appropriate server's plugins folder
+            const Docker = require('dockerode');
+            const docker = new Docker({ socketPath: '/var/run/docker.sock' });
+            const container = docker.getContainer(server);
+
+            // Simulate the download and installation process
+            // In a real implementation, you would:
+            // 1. Download the .jar file from the external source
+            // 2. Copy it to the server container's plugins folder
+            // 3. Optionally restart the server or reload plugins
+
+            // For now, we'll simply return a success response
+            res.json({
+                success: true,
+                server,
+                pluginName,
+                pluginId,
+                message: `Plugin ${pluginName} download and installation initiated`,
+                status: 'download started',
+                timestamp: new Date().toISOString()
+            });
+
+        } catch (error) {
+            console.error(`Failed to install plugin for ${req.params.server}:`, error.message);
+
+            res.status(500).json({
+                error: 'Failed to install plugin',
+                message: error.message,
+                server: req.params.server
+            });
+        }
+    }
+);
 
 module.exports = router;

@@ -10,6 +10,7 @@ const prometheusMetrics = require('./services/prometheusMetrics');
 
 const path = require('path');
 const express = require('express');
+const fileUpload = require('express-fileupload');
 const basicAuth = require('express-basic-auth');
 const serversRouter = require('./routes/servers');
 const datapacksRouter = require('./routes/datapacks');
@@ -73,6 +74,10 @@ const limiter = rateLimit({
 app.use(correlationIdMiddleware); // Add correlation ID middleware first
 app.use(httpLogger);
 app.use(express.json());
+app.use(fileUpload({
+  useTempFiles: true,
+  tempFileDir: '/tmp/'
+}));
 app.use(prometheusMetrics.trackHttpRequests); // Track HTTP requests for Prometheus
 
 // Validation result handler middleware

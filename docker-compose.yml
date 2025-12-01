@@ -11,6 +11,26 @@ x-mc-server-base: &mc-server-base
     - "25565"
 
 services:
+  docker-proxy:
+    build:
+      context: ./docker-proxy
+      dockerfile: Dockerfile
+    container_name: mc-docker-proxy
+    environment:
+      - DOCKER_PROXY_TOKEN=${DOCKER_PROXY_TOKEN:-docker-proxy-secret-token}
+      - ALLOWED_ORIGIN=${ADMIN_API_URL:-http://admin-api:3000}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - minecraft-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
   mc-ilias:
     <<: *mc-server-base
     container_name: mc-ilias
@@ -113,8 +133,10 @@ services:
       - .env
     ports:
       - "${ADMIN_API_PORT:-3000}:3000"
+    environment:
+      - DOCKER_PROXY_URL=http://docker-proxy:3001
+      - DOCKER_PROXY_TOKEN=${DOCKER_PROXY_TOKEN:-docker-proxy-secret-token}
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
       - ./admin-api/admin.html:/usr/src/app/admin.html
       - ./admin-api/stats.html:/usr/src/app/stats.html
       - ./admin-api/docs.html:/usr/src/app/docs.html
@@ -127,6 +149,8 @@ services:
     networks:
       - proxy
       - minecraft-net
+    depends_on:
+      - docker-proxy
     restart: unless-stopped
 
   admin-ui:

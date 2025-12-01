@@ -156,6 +156,151 @@
         </div>
       </div>
 
+      <!-- File Browser -->
+      <div class="feature-card">
+        <h3>📁 File Browser</h3>
+        <select v-model="selectedServerForFiles" @change="loadFiles">
+          <option value="">Select Server</option>
+          <option v-for="server in servers" :key="server" :value="server">
+            {{ server }}
+          </option>
+        </select>
+        <div class="file-browser-controls">
+          <input v-model="currentPath" @keyup.enter="loadFiles" placeholder="Path (e.g., /plugins, /worlds)">
+          <button @click="loadFiles">Load</button>
+        </div>
+        <div v-if="fileBrowserLoading" class="loading">Loading files...</div>
+        <div v-else-if="files.length > 0 || directories.length > 0" class="file-browser-content">
+          <div class="file-browser-nav">
+            <button @click="goUpDirectory" :disabled="currentPath === '.' || !currentPath">..</button>
+          </div>
+          <div class="directory-list">
+            <div v-for="dir in directories" :key="dir.path" class="directory-item" @click="openDirectory(dir)">
+              <i class="fas fa-folder"></i>
+              <span>{{ dir.name }}</span>
+              <small>{{ dir.modified }}</small>
+            </div>
+          </div>
+          <div class="file-list">
+            <div v-for="file in files" :key="file.path" class="file-item">
+              <i class="fas fa-file"></i>
+              <span>{{ file.name }}</span>
+              <small>{{ file.size }} | {{ file.modified }}</small>
+              <button @click="downloadFile(file)">Download</button>
+            </div>
+          </div>
+        </div>
+        <div class="file-upload">
+          <h4>Upload File</h4>
+          <input type="file" @change="onFileUpload">
+          <button @click="uploadFile" :disabled="!selectedFile || !selectedServerForFiles">Upload</button>
+        </div>
+      </div>
+
+      <!-- Console Access -->
+      <div class="feature-card">
+        <h3>💬 Server Console</h3>
+        <select v-model="selectedServerForConsole" @change="loadConsole">
+          <option value="">Select Server</option>
+          <option v-for="server in servers" :key="server" :value="server">
+            {{ server }}
+          </option>
+        </select>
+        <div class="console-controls">
+          <input v-model="consoleLines" type="number" min="10" max="1000" placeholder="Lines to show">
+          <button @click="loadConsole">Refresh</button>
+        </div>
+        <div v-if="consoleLoading" class="loading">Loading console...</div>
+        <div v-else-if="consoleOutput.length > 0" class="console-output">
+          <div v-for="(line, index) in consoleOutput" :key="index" class="console-line">
+            {{ line }}
+          </div>
+        </div>
+        <div class="command-input">
+          <input
+            v-model="commandInput"
+            @keyup.enter="sendCommand"
+            placeholder="Enter command..."
+            :disabled="!selectedServerForConsole"
+          >
+          <button @click="sendCommand" :disabled="!commandInput || !selectedServerForConsole">
+            Send Command
+          </button>
+        </div>
+      </div>
+
+      <!-- Plugin Store -->
+      <div class="feature-card">
+        <h3>🔌 Plugin Store</h3>
+        <div class="plugin-store-search">
+          <input v-model="pluginStoreSearch" placeholder="Search plugins...">
+          <select v-model="pluginStoreCategory" @change="loadPluginStore">
+            <option value="">All Categories</option>
+            <option v-for="category in pluginStoreCategories" :key="category" :value="category">
+              {{ category }}
+            </option>
+          </select>
+          <button @click="loadPluginStore">Search</button>
+        </div>
+        <div v-if="pluginStoreLoading" class="loading">Loading plugin store...</div>
+        <div v-else-if="pluginStore.length > 0" class="plugin-store-results">
+          <div v-for="plugin in pluginStore" :key="plugin.id" class="plugin-item">
+            <div class="plugin-info">
+              <h4>{{ plugin.name }} (v{{ plugin.version }})</h4>
+              <p>{{ plugin.description }}</p>
+              <div class="plugin-meta">
+                <span>By: {{ plugin.author }}</span>
+                <span>Downloads: {{ formatNumber(plugin.downloads) }}</span>
+                <span>Rating: {{ plugin.rating }}</span>
+              </div>
+            </div>
+            <div class="plugin-actions">
+              <button @click="installPluginFromStore(plugin)" :disabled="installingPlugin === plugin.id">
+                {{ installingPlugin === plugin.id ? 'Installing...' : plugin.free ? 'Install' : 'Buy & Install' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Backup Management -->
+      <div class="feature-card">
+        <h3>💾 Backup Management</h3>
+        <select v-model="selectedServerForBackup" @change="loadBackups">
+          <option value="">Select Server</option>
+          <option v-for="server in servers" :key="server" :value="server">
+            {{ server }}
+          </option>
+        </select>
+        <div class="backup-controls">
+          <input v-model="backupName" placeholder="Backup name (optional)">
+          <select v-model="backupType">
+            <option value="full">Full Backup</option>
+            <option value="incremental">Incremental</option>
+            <option value="world_only">World Only</option>
+          </select>
+          <button @click="createBackup" :disabled="!selectedServerForBackup || creatingBackup">
+            {{ creatingBackup ? 'Creating...' : 'Create Backup' }}
+          </button>
+        </div>
+        <div v-if="backupLoading" class="loading">Loading backups...</div>
+        <div v-else-if="backups.length > 0" class="backup-list">
+          <div v-for="backup in backups" :key="backup.name || backup.id" class="backup-item">
+            <div class="backup-info">
+              <h4>{{ backup.name || backup.id }}</h4>
+              <p v-if="backup.size">Size: {{ formatSize(backup.size) }}</p>
+              <p v-if="backup.type">Type: {{ backup.type }}</p>
+              <small v-if="backup.timestamp">{{ backup.timestamp }}</small>
+            </div>
+            <div class="backup-actions">
+              <button @click="restoreBackup(backup)">Restore</button>
+              <button @click="downloadBackup(backup)">Download</button>
+              <button @click="deleteBackup(backup)" class="danger">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- WebHook Events -->
       <div class="feature-card">
         <h3>🔔 WebHook Events</h3>
@@ -208,18 +353,40 @@ export default {
       selectedServerForWorld: '',
       selectedServerForPlugins: '',
       selectedServerForPerformance: '',
+      selectedServerForFiles: '',
+      selectedServerForConsole: '',
+      selectedServerForBackup: '',
       serverStatus: null,
       players: [],
       worlds: [],
       plugins: [],
       performance: null,
-      webhookEvents: [],
+      files: [],
+      directories: [],
+      consoleOutput: [],
+      backups: [],
+      pluginStore: [],
+      pluginStoreCategories: [],
+      pluginStoreSearch: '',
+      pluginStoreCategory: '',
+      backupName: '',
+      backupType: 'full',
+      commandInput: '',
+      consoleLines: 100,
+      currentPath: '.',
+      selectedFile: null,
       statusLoading: false,
       playersLoading: false,
       worldsLoading: false,
       pluginsLoading: false,
       performanceLoading: false,
+      fileBrowserLoading: false,
+      consoleLoading: false,
+      backupLoading: false,
+      pluginStoreLoading: false,
       eventsLoading: false,
+      creatingBackup: false,
+      installingPlugin: null,
       error: null,
       servers: [
         'mc-ilias',
@@ -242,6 +409,9 @@ export default {
         this.refreshEvents();
       }
     }, 30000);
+
+    // Load plugin store on initial mount
+    this.loadPluginStore();
   },
   methods: {
     async checkServerApiHealth() {
@@ -460,6 +630,252 @@ export default {
         console.error('Failed to clear events:', error);
         this.error = 'Failed to clear events';
       }
+    },
+
+    async loadFiles() {
+      if (!this.selectedServerForFiles) return;
+
+      this.fileBrowserLoading = true;
+      try {
+        const response = await axios.get(`/api/minecraft-serverapi/${this.selectedServerForFiles}/files`, {
+          params: { path: this.currentPath }
+        });
+        this.directories = response.data.directories || [];
+        this.files = response.data.files || [];
+      } catch (error) {
+        console.error('Failed to load files:', error);
+        this.error = 'Failed to load files: ' + (error.response?.data?.message || error.message);
+      } finally {
+        this.fileBrowserLoading = false;
+      }
+    },
+
+    openDirectory(dir) {
+      this.currentPath = dir.path;
+      this.loadFiles();
+    },
+
+    goUpDirectory() {
+      if (this.currentPath && this.currentPath !== '.') {
+        const pathParts = this.currentPath.split('/');
+        pathParts.pop(); // Remove current directory
+        this.currentPath = pathParts.join('/') || '.';
+        this.loadFiles();
+      }
+    },
+
+    async downloadFile(file) {
+      try {
+        // Create a temporary link to trigger the download
+        const link = document.createElement('a');
+        link.href = `/api/minecraft-serverapi/${this.selectedServerForFiles}/files/download/${encodeURIComponent(file.path)}`;
+        link.download = file.name;
+        link.target = '_blank'; // Open in new tab to handle authentication
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (error) {
+        console.error('Failed to download file:', error);
+        this.error = 'Failed to download file: ' + (error.response?.data?.message || error.message);
+      }
+    },
+
+    onFileUpload(event) {
+      this.selectedFile = event.target.files[0];
+    },
+
+    async uploadFile() {
+      if (!this.selectedFile || !this.selectedServerForFiles) return;
+
+      const formData = new FormData();
+      formData.append('file', this.selectedFile);
+      formData.append('path', this.currentPath);
+
+      try {
+        await axios.post(`/api/minecraft-serverapi/${this.selectedServerForFiles}/files/upload`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+
+        // Refresh the file list after upload
+        this.loadFiles();
+        alert('File uploaded successfully!');
+      } catch (error) {
+        console.error('Failed to upload file:', error);
+        this.error = 'Failed to upload file: ' + (error.response?.data?.message || error.message);
+      }
+    },
+
+    async loadConsole() {
+      if (!this.selectedServerForConsole) return;
+
+      this.consoleLoading = true;
+      try {
+        const response = await axios.get(`/api/minecraft-serverapi/${this.selectedServerForConsole}/console`, {
+          params: { lines: this.consoleLines || 100 }
+        });
+        this.consoleOutput = response.data.console || [];
+      } catch (error) {
+        console.error('Failed to load console:', error);
+        this.error = 'Failed to load console: ' + (error.response?.data?.message || error.message);
+      } finally {
+        this.consoleLoading = false;
+      }
+    },
+
+    async sendCommand() {
+      if (!this.commandInput || !this.selectedServerForConsole) return;
+
+      try {
+        await axios.post(`/api/minecraft-serverapi/${this.selectedServerForConsole}/console/command`, {
+          command: this.commandInput
+        });
+
+        // Refresh console to show the command result
+        this.loadConsole();
+        this.commandInput = '';
+      } catch (error) {
+        console.error('Failed to send command:', error);
+        this.error = 'Failed to send command: ' + (error.response?.data?.message || error.message);
+      }
+    },
+
+    async loadPluginStore() {
+      try {
+        this.pluginStoreLoading = true;
+
+        const params = {};
+        if (this.pluginStoreSearch) params.search = this.pluginStoreSearch;
+        if (this.pluginStoreCategory) params.category = this.pluginStoreCategory;
+
+        const response = await axios.get('/api/minecraft-serverapi/plugins/store', { params });
+        this.pluginStore = response.data.plugins || [];
+        this.pluginStoreCategories = response.data.categories || [];
+      } catch (error) {
+        console.error('Failed to load plugin store:', error);
+        this.error = 'Failed to load plugin store: ' + (error.response?.data?.message || error.message);
+      } finally {
+        this.pluginStoreLoading = false;
+      }
+    },
+
+    async installPluginFromStore(plugin) {
+      if (!this.selectedServerForFiles) { // Using selectedServerForFiles as the target server
+        this.error = 'Please select a server first';
+        return;
+      }
+
+      this.installingPlugin = plugin.id;
+      try {
+        await axios.post(`/api/minecraft-serverapi/${this.selectedServerForFiles}/plugins/install-external`, {
+          pluginId: plugin.id,
+          pluginName: plugin.name,
+          downloadUrl: plugin.downloadUrl
+        });
+
+        alert(`Plugin ${plugin.name} installation initiated!`);
+      } catch (error) {
+        console.error('Failed to install plugin:', error);
+        this.error = 'Failed to install plugin: ' + (error.response?.data?.message || error.message);
+      } finally {
+        this.installingPlugin = null;
+      }
+    },
+
+    async loadBackups() {
+      if (!this.selectedServerForBackup) return;
+
+      this.backupLoading = true;
+      try {
+        const response = await axios.get(`/api/minecraft-serverapi/${this.selectedServerForBackup}/backups`);
+        this.backups = response.data.backups || [];
+      } catch (error) {
+        console.error('Failed to load backups:', error);
+        this.error = 'Failed to load backups: ' + (error.response?.data?.message || error.message);
+      } finally {
+        this.backupLoading = false;
+      }
+    },
+
+    async createBackup() {
+      if (!this.selectedServerForBackup) return;
+
+      this.creatingBackup = true;
+      try {
+        await axios.post(`/api/minecraft-serverapi/${this.selectedServerForBackup}/backups`, {
+          name: this.backupName || undefined,
+          type: this.backupType
+        });
+
+        this.backupName = '';
+        this.loadBackups(); // Refresh the backup list
+        alert('Backup created successfully!');
+      } catch (error) {
+        console.error('Failed to create backup:', error);
+        this.error = 'Failed to create backup: ' + (error.response?.data?.message || error.message);
+      } finally {
+        this.creatingBackup = false;
+      }
+    },
+
+    async restoreBackup(backup) {
+      if (!confirm(`Are you sure you want to restore backup "${backup.name || backup.id}"? This may overwrite current data.`)) return;
+
+      try {
+        await axios.post(`/api/minecraft-serverapi/${this.selectedServerForBackup}/backups/restore`, {
+          name: backup.name || backup.id
+        });
+
+        alert('Backup restore process initiated!');
+      } catch (error) {
+        console.error('Failed to restore backup:', error);
+        this.error = 'Failed to restore backup: ' + (error.response?.data?.message || error.message);
+      }
+    },
+
+    async downloadBackup(backup) {
+      try {
+        // Create a temporary link to trigger the download
+        const link = document.createElement('a');
+        link.href = `/api/minecraft-serverapi/${this.selectedServerForBackup}/backups/${backup.name || backup.id}/download`;
+        link.download = backup.name || backup.id;
+        link.target = '_blank'; // Open in new tab to handle authentication
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (error) {
+        console.error('Failed to download backup:', error);
+        this.error = 'Failed to download backup: ' + (error.response?.data?.message || error.message);
+      }
+    },
+
+    async deleteBackup(backup) {
+      if (!confirm(`Are you sure you want to delete backup "${backup.name || backup.id}"? This cannot be undone.`)) return;
+
+      try {
+        await axios.delete(`/api/minecraft-serverapi/${this.selectedServerForBackup}/backups/${backup.name || backup.id}`);
+
+        this.loadBackups(); // Refresh the backup list
+        alert('Backup deleted successfully!');
+      } catch (error) {
+        console.error('Failed to delete backup:', error);
+        this.error = 'Failed to delete backup: ' + (error.response?.data?.message || error.message);
+      }
+    },
+
+    formatNumber(num) {
+      if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+      if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+      return num;
+    },
+
+    formatSize(bytes) {
+      if (bytes === 'DIR') return 'DIR';
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+      if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+      return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
     },
 
     formatUptime(uptime) {
@@ -742,6 +1158,222 @@ button:disabled {
 }
 
 .error-message button:hover {
+  background-color: #c82333;
+}
+
+.file-browser-controls {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.file-browser-controls input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.file-browser-content {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  padding: 10px;
+}
+
+.file-browser-nav {
+  margin-bottom: 10px;
+}
+
+.file-browser-nav button {
+  padding: 5px 10px;
+  background-color: #6c757d;
+}
+
+.directory-list, .file-list {
+  margin: 10px 0;
+}
+
+.directory-item, .file-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+
+.directory-item:hover, .file-item:hover {
+  background-color: #f8f9fa;
+}
+
+.directory-item i, .file-item i {
+  margin-right: 8px;
+}
+
+.file-item {
+  cursor: default;
+}
+
+.file-item button {
+  margin-left: 10px;
+}
+
+.file-upload {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.file-upload input {
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.console-controls {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.console-controls input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.console-output {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  padding: 10px;
+  background-color: #2d2d2d;
+  color: #f8f8f2;
+  font-family: monospace;
+  margin: 10px 0;
+}
+
+.console-line {
+  margin: 2px 0;
+  line-height: 1.4;
+}
+
+.plugin-store-search {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.plugin-store-search input, .plugin-store-search select {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.plugin-store-search button {
+  white-space: nowrap;
+}
+
+.plugin-store-results {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.plugin-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.plugin-info {
+  flex: 1;
+  padding-right: 15px;
+}
+
+.plugin-info h4 {
+  margin: 0 0 5px 0;
+  color: #333;
+}
+
+.plugin-info p {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.plugin-meta {
+  display: flex;
+  gap: 15px;
+  font-size: 12px;
+  color: #888;
+}
+
+.plugin-meta span {
+  display: inline-block;
+}
+
+.plugin-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.backup-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.backup-controls input, .backup-controls select {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.backup-list {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 10px;
+}
+
+.backup-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.backup-info h4 {
+  margin: 0 0 5px 0;
+  color: #333;
+}
+
+.backup-info p {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.backup-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.backup-actions .danger {
+  background-color: #dc3545;
+}
+
+.backup-actions .danger:hover:not(:disabled) {
   background-color: #c82333;
 }
 </style>
