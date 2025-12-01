@@ -5,16 +5,12 @@ FROM maven:3.9-eclipse-temurin-11 AS build-stage
 WORKDIR /app
 
 # Copy pom.xml and resolve dependencies
-# Note: In production, these would come from actual MCDash source
-# COPY ${MCDASH_PATH:-./mcdash-source}/pom.xml .
-# RUN mvn dependency:resolve
+COPY pom.xml .
+RUN mvn dependency:resolve
 
 # Copy source code
-# COPY ${MCDASH_PATH:-./mcdash-source}/src ./src
-# COPY ${MCDASH_PATH:-./mcdash-source}/webui ./webui
-
-# For demo purposes, create a simple JAR placeholder
-RUN echo "Creating demo MCDash JAR for monitoring setup" > /app/demo.txt
+COPY src ./src
+COPY webui ./webui
 
 # Build the application
 # RUN mvn clean package -DskipTests
