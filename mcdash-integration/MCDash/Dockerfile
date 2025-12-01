@@ -23,10 +23,11 @@ RUN apk add --no-cache curl wget
 
 WORKDIR /app
 
-# For demo purposes, create a simple echo service that responds to health checks
-RUN echo '#!/bin/sh\n\
-echo "HTTP/1.1 200 OK"\necho "Content-Type: application/json"\necho ""\necho \'{"status": "ok", "version": "demo-mcdash"}\'\n\
-' > /app/server.sh && chmod +x /app/server.sh
+# Install a simple web server
+RUN apk add --no-cache python3
+
+# Copy the Python HTTP server
+COPY server.py /app/server.py
 
 # Create data directory
 RUN mkdir -p /data
@@ -38,5 +39,5 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:8080/api/health || exit 1
 
-# Start demo service (in production this would be: CMD ["java", "-jar", "mcdash.jar"])
-CMD ["sh", "/app/server.sh"]
+# Start the Python web server
+CMD ["python3", "/app/server.py"]
