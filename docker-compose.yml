@@ -233,6 +233,7 @@ services:
       - ./landing/basop-bafep-stp-mc-landing/data:/data/worlds/mc-basop-bafep-stp:ro
       - ./landing/play-mc-landing/data:/data/worlds/mc-play:ro
       - ./overviewer-output:/data/output
+      - /opt/mc-server/minecraft-assets:/minecraft-assets:ro
     networks:
       - proxy
       - minecraft-net

@@ -1,32 +1,31 @@
 #!/bin/bash
+set -e
 
 # Function to generate config and render
 render_map() {
-    SERVER_NAME="$1"
-    WORLD_PATH="$2"
-    OUTPUT_NAME="$3"
-    TITLE="$4"
+    SERVER_NAME=""
+    WORLD_PATH=""
+    OUTPUT_NAME=""
+    TITLE=""
 
-    echo "Starting render for $TITLE ($SERVER_NAME from $WORLD_PATH)..."
+    echo "Starting render for  ( from )..."
     
-    # Ensure output directory exists
-    mkdir -p /data/output/$OUTPUT_NAME
+    mkdir -p /data/output/
 
-    # Create config file
-    cat > /tmp/config_$SERVER_NAME.py <<CONFIG
-outputdir = "/data/output/$OUTPUT_NAME"
-worlds["$SERVER_NAME"] = "$WORLD_PATH"
+    cat > /tmp/config_.py <<CONFIG
+outputdir = "/data/output/"
+texturepath = "/minecraft-assets"
+worlds[""] = ""
 
 renders["day"] = {
-    "world": "$SERVER_NAME",
+    "world": "",
     "title": "Day",
     "rendermode": "smooth_lighting",
     "dimension": "overworld",
 }
 CONFIG
 
-    # Run overviewer
-    python3 /app/overviewer.py --config /tmp/config_$SERVER_NAME.py --processes 2
+    python3 /app/overviewer.py --config /tmp/config_.py --processes 2
 }
 
 # Render all mc-* projects that have world data mounted into overviewer
