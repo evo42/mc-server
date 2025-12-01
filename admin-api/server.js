@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const WebSocketService = require('./services/websocketService');
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 const { correlationIdMiddleware } = require('./middleware/correlationId');
+const prometheusMetrics = require('./services/prometheusMetrics');
 
 const path = require('path');
 const express = require('express');
@@ -13,6 +14,9 @@ const basicAuth = require('express-basic-auth');
 const serversRouter = require('./routes/servers');
 const datapacksRouter = require('./routes/datapacks');
 const publicRouter = require('./routes/public');
+const mcdashRouter = require('./routes/mcdash');
+const minecraftServerApiRouter = require('./routes/minecraft-serverapi');
+const overviewerRouter = require('./routes/overviewer');
 const historyService = require('./services/historyService');
 
 // Start history collection
@@ -69,6 +73,7 @@ const limiter = rateLimit({
 app.use(correlationIdMiddleware); // Add correlation ID middleware first
 app.use(httpLogger);
 app.use(express.json());
+app.use(prometheusMetrics.trackHttpRequests); // Track HTTP requests for Prometheus
 
 // Validation result handler middleware
 const handleValidationErrors = (req, res, next) => {
@@ -96,6 +101,21 @@ const publicLimiter = rateLimit({
 
 // Public routes (no auth required)
 app.use('/api/public', publicRouter); //_rate_limit_disabled_
+
+// Overviewer public maps static serving
+app.use('/public/overviewer', express.static('/data/output'));
+
+// Prometheus Metrics Endpoint
+app.get('/metrics', async (req, res) => {
+    try {
+        res.set('Content-Type', prometheusMetrics.register.contentType);
+        const metrics = await prometheusMetrics.register.metrics();
+        res.end(metrics);
+    } catch (error) {
+        logger.error('Error generating Prometheus metrics', { error: error.message });
+        res.status(500).end('Error generating metrics');
+    }
+});
 
 // Rate limiting for authentication attempts to prevent brute force
 const authLimiter = rateLimit({
@@ -147,6 +167,9 @@ app.use('/api', basicAuthMiddleware); //_rate_limit_disabled_
 app.use('/api/auth', require('./routes/auth')); // Authentication routes for JWT
 app.use('/api/servers', serversRouter);
 app.use('/api/backup', require('./routes/backup')); // Backup and restore functionality
+app.use('/api/mcdash', mcdashRouter); // MCDash integration routes
+app.use('/api/minecraft-serverapi', minecraftServerApiRouter); // MinecraftServerAPI integration routes
+app.use('/api/overviewer', overviewerRouter); // Minecraft Overviewer integration routes
 
 // Route for the admin page, with authentication
 app.get('/mc-admin', basicAuthMiddleware, (req, res) => {

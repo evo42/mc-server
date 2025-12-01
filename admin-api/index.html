@@ -1388,7 +1388,7 @@
         async function loadInstalledDatapacks() {
             try {
                 // Load datapacks for mc-ilias
-                const iliasResponse = await fetch('/api/datapacks/mc-ilias');
+                const iliasResponse = await fetch('/api/public/datapacks/mc-ilias');
                 const iliasData = await iliasResponse.json();
                 displayDatapacks('ilias', iliasData.datapacks);
             } catch (error) {
@@ -1398,7 +1398,7 @@
 
             try {
                 // Load datapacks for mc-niilo
-                const niiloResponse = await fetch('/api/datapacks/mc-niilo');
+                const niiloResponse = await fetch('/api/public/datapacks/mc-niilo');
                 const niiloData = await niiloResponse.json();
                 displayDatapacks('niilo', niiloData.datapacks);
             } catch (error) {
@@ -1408,7 +1408,7 @@
 
             try {
                 // Load datapacks for bgstpoelten
-                const bgstpoeltenResponse = await fetch('/api/datapacks/bgstpoelten');
+                const bgstpoeltenResponse = await fetch('/api/public/datapacks/mc-bgstpoelten');
                 const bgstpoeltenData = await bgstpoeltenResponse.json();
                 displayDatapacks('bgstpoelten', bgstpoeltenData.datapacks);
             } catch (error) {
@@ -1418,7 +1418,7 @@
 
             try {
                 // Load datapacks for htlstp
-                const htlstpResponse = await fetch('/api/datapacks/htlstp');
+                const htlstpResponse = await fetch('/api/public/datapacks/mc-htlstp');
                 const htlstpData = await htlstpResponse.json();
                 displayDatapacks('htlstp', htlstpData.datapacks);
             } catch (error) {
@@ -1428,7 +1428,7 @@
 
             try {
                 // Load datapacks for borgstpoelten
-                const borgstpoeltenResponse = await fetch('/api/datapacks/borgstpoelten');
+                const borgstpoeltenResponse = await fetch('/api/public/datapacks/mc-borgstpoelten');
                 const borgstpoeltenData = await borgstpoeltenResponse.json();
                 displayDatapacks('borgstpoelten', borgstpoeltenData.datapacks);
             } catch (error) {
@@ -1438,7 +1438,7 @@
 
             try {
                 // Load datapacks for hakstpoelten
-                const hakstpoeltenResponse = await fetch('/api/datapacks/hakstpoelten');
+                const hakstpoeltenResponse = await fetch('/api/public/datapacks/mc-hakstpoelten');
                 const hakstpoeltenData = await hakstpoeltenResponse.json();
                 displayDatapacks('hakstpoelten', hakstpoeltenData.datapacks);
             } catch (error) {
@@ -1448,7 +1448,7 @@
 
             try {
                 // Load datapacks for basopbafepstp
-                const basopbafepstpResponse = await fetch('/api/datapacks/basopbafepstp');
+                const basopbafepstpResponse = await fetch('/api/public/datapacks/mc-basop-bafep-stp');
                 const basopbafepstpData = await basopbafepstpResponse.json();
                 displayDatapacks('basopbafepstp', basopbafepstpData.datapacks);
             } catch (error) {
@@ -1458,7 +1458,7 @@
 
             try {
                 // Load datapacks for play
-                const playResponse = await fetch('/api/datapacks/play');
+                const playResponse = await fetch('/api/public/datapacks/mc-play');
                 const playData = await playResponse.json();
                 displayDatapacks('play', playData.datapacks);
             } catch (error) {

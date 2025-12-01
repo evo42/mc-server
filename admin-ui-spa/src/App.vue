@@ -19,6 +19,15 @@
             <li class="nav-item">
               <router-link class="nav-link" to="/datapacks">Datapacks</router-link>
             </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/mcdash">MCDash</router-link>
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/minecraft-serverapi">Server API</router-link>
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/overviewer">World Maps</router-link>
+            </li>
           </ul>
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">

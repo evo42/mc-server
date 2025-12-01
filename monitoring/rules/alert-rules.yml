@@ -1,0 +1,237 @@
+# Prometheus Alert Rules für Minecraft Server Platform
+groups:
+  - name: minecraft-platform.rules
+    rules:
+      # ================================
+      # KRITISCHE SYSTEM ALERTS
+      # ================================
+
+      # Server Down
+      - alert: MinecraftServerDown
+        expr: up{job="minecraft-servers"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: minecraft-server
+        annotations:
+          summary: "Minecraft Server {{ $labels.instance }} ist down"
+          description: "Server {{ $labels.instance }} ist seit mehr als 1 Minute nicht erreichbar"
+          actions: "Container Status prüfen: docker ps | grep {{ $labels.instance }}"
+          query: "up{job=\"minecraft-servers\",instance=\"{{ $labels.instance }}\"} == 0"
+
+      # Hohe CPU Auslastung
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
+        for: 5m
+        labels:
+          severity: warning
+          service: system
+        annotations:
+          summary: "Hohe CPU Auslastung auf {{ $labels.instance }}"
+          description: "CPU Auslastung ist {{ $value }}% für mehr als 5 Minuten"
+          actions: "System Load prüfen: top, htop, oder System Dashboard"
+          query: "100 - (avg by(instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100) > 85"
+
+      # Kritische CPU Auslastung
+      - alert: CriticalCPUUsage
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 95
+        for: 2m
+        labels:
+          severity: critical
+          service: system
+        annotations:
+          summary: "KRITISCHE CPU Auslastung auf {{ $labels.instance }}"
+          description: "CPU Auslastung ist {{ $value }}% für mehr als 2 Minuten"
+          actions: "SOFORTIGE AKTION: Container neustarten oder Scale up"
+          query: "100 - (avg by(instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100) > 95"
+
+      # Hoher Speicherverbrauch
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          service: system
+        annotations:
+          summary: "Hoher Speicherverbrauch auf {{ $labels.instance }}"
+          description: "Memory Auslastung ist {{ $value }}% für mehr als 5 Minuten"
+          actions: "Memory Usage prüfen: free -h, docker stats"
+          query: "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85"
+
+      # Kritischer Speicherverbrauch
+      - alert: CriticalMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 95
+        for: 2m
+        labels:
+          severity: critical
+          service: system
+        annotations:
+          summary: "KRITISCHER Speicherverbrauch auf {{ $labels.instance }}"
+          description: "Memory Auslastung ist {{ $value }}% für mehr als 2 Minuten"
+          actions: "SOFORTIGE AKTION: Memory Leaks prüfen oder Container neustarten"
+          query: "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 95"
+
+      # ================================
+      # CONTAINER ALERTS
+      # ================================
+
+      # Container Restart Loop
+      - alert: ContainerRestartLoop
+        expr: increase(container_start_time_seconds[10m]) > 5
+        for: 0m
+        labels:
+          severity: critical
+          service: container
+        annotations:
+          summary: "Container {{ $labels.name }} startet zu häufig"
+          description: "Container {{ $labels.name }} hat sich in den letzten 10 Minuten {{ $value }} mal neugestartet"
+          actions: "Container Logs prüfen: docker logs {{ $labels.name }}"
+          query: "increase(container_start_time_seconds{name=\"{{ $labels.name }}\"}[10m]) > 5"
+
+      # ================================
+      # APPLICATION ALERTS
+      # ================================
+
+      # Admin API nicht verfügbar
+      - alert: AdminAPIDown
+        expr: up{job="admin-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: admin-api
+        annotations:
+          summary: "Admin API ist nicht verfügbar"
+          description: "Admin API ist seit mehr als 1 Minute nicht erreichbar"
+          actions: "API Status prüfen: curl http://admin-api:3000/health"
+          query: "up{job=\"admin-api\"} == 0"
+
+      # Hohe API Response Zeit
+      - alert: HighAPIResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="admin-api"}[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+          service: admin-api
+        annotations:
+          summary: "Hohe API Response Zeit"
+          description: "95th percentile Response Zeit ist {{ $value }}s für mehr als 5 Minuten"
+          actions: "Performance Dashboard: http://grafana.${DOMAIN}/dashboard/db/admin-api"
+          query: "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job=\"admin-api\"}[5m])) > 1"
+
+      # Hohe Error Rate
+      - alert: HighAPIErrorRate
+        expr: rate(http_requests_total{job="admin-api",status=~"5.."}[5m]) / rate(http_requests_total{job="admin-api"}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: critical
+          service: admin-api
+        annotations:
+          summary: "Hohe API Error Rate"
+          description: "Error Rate ist {{ $value | humanizePercentage }} für mehr als 5 Minuten"
+          actions: "Error Logs prüfen: docker logs mc-admin-api"
+          query: "rate(http_requests_total{job=\"admin-api\",status=~\"5..\"}[5m]) / rate(http_requests_total{job=\"admin-api\"}[5m]) > 0.1"
+
+      # ================================
+      # MINECRAFT SPEZIFISCHE ALERTS
+      # ================================
+
+      # Niedrige Player Count
+      - alert: LowPlayerCount
+        expr: minecraft_players_online < 1
+        for: 15m
+        labels:
+          severity: info
+          service: minecraft-server
+        annotations:
+          summary: "Niedrige Player Count auf {{ $labels.server }}"
+          description: "Server {{ $labels.server }} hat nur {{ $value }} Spieler online"
+          actions: "Spielerschaft prüfen oder Marketing Aktionen erwägen"
+          query: "minecraft_players_online{server=\"{{ $labels.server }}\"} < 1"
+
+      # Server Lag
+      - alert: MinecraftServerLag
+        expr: minecraft_server_tick_duration_seconds > 0.05
+        for: 3m
+        labels:
+          severity: warning
+          service: minecraft-server
+        annotations:
+          summary: "Server Lag auf {{ $labels.server }}"
+          description: "Tick Dauer ist {{ $value }}s (normal < 0.05s)"
+          actions: "Server Performance prüfen, Plugins optimieren"
+          query: "minecraft_server_tick_duration_seconds{server=\"{{ $labels.server }}\"} > 0.05"
+
+      # ================================
+      # INFRASTRUCTURE ALERTS
+      # ================================
+
+      # Disk Space niedrig
+      - alert: LowDiskSpace
+        expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100 < 15
+        for: 5m
+        labels:
+          severity: warning
+          service: system
+        annotations:
+          summary: "Niedriger Disk Space auf {{ $labels.instance }}"
+          description: "Nur {{ $value }}% Disk Space verfügbar"
+          actions: "Disk Space cleanup: docker system prune, log rotation"
+          query: "(node_filesystem_avail_bytes{mountpoint=\"/\"} / node_filesystem_size_bytes{mountpoint=\"/\"}) * 100 < 15"
+
+      # Kritischer Disk Space
+      - alert: CriticalDiskSpace
+        expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100 < 5
+        for: 2m
+        labels:
+          severity: critical
+          service: system
+        annotations:
+          summary: "KRITISCHER Disk Space auf {{ $labels.instance }}"
+          description: "Nur {{ $value }}% Disk Space verfügbar - SOFORTIGE AKTION ERFORDERLICH"
+          actions: "SOFORTIGE AKTION: Logs löschen, Container stoppen, Disk erweitern"
+          query: "(node_filesystem_avail_bytes{mountpoint=\"/\"} / node_filesystem_size_bytes{mountpoint=\"/\"}) * 100 < 5"
+
+      # ================================
+      # SECURITY ALERTS
+      # ================================
+
+      # Ungewöhnlich viele Authentication Attempts
+      - alert: HighAuthAttempts
+        expr: rate(http_requests_total{job="admin-api",endpoint="/api/auth"}[5m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+          service: security
+        annotations:
+          summary: "Hohe Authentication Attempt Rate"
+          description: "{{ $value }} Authentication Attempts pro Sekunde"
+          actions: "Brute Force Attacke prüfen, IP Blacklisting erwägen"
+          query: "rate(http_requests_total{job=\"admin-api\",endpoint=\"/api/auth\"}[5m]) > 10"
+
+  - name: redis.rules
+    rules:
+      # Redis Verfügbarkeit
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: redis
+        annotations:
+          summary: "Redis Cache ist nicht verfügbar"
+          description: "Redis Cache ist seit mehr als 1 Minute nicht erreichbar"
+          actions: "Redis Status prüfen: redis-cli ping"
+          query: "up{job=\"redis\"} == 0"
+
+      # Redis hohe Memory Usage
+      - alert: RedisHighMemoryUsage
+        expr: redis_memory_used_bytes / redis_memory_max_bytes * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: redis
+        annotations:
+          summary: "Redis hohe Memory Usage"
+          description: "Redis Memory Usage ist {{ $value }}%"
+          actions: "Cache Size optimieren, Expiration Policies prüfen"
+          query: "redis_memory_used_bytes / redis_memory_max_bytes * 100 > 80"

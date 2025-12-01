@@ -1,0 +1,77 @@
+# Prometheus Configuration für Minecraft Server Platform
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'mc-server-platform'
+    environment: 'production'
+
+# Alerting rules
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+# Scrape Rules
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Node Exporter - System Metriken
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 15s
+
+  # cAdvisor - Container Metriken
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+    scrape_interval: 15s
+
+  # Admin API - Application Metriken
+  - job_name: 'admin-api'
+    static_configs:
+      - targets: ['admin-api:3000']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+
+  # Minecraft Server Metriken
+  - job_name: 'minecraft-servers'
+    static_configs:
+      - targets: [
+          'mc-ilias:25565',
+          'mc-niilo:25565',
+          'mc-bgstpoelten:25565',
+          'mc-htlstp:25565',
+          'mc-borgstpoelten:25565',
+          'mc-hakstpoelten:25565',
+          'mc-basop-bafep-stp:25565',
+          'mc-play:25565'
+        ]
+    scrape_interval: 30s
+    metrics_path: '/metrics'
+
+  # Redis Metriken
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+    scrape_interval: 15s
+
+  # Jaeger Metrics
+  - job_name: 'jaeger'
+    static_configs:
+      - targets: ['jaeger:14269']
+    scrape_interval: 30s
+
+# Remote Write für langfristige Speicherung (optional)
+# remote_write:
+#   - url: "http://victoriametrics:8428/api/v1/write"
+#     queue_config:
+#       max_samples_per_send: 10000
+#       max_shards: 200
+#       capacity: 2500

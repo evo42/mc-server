@@ -8,6 +8,9 @@ import Datapacks from './components/Datapacks.vue'
 import ServerConfiguration from './components/ServerConfiguration.vue'
 import BackupManagement from './components/BackupManagement.vue'
 import Dashboard from './components/Dashboard.vue'
+import MCDashIntegration from './components/MCDashIntegration.vue'
+import MinecraftServerAPIIntegration from './components/MinecraftServerAPIIntegration.vue'
+import OverviewerIntegration from './components/OverviewerIntegration.vue'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 import './assets/css/style.css'
@@ -19,7 +22,10 @@ const routes = [
   { path: '/datapacks/:server?', component: Datapacks },
   { path: '/server-config/:server', component: ServerConfiguration },
   { path: '/backup/:server', component: BackupManagement },
-  { path: '/dashboard', component: Dashboard }
+  { path: '/dashboard', component: Dashboard },
+  { path: '/mcdash', component: MCDashIntegration },
+  { path: '/minecraft-serverapi', component: MinecraftServerAPIIntegration },
+  { path: '/overviewer', component: OverviewerIntegration }
 ]
 
 // Create router
