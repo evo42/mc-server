@@ -217,6 +217,7 @@ services:
       context: ./overviewer-integration
       dockerfile: Dockerfile
     container_name: mc-overviewer
+    command: python3 -m http.server 8080 --directory /data/output
     ports:
       - "8083:8080"
     environment:
@@ -225,12 +226,12 @@ services:
     volumes:
       - ./mc-ilias/data:/data/worlds/mc-ilias:ro
       - ./mc-niilo/data:/data/worlds/mc-niilo:ro
-      - ./mc-bgstpoelten/data:/data/worlds/mc-bgstpoelten:ro
-      - ./mc-htlstp/data:/data/worlds/mc-htlstp:ro
-      - ./mc-borgstpoelten/data:/data/worlds/mc-borgstpoelten:ro
-      - ./mc-hakstpoelten/data:/data/worlds/mc-hakstpoelten:ro
-      - ./mc-basop-bafep-stp/data:/data/worlds/mc-basop-bafep-stp:ro
-      - ./mc-play/data:/data/worlds/mc-play:ro
+      - ./landing/bgstpoelten-mc-landing/data:/data/worlds/mc-bgstpoelten:ro
+      - ./landing/htlstp-mc-landing/data:/data/worlds/mc-htlstp:ro
+      - ./landing/borgstpoelten-mc-landing/data:/data/worlds/mc-borgstpoelten:ro
+      - ./landing/hakstpoelten-mc-landing/data:/data/worlds/mc-hakstpoelten:ro
+      - ./landing/basop-bafep-stp-mc-landing/data:/data/worlds/mc-basop-bafep-stp:ro
+      - ./landing/play-mc-landing/data:/data/worlds/mc-play:ro
       - ./overviewer-output:/data/output
     networks:
       - proxy
