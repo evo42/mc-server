@@ -37,6 +37,61 @@ RUN pip install --no-cache-dir --upgrade pip && \
     # Clean pip cache
     pip cache purge
 
+# ---------------------------------------------------------------------------
+# Install Pillow C headers required by Minecraft-Overviewer
+#
+# Overviewer needs the legacy Imaging C headers from Pillow to build its
+# C extension. When Pillow is installed via pip, those headers are not
+# installed system-wide by default. The official Overviewer docs recommend
+# downloading the matching Pillow sources and pointing PIL_INCLUDE_DIR at
+# the header location. Here we automate that inside the image so that
+# `python setup.py build_ext` can find Imaging.h.
+# ---------------------------------------------------------------------------
+RUN python - << 'PY'
+import os
+from distutils.sysconfig import get_python_inc
+import tarfile
+import tempfile
+import urllib.request
+
+from PIL import Image  # ensures Pillow is installed
+
+version = Image.__version__
+url = f"https://github.com/python-pillow/Pillow/archive/refs/tags/{version}.tar.gz"
+
+# Determine the Python include directory and our target Imaging/ folder.
+# This mirrors the logic in Minecraft-Overviewer's setup.py, which uses
+# get_python_inc(plat_specific=1) + '/Imaging'.
+include_root = get_python_inc(plat_specific=1)
+imaging_dir = os.path.join(include_root, "Imaging")
+os.makedirs(imaging_dir, exist_ok=True)
+
+with tempfile.TemporaryDirectory() as tmpdir:
+    archive_path = os.path.join(tmpdir, "pillow.tar.gz")
+    urllib.request.urlretrieve(url, archive_path)
+    with tarfile.open(archive_path, "r:gz") as tar:
+        tar.extractall(tmpdir)
+
+    # Find extracted Pillow source directory
+    pillow_src_root = None
+    for name in os.listdir(tmpdir):
+        candidate = os.path.join(tmpdir, name, "src", "libImaging")
+        if os.path.isdir(candidate):
+            pillow_src_root = candidate
+            break
+
+    if pillow_src_root is None:
+        raise SystemExit("Failed to locate Pillow src/libImaging in extracted archive")
+
+    for header in ("Imaging.h", "ImagingUtils.h", "ImPlatform.h"):
+        src = os.path.join(pillow_src_root, header)
+        dst = os.path.join(imaging_dir, header)
+        with open(src, "rb") as fsrc, open(dst, "wb") as fdst:
+            fdst.write(fsrc.read())
+
+print("Installed Pillow Imaging headers into:", imaging_dir)
+PY
+
 # Install Overviewer and its dependencies
 RUN python setup.py build_ext --inplace && \
     python setup.py install && \
