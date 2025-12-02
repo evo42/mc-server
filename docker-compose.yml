@@ -651,7 +651,7 @@ services:
       - ./bluemap-data:/app/web
       - ./bluemap-render-cache:/app/data/cache
       - ./bluemap-render-logs:/app/data/logs
-    command: ["-c", "/app/config", "-r", "-u", "-w"]
+    command: ["-c", "/app/config", "-w"]
     networks:
       - minecraft-net
     depends_on:

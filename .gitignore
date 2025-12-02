@@ -7,6 +7,11 @@
 /logs/
 **.log*s/
 
+
+# Data
+prometheus-data/
+
+
 # Node/JS
 node_modules/
 npm-debug.log*
