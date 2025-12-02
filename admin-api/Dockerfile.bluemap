@@ -12,6 +12,8 @@ RUN npm install --only=production
 COPY routes/ ./routes/
 COPY services/ ./services/
 COPY middleware/ ./middleware/
+COPY controllers/ ./controllers/
+COPY utils/ ./utils/
 COPY server.js ./
 
 # Create directories for BlueMap data

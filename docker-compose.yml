@@ -438,7 +438,7 @@ services:
   bluemap-api:
     build:
       context: ./admin-api
-      dockerfile: Dockerfile.bluemap
+      dockerfile: Dockerfile
     container_name: mc-bluemap-api
     env_file:
       - .env
@@ -473,7 +473,7 @@ services:
     image: ghcr.io/bluemap-minecraft/bluemap:v5.10
     container_name: mc-bluemap-web-basop-bafep-stp
     ports:
-      - "8081:8080"
+      - "8081:8100"
     volumes:
       - ./mc-basop-bafep-stp/data:/minecraft/world:ro
       - ./bluemap-migration/configs/mc-basop-bafep-stp:/webapp/conf:ro
@@ -491,11 +491,13 @@ services:
       retries: 3
       start_period: 120s
 
+    command: ["/bin/sh", "-c", "java -jar /app/cli.jar -w"]
+
   bluemap-web-mc-bgstpoelten:
     image: ghcr.io/bluemap-minecraft/bluemap:v5.10
     container_name: mc-bluemap-web-bgstpoelten
     ports:
-      - "8088:8080"
+      - "8082:8100"
     volumes:
       - ./landing/bgstpoelten-mc-landing/data:/minecraft/world:ro
       - ./bluemap-migration/configs/mc-bgstpoelten:/webapp/conf:ro
@@ -513,13 +515,13 @@ services:
       retries: 3
       start_period: 120s
 
-    command: ["-w"]
+    command: ["/bin/sh", "-c", "java -jar /app/cli.jar -w"]
 
   bluemap-web-mc-borgstpoelten:
     image: ghcr.io/bluemap-minecraft/bluemap:v5.10
     container_name: mc-bluemap-web-borgstpoelten
     ports:
-      - "8083:8080"
+      - "8083:8100"
     volumes:
       - ./landing/borgstpoelten-mc-landing/data:/minecraft/world:ro
       - ./bluemap-migration/configs/mc-borgstpoelten:/webapp/conf:ro
@@ -537,11 +539,13 @@ services:
       retries: 3
       start_period: 120s
 
+    command: ["/bin/sh", "-c", "java -jar /app/cli.jar -w"]
+
   bluemap-web-mc-hakstpoelten:
     image: ghcr.io/bluemap-minecraft/bluemap:v5.10
     container_name: mc-bluemap-web-hakstpoelten
     ports:
-      - "8084:8080"
+      - "8084:8100"
     volumes:
       - ./landing/hakstpoelten-mc-landing/data:/minecraft/world:ro
       - ./bluemap-migration/configs/mc-hakstpoelten:/webapp/conf:ro
@@ -559,11 +563,13 @@ services:
       retries: 3
       start_period: 120s
 
+    command: ["/bin/sh", "-c", "java -jar /app/cli.jar -w"]
+
   bluemap-web-mc-htlstp:
     image: ghcr.io/bluemap-minecraft/bluemap:v5.10
     container_name: mc-bluemap-web-htlstp
     ports:
-      - "8085:8080"
+      - "8085:8100"
     volumes:
       - ./landing/htlstp-mc-landing/data:/minecraft/world:ro
       - ./bluemap-migration/configs/mc-htlstp:/webapp/conf:ro
@@ -581,11 +587,13 @@ services:
       retries: 3
       start_period: 120s
 
+    command: ["/bin/sh", "-c", "java -jar /app/cli.jar -w"]
+
   bluemap-web-mc-ilias:
     image: ghcr.io/bluemap-minecraft/bluemap:v5.10
     container_name: mc-bluemap-web-ilias
     ports:
-      - "8086:8080"
+      - "8086:8100"
     volumes:
       - ./mc-ilias/data:/minecraft/world:ro
       - ./bluemap-migration/configs/mc-ilias:/webapp/conf:ro
@@ -603,11 +611,13 @@ services:
       retries: 3
       start_period: 120s
 
+    command: ["/bin/sh", "-c", "java -jar /app/cli.jar -w"]
+
   bluemap-web-mc-niilo:
     image: ghcr.io/bluemap-minecraft/bluemap:v5.10
     container_name: mc-bluemap-web-niilo
     ports:
-      - "8087:8080"
+      - "8087:8100"
     volumes:
       - ./mc-niilo/data:/minecraft/world:ro
       - ./bluemap-migration/configs/mc-niilo:/webapp/conf:ro
@@ -624,6 +634,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 120s
+
+    command: ["/bin/sh", "-c", "java -jar /app/cli.jar -w"]
 
   # BlueMap Render Engine (Lazy Server)
   bluemap-render-engine:
@@ -684,7 +696,7 @@ services:
     image: grafana/grafana:latest
     container_name: mc-grafana
     ports:
-      - "3001:3000"
+      - "3002:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin123}
       - GF_USERS_ALLOW_SIGN_UP=false
