@@ -1,48 +1,24 @@
 network_compression_threshold: 256
 remote_ping_timeout: 5000
-online_mode: false
 remote_ping_cache: -1
+online_mode: false
 forge_support: false
 max_packets_per_second: 4096
-listeners:
-- motd: '&1Virtual Minecraft Network - Use /server commands to switch'
-  tab_list: GLOBAL_PING
-  priorities:
-  - mc-play
-  host: 0.0.0.0:25565
-  max_players: 42
-  tab_size: 60
-  force_default_server: true
-  forced_hosts:
-    mc.ikaria.dev: mc-ilias
-    play.ikaria.dev: mc-ilias
-    mc.kdlk.net: mc-niilo
-    play.kdlk.net: mc-niilo
-    bgstpoelten.lerncraft.xyz: mc-bgstpoelten
-    htlstp.lerncraft.xyz: mc-htlstp
-    borgstpoelten.lerncraft.xyz: mc-borgstpoelten
-    hakstpoelten.lerncraft.xyz: mc-hakstpoelten
-    basop-bafep-stp.lerncraft.xyz: mc-basop-bafep-stp
-    live.lerncraft.xyz: mc-play
-  bind_local_address: true
-  ping_passthrough: false
-  query_enabled: false
-  query_port: 25577
-  proxy_protocol: false
+ip_forward: true
 disabled_commands:
 - disabledcommandhere
 max_packets_data_per_second: 33554432
-reject_transfers: false
 player_limit: 42
-connection_throttle: 4000
+reject_transfers: false
+log_commands: false
 connection_throttle_limit: 3
 prevent_proxy_connections: false
-log_commands: false
+connection_throttle: 4000
 log_pings: true
+stats: dda6340a-fbdb-4918-af26-aa66c9dc3b5d
 groups:
   rene:
   - admin
-stats: dda6340a-fbdb-4918-af26-aa66c9dc3b5d
 servers:
   mc-ilias:
     address: mc-ilias:25565
@@ -88,7 +64,31 @@ permissions:
   - bungeecord.command.send
   - bungeecord.command.server
   - bungeecord.command.list
-ip_forward: true
+listeners:
+- motd: '&1Virtual Minecraft Network - Use /server commands to switch'
+  tab_list: GLOBAL_PING
+  priorities:
+  - mc-play
+  host: 0.0.0.0:25565
+  max_players: 42
+  tab_size: 60
+  force_default_server: true
+  forced_hosts:
+    mc.ikaria.dev: mc-ilias
+    play.ikaria.dev: mc-ilias
+    mc.kdlk.net: mc-niilo
+    play.kdlk.net: mc-niilo
+    bgstpoelten.lerncraft.xyz: mc-bgstpoelten
+    htlstp.lerncraft.xyz: mc-htlstp
+    borgstpoelten.lerncraft.xyz: mc-borgstpoelten
+    hakstpoelten.lerncraft.xyz: mc-hakstpoelten
+    basop-bafep-stp.lerncraft.xyz: mc-basop-bafep-stp
+    live.lerncraft.xyz: mc-play
+  bind_local_address: true
+  ping_passthrough: false
+  query_enabled: false
+  query_port: 25577
+  proxy_protocol: false
 enforce_secure_profile: false
 server_connect_timeout: 5000
 timeout: 30000
