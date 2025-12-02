@@ -632,9 +632,7 @@ services:
 
   # BlueMap Render Engine (Lazy Server)
   bluemap-render-engine:
-    build:
-      context: ./bluemap-render-engine
-      dockerfile: Dockerfile
+    image: ghcr.io/bluemap-minecraft/bluemap:v5.10
     container_name: mc-bluemap-render-engine
     environment:
       - REDIS_HOST=redis
@@ -642,26 +640,29 @@ services:
       - REDIS_PASSWORD=${REDIS_PASSWORD:-redissecure123}
       - JAVA_OPTS=-Xmx2G -Xms1G
     volumes:
-      - ./mc-basop-bafep-stp/data:/data/worlds/mc-basop-bafep-stp:ro
-      - ./landing/bgstpoelten-mc-landing/data:/data/worlds/mc-bgstpoelten:ro
-      - ./landing/borgstpoelten-mc-landing/data:/data/worlds/mc-borgstpoelten:ro
-      - ./landing/hakstpoelten-mc-landing/data:/data/worlds/mc-hakstpoelten:ro
-      - ./landing/htlstp-mc-landing/data:/data/worlds/mc-htlstp:ro
-      - ./mc-ilias/data:/data/worlds/mc-ilias:ro
-      - ./mc-niilo/data:/data/worlds/mc-niilo:ro
-      - ./bluemap-render-cache:/data/cache
-      - ./bluemap-render-logs:/data/logs
+      - ./mc-basop-bafep-stp/data:/app/worlds/mc-basop-bafep-stp:ro
+      - ./landing/bgstpoelten-mc-landing/data:/app/worlds/mc-bgstpoelten:ro
+      - ./landing/borgstpoelten-mc-landing/data:/app/worlds/mc-borgstpoelten:ro
+      - ./landing/hakstpoelten-mc-landing/data:/app/worlds/mc-hakstpoelten:ro
+      - ./landing/htlstp-mc-landing/data:/app/worlds/mc-htlstp:ro
+      - ./mc-ilias/data:/app/worlds/mc-ilias:ro
+      - ./mc-niilo/data:/app/worlds/mc-niilo:ro
+      - ./bluemap-render-engine/config:/app/config
+      - ./bluemap-data:/app/web
+      - ./bluemap-render-cache:/app/data/cache
+      - ./bluemap-render-logs:/app/data/logs
+    command: ["-c", "/app/config", "-r", "-u", "-w"]
     networks:
       - minecraft-net
     depends_on:
       - redis
     restart: unless-stopped
-    deploy:
-      replicas: 1
-      resources:
-        limits:
-          memory: 3G
-          cpus: '2.0'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8100/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
 
   # Prometheus for BlueMap Metrics
   prometheus:
