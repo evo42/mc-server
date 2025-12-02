@@ -466,7 +466,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 60s
+      start_period: 120s
 
   # BlueMap Web Interface Servers (one per Minecraft server)
   bluemap-web-mc-basop-bafep-stp:
@@ -475,8 +475,8 @@ services:
     ports:
       - "8081:8100"
     volumes:
-      - ./mc-basop-bafep-stp/data:/minecraft/world:ro
-      - ./bluemap-migration/configs/mc-basop-bafep-stp:/webapp/conf:ro
+      - ./mc-basop-bafep-stp/data:/minecraft/worlds/mc-basop-bafep-stp:ro
+      - ./bluemap-migration/configs/mc-basop-bafep-stp:/webapp/conf
       - ./bluemap-data/mc-basop-bafep-stp:/webapp/data
     environment:
       - BLUEWEB_CONFIG_PATH=/webapp/conf
@@ -485,13 +485,12 @@ services:
       - minecraft-net
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      test: ["CMD", "curl", "-f", "http://localhost:8100/"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 120s
-
-    command: ["/bin/sh", "-c", "java -jar /app/cli.jar -w"]
+    command: ["-c", "/webapp/conf", "-w"]
 
   bluemap-web-mc-bgstpoelten:
     image: ghcr.io/bluemap-minecraft/bluemap:v5.10
@@ -499,8 +498,8 @@ services:
     ports:
       - "8082:8100"
     volumes:
-      - ./landing/bgstpoelten-mc-landing/data:/minecraft/world:ro
-      - ./bluemap-migration/configs/mc-bgstpoelten:/webapp/conf:ro
+      - ./landing/bgstpoelten-mc-landing/data:/minecraft/worlds/mc-bgstpoelten:ro
+      - ./bluemap-migration/configs/mc-bgstpoelten:/webapp/conf
       - ./bluemap-data/mc-bgstpoelten:/webapp/data
     environment:
       - BLUEWEB_CONFIG_PATH=/webapp/conf
@@ -509,13 +508,12 @@ services:
       - minecraft-net
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      test: ["CMD", "curl", "-f", "http://localhost:8100/"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 120s
-
-    command: ["/bin/sh", "-c", "java -jar /app/cli.jar -w"]
+    command: ["-c", "/webapp/conf", "-w"]
 
   bluemap-web-mc-borgstpoelten:
     image: ghcr.io/bluemap-minecraft/bluemap:v5.10
@@ -523,8 +521,8 @@ services:
     ports:
       - "8083:8100"
     volumes:
-      - ./landing/borgstpoelten-mc-landing/data:/minecraft/world:ro
-      - ./bluemap-migration/configs/mc-borgstpoelten:/webapp/conf:ro
+      - ./landing/borgstpoelten-mc-landing/data:/minecraft/worlds/mc-borgstpoelten:ro
+      - ./bluemap-migration/configs/mc-borgstpoelten:/webapp/conf
       - ./bluemap-data/mc-borgstpoelten:/webapp/data
     environment:
       - BLUEWEB_CONFIG_PATH=/webapp/conf
@@ -533,13 +531,12 @@ services:
       - minecraft-net
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      test: ["CMD", "curl", "-f", "http://localhost:8100/"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 120s
-
-    command: ["/bin/sh", "-c", "java -jar /app/cli.jar -w"]
+    command: ["-c", "/webapp/conf", "-w"]
 
   bluemap-web-mc-hakstpoelten:
     image: ghcr.io/bluemap-minecraft/bluemap:v5.10
@@ -547,8 +544,8 @@ services:
     ports:
       - "8084:8100"
     volumes:
-      - ./landing/hakstpoelten-mc-landing/data:/minecraft/world:ro
-      - ./bluemap-migration/configs/mc-hakstpoelten:/webapp/conf:ro
+      - ./landing/hakstpoelten-mc-landing/data:/minecraft/worlds/mc-hakstpoelten:ro
+      - ./bluemap-migration/configs/mc-hakstpoelten:/webapp/conf
       - ./bluemap-data/mc-hakstpoelten:/webapp/data
     environment:
       - BLUEWEB_CONFIG_PATH=/webapp/conf
@@ -557,13 +554,12 @@ services:
       - minecraft-net
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      test: ["CMD", "curl", "-f", "http://localhost:8100/"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 120s
-
-    command: ["/bin/sh", "-c", "java -jar /app/cli.jar -w"]
+    command: ["-c", "/webapp/conf", "-w"]
 
   bluemap-web-mc-htlstp:
     image: ghcr.io/bluemap-minecraft/bluemap:v5.10
@@ -571,8 +567,8 @@ services:
     ports:
       - "8085:8100"
     volumes:
-      - ./landing/htlstp-mc-landing/data:/minecraft/world:ro
-      - ./bluemap-migration/configs/mc-htlstp:/webapp/conf:ro
+      - ./landing/htlstp-mc-landing/data:/minecraft/worlds/mc-htlstp:ro
+      - ./bluemap-migration/configs/mc-htlstp:/webapp/conf
       - ./bluemap-data/mc-htlstp:/webapp/data
     environment:
       - BLUEWEB_CONFIG_PATH=/webapp/conf
@@ -581,13 +577,12 @@ services:
       - minecraft-net
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      test: ["CMD", "curl", "-f", "http://localhost:8100/"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 120s
-
-    command: ["/bin/sh", "-c", "java -jar /app/cli.jar -w"]
+    command: ["-c", "/webapp/conf", "-w"]
 
   bluemap-web-mc-ilias:
     image: ghcr.io/bluemap-minecraft/bluemap:v5.10
@@ -595,8 +590,8 @@ services:
     ports:
       - "8086:8100"
     volumes:
-      - ./mc-ilias/data:/minecraft/world:ro
-      - ./bluemap-migration/configs/mc-ilias:/webapp/conf:ro
+      - ./mc-ilias/data:/minecraft/worlds/mc-ilias:ro
+      - ./bluemap-migration/configs/mc-ilias:/webapp/conf
       - ./bluemap-data/mc-ilias:/webapp/data
     environment:
       - BLUEWEB_CONFIG_PATH=/webapp/conf
@@ -605,13 +600,12 @@ services:
       - minecraft-net
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      test: ["CMD", "curl", "-f", "http://localhost:8100/"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 120s
-
-    command: ["/bin/sh", "-c", "java -jar /app/cli.jar -w"]
+    command: ["-c", "/webapp/conf", "-w"]
 
   bluemap-web-mc-niilo:
     image: ghcr.io/bluemap-minecraft/bluemap:v5.10
@@ -619,8 +613,8 @@ services:
     ports:
       - "8087:8100"
     volumes:
-      - ./mc-niilo/data:/minecraft/world:ro
-      - ./bluemap-migration/configs/mc-niilo:/webapp/conf:ro
+      - ./mc-niilo/data:/minecraft/worlds/mc-niilo:ro
+      - ./bluemap-migration/configs/mc-niilo:/webapp/conf
       - ./bluemap-data/mc-niilo:/webapp/data
     environment:
       - BLUEWEB_CONFIG_PATH=/webapp/conf
@@ -629,13 +623,12 @@ services:
       - minecraft-net
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      test: ["CMD", "curl", "-f", "http://localhost:8100/"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 120s
-
-    command: ["/bin/sh", "-c", "java -jar /app/cli.jar -w"]
+    command: ["-c", "/webapp/conf", "-w"]
 
   # BlueMap Render Engine (Lazy Server)
   bluemap-render-engine:
@@ -677,7 +670,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus-data:/prometheus
+      - ./prometheus-data:/prometheus:Z
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
@@ -686,10 +679,12 @@ services:
       - '--web.console.templates=/etc/prometheus/consoles'
       - '--storage.tsdb.retention.time=200h'
       - '--web.enable-lifecycle'
+      - '--storage.tsdb.retention.size=10GB'
     networks:
       - proxy
       - minecraft-net
     restart: unless-stopped
+    user: "root"
 
   # Grafana for BlueMap Visualization
   grafana:
