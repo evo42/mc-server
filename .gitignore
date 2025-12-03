@@ -1,6 +1,10 @@
 # Secrets
 .secrets
 
+# Data
+prometheus-data
+grafana-data
+
 # Logs
 *.log*
 *.log*.gz
